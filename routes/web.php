@@ -19,6 +19,10 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/usuarios', function () {
     return view('usuarios');
-});
+})->name('usuarios');
+
+Route::get('/control-acceso', function () {
+    return view('controlacceso');
+})->name('controlacceso');
 
 require __DIR__.'/auth.php';

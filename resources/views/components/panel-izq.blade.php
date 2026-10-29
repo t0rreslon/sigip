@@ -17,7 +17,7 @@
                 <span>Inicio</span>
             </a>
 
-            <a href="#" class="button-options">
+            <a href="{{ route('usuarios') }}" class="button-options">
                 <img src="https://img.icons8.com/pastel-glyph/64/conference-call.png"
                     alt="">
                 <span>Usuarios</span>
@@ -35,7 +35,7 @@
                 <span>Pagos QR</span>
             </a>
 
-            <a href="#" class="button-options">
+            <a href="{{ route('controlacceso') }}" class="button-options">
                 <img src="https://img.icons8.com/fluency-systems-regular/24/door-opened.png"
                     alt="">
                 <span>Control de acceso</span>
