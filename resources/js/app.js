@@ -10,3 +10,4 @@ Alpine.start();
 import '../css/styles2.css';
 import '../css/panel_izq.css';
 import '../css/nav_bar.css';
+import '../css/styles_control_acceso.css';

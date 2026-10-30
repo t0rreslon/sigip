@@ -277,7 +277,7 @@
                     </form>
                 </dialog>
             <!-- CIERRA POP-UP DEL FORMULARIO DE REGISTRO -->
-                <div class="contenido-cuentas flexbox">
+                <div class="contenido-cuentas">
                     <!-- se deberian de cambiar los nombres de los id, ya que no son nada descriptivos ni intituivos -->
                     <p style="color: #2463A6" id="blue">128 registrados</p>
                     <p style="color: #198754" id="green">112 activos</p>
@@ -288,7 +288,7 @@
                         <button type="button">Todos los usuarios</button>
                         <button type="button">Personal del gimansio</button>
                     </div>
-                    <div class="busquedas flexbox">
+                    <div class="busquedas">
                         <div class="buscar">
                             <svg
                                 class="icono-busqueda"

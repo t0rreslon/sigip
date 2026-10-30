@@ -10,14 +10,16 @@ body{
     margin: 0;
     min-height: 100%;
     background-color: #F3F5F8;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 /* ACOMODAR EL ESPACIO ENTRE PANELES Y TABBLAS */
 .flexbox {
     display: flex;
-    align-items: flex-start;
-    width: 100vw;
-    height: 100vh;
+    align-items: stretch;
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
 }
 
 aside, .panel-izquierdo { 
@@ -34,17 +36,18 @@ aside, .panel-izquierdo {
 
 /* PANEL DERECHO */
 .panel-dere {
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
     width: 0;
-    height: 100vh;
-    max-height: none;
+    min-height: 100vh;
+    height: auto;
     background-color: #F3F5F8;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    padding: 0px;
-    overflow-y: auto;
+    padding: 0;
+    overflow: visible;
+    margin-left: 236px;
 }
 
 /* ----------------------------------------------------------------------- */
@@ -162,7 +165,13 @@ aside, .panel-izquierdo {
 
 .contenido-cuentas{
     width: 100%;
-    height: 24px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
 }
 
 .contenido-cuentas p{
@@ -198,6 +207,7 @@ aside, .panel-izquierdo {
     padding: 16px;
     background-color: #ffffff;
     margin-top: 10px;
+    margin-bottom: 50px;
 }
 
 .pestanas{
@@ -420,15 +430,11 @@ aside, .panel-izquierdo {
     max-width: 100%;
     min-width: 0;
     margin-top: 2px;
-
-    overflow-x: auto;
-    overflow-y: auto;
-
+    overflow: visible;
     background-color: #FFFFFF;
     border: none;
     border-radius: 6px;
-
-    max-height: 426px;
+    max-height: none;
 }
 
 .tabla-users{
@@ -455,7 +461,9 @@ aside, .panel-izquierdo {
     padding: 14px 12px;
     background-color: #F3F5F8;
     border-bottom: 2px solid #D0D5DD;
-
+    position: sticky;
+    top: 0;
+    z-index: 1; /* Mantiene el encabezado por encima del contenido */
     text-align: left;
     vertical-align: middle;
     white-space: normal;
