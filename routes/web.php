@@ -25,4 +25,8 @@ Route::get('/control-acceso', function () {
     return view('controlacceso');
 })->name('controlacceso');
 
+Route::get('/prestamos', function () {
+    return view('prestamos');
+})->name('prestamos');
+
 require __DIR__.'/auth.php';

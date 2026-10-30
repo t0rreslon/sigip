@@ -1,0 +1,12 @@
+/* CONTENIDO PRINCIPAL DE PRESTAMOS */
+.contenido-prestamos{
+    height: auto;
+    max-height: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding-top: 24px;
+    padding-right: 32px;
+    padding-left: 32px;
+    box-sizing: border-box;
+}

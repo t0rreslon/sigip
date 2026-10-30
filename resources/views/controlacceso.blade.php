@@ -28,7 +28,7 @@
         <!-- ABRE PANEL DERECHO -->
         <div class="panel-dere">
             <!-- ABRE NAVBAR -->
-                <x-nav_bar />
+            <x-nav_bar />
             <!-- CIERRA NAVBAR -->
             <!-- ABRE CONTENIDO PRINCIPAL -->
             <main class="contenido-principal">
