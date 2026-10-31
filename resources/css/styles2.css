@@ -380,7 +380,8 @@ aside, .panel-izquierdo {
 
 /* Combo-box */
 .combobox-estado {
-    width: 100%;
+    width: auto;
+    min-width: 0;
     min-height: 42px;
     padding: 10px 14px;
     background-color: #FFFFFF;
@@ -415,17 +416,6 @@ aside, .panel-izquierdo {
 /* TABLA DE CONTENIDO DE USUARIOS */
 
 .tabla{
-    /*
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    margin-top: 2px;
-    overflow-x: auto;
-    overflow-y: auto;
-    background-color: #ffffff;
-    border: none;
-    max-height: 426px;
-    */
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -438,26 +428,13 @@ aside, .panel-izquierdo {
 }
 
 .tabla-users{
-    /*
     width: 100%;
     min-width: 850px;
-    border-collapse: collapse;
-    table-layout: auto;
-    */
-    width: 100%;
-    min-width: 850px;
-
     border-collapse: collapse;
     table-layout: fixed;
 }
 
 .tabla-users thead th{
-    /* padding: 16px 18px;
-    background-color: #F3F5F8;
-    border-bottom: 2px solid #D0D5DD;
-    text-align: left;
-    white-space: nowrap;
-    color: #667085; */
     padding: 14px 12px;
     background-color: #F3F5F8;
     border-bottom: 2px solid #D0D5DD;

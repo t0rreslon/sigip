@@ -47,7 +47,7 @@
                 <span>Reservas de espacios</span>
             </a>
 
-            <a href="#" class="button-options">
+            <a href="{{ route('prestamos') }}" class="button-options">
                 <img src="https://img.icons8.com/pulsar-line/48/handshake.png"
                     alt="">
                 <span>Préstamos y devoluciones</span>

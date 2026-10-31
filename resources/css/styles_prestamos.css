@@ -10,3 +10,284 @@
     padding-left: 32px;
     box-sizing: border-box;
 }
+
+/* ESTRUCTURA GENERAL DE LA SECCIÓN DE PRESTAMOS */
+.contenido-prestamos {
+    width: 100%;
+    padding-top: 24px;
+    padding-right: 32px;
+    padding-left: 32px;
+    box-sizing: border-box;
+}
+
+/* CONTENEDOR GRID DE TARJETAS */
+.disponibilidad-elementos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    width: 100%;
+    margin-top: 24px;
+    box-sizing: border-box;
+}
+
+/* TARJETA INDIVIDUAL */
+.tarjeta-metrica {
+    background-color: #ffffff;
+    border: 1px solid #E0E0E0;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 120px;
+    box-sizing: border-box;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.tarjeta-metrica:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+/* ENCABEZADO DE LA TARJETA (Título + Icono) */
+.tarjeta-metrica-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.titulo-implemento {
+    font-size: 13.5px;
+    color: #64748B;
+    font-weight: 500;
+}
+
+.icono-metrica {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* CUERPO DE LA TARJETA (Número grande + Detalle) */
+.tarjeta-metrica-cuerpo {
+    display: flex;
+    flex-direction: column;
+}
+
+.tarjeta-metrica-cuerpo .cantidad {
+    font-size: 28px;
+    font-weight: 700;
+    color: #182C46;
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
+
+.tarjeta-metrica-cuerpo .detalle {
+    font-size: 12px;
+    color: #64748B;
+}
+
+/* COMBOBOX DE categoria */
+/* Contenedor */
+.categoria {
+    flex: 0 1 190px;
+    /* display: flex; */
+    flex-direction: column;
+    gap: 6px;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+}
+
+/* Combo-box */
+.combobox-categoria {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    padding: 10px 14px;
+    background-color: #FFFFFF;
+    color: #667085;
+    border: 1px solid #D0D5DD;
+    border-radius: 6px;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Al seleccionar */
+.combobox-categoria:focus {
+    border-color: #2463A6;
+    box-shadow: 0 0 0 3px rgba(36, 99, 166, 0.12);
+}
+
+/* Opciones */
+.combobox-categoria option {
+    background-color: #FFFFFF;
+    color: #17365D;
+    padding: 10px;
+}
+
+/* Placeholder */
+.combobox-categoria option:disabled {
+    color: #98A2B3;
+}
+
+/* COMBOBOX DE ESTADO */
+/* Contenedor */
+.estados{
+    /* display: flex; */
+    flex: 01 190px;
+    flex-direction: column;
+    gap: 6px;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+}
+
+/* Combo-box */
+.combobox-estado {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 14px;
+    background-color: #FFFFFF;
+    color: #667085;
+    border: 1px solid #D0D5DD;
+    border-radius: 6px;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Al seleccionar */
+.combobox-estado:focus {
+    border-color: #2463A6;
+    box-shadow: 0 0 0 3px rgba(36, 99, 166, 0.12);
+}
+
+/* Opciones */
+.combobox-estado option {
+    background-color: #FFFFFF;
+    color: #17365D;
+    padding: 10px;
+}
+
+/* Placeholder */
+.combobox-estado option:disabled {
+    color: #98A2B3;
+}
+
+/* ESTILOS TABLA PRESTAMO */
+
+.tabla-prestamos{
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.tabla-prestamos thead th{
+    padding: 14px 12px;
+    background-color: #F3F5F8;
+    border-bottom: 2px solid #D0D5DD;
+    position: sticky;
+    top: 0;
+    z-index: 1; /* Mantiene el encabezado por encima del contenido */
+    text-align: left;
+    vertical-align: middle;
+    white-space: normal;
+    overflow-wrap: break-word;
+    color: #667085;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* estilos independientes de cada columna */
+/* MANEJO DE LAS COLUMNAS INDEPENDIENTES */
+
+.tabla-prestamos .col-identificacion{
+    width: 14%;
+    color: #334155;
+    font-size: 13px;
+}
+
+.tabla-prestamos .col-categoria{
+    width: 12%;
+    color: #334155;
+    font-size: 13px;
+}
+
+.tabla-prestamos .col-responsable{
+    width: 12%;
+    color: #334155;
+    font-size: 13px;
+}
+
+.tabla-prestamos .col-prestamo{
+    width: 10%;
+    color: #344054;
+    font-size: 13px;
+}
+
+.tabla-prestamos .col-estado{
+    width: 10%;
+    color: #344054;
+    font-size: 13px;
+}
+
+.tabla-prestamos .col-devolucion{
+    width: 11%;
+    color: #667085;
+    font-size: 12px;
+}
+
+/* Espaciado de las celdas */
+.tabla-prestamos tbody td {
+    padding: 14px 12px;
+    vertical-align: middle;
+    color: #334155;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+/* ESTILOS DEL BOTÓN: Registrar devolución */
+.registrar-devolucion {
+    background-color: #EBF5FF;
+    color: #2463A6;
+    border: 1px solid #C3D9FF;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.registrar-devolucion:hover {
+    background-color: #2463A6;
+    color: #FFFFFF;
+    border-color: #2463A6;
+    box-shadow: 0 2px 4px rgba(36, 99, 166, 0.2);
+}
+
+/* ESTILOS DE LAS FILAS */
+
+.tabla-prestamos tbody tr {
+    background: #FFFFFF;
+    border-bottom: 1px solid #E4E7EC;
+    transition: background-color 0.2s ease;
+}
+
+.tabla-prestamos tbody tr:nth-child(even) {
+    background: #F9FAFB;
+}
+.tabla-prestamos tbody tr:hover {
+    background: #F3F5F8;
+}
