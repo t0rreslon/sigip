@@ -8,6 +8,7 @@
     @vite(['resources/js/app.js'])
     <!-- javascrpit del pop-out -->
     @vite(['resources/js/app.js', 'resources/js/pop_out.js'])
+    @vite(['resources/js/app.js', 'resources/js/devolucion-prestamo.js'])
     <!-- bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
     <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
@@ -118,7 +119,7 @@
                                 <!-- ESTADO -->
                                 <div class="col-md-6">
                                     <label for="estado_prestamo" class="form-label">
-                                        Estado del usuario
+                                        Estado del prestamo
                                     </label>
                                     <select
                                         class="form-select"
@@ -148,11 +149,12 @@
                                     type="submit"
                                     class="btn-guardar"
                                 >
-                                    Guardar usuario
+                                    Guardar prestamo
                                 </button>
                             </div>
                         </form>
                     </dialog>
+                    <!-- CIERRA POP OUT DE REGISTRAR PRESTAMO -->
                     <!-- ABRE DISPONIBILIDAD DE ELEMENTOS -->
                     <div class="disponibilidad-elementos">
                         <!-- TARJETA 1: Colchonetas -->
@@ -316,7 +318,7 @@
                                     </td>
                                     <td class="col-estado">
                                         <span class="estado activo">Activo</span>
-                                        <button class="registrar-devolucion">
+                                        <button class="registrar-devolucion" type="button">
                                             Registrar devolucion
                                         </button>
                                     </td>
@@ -340,7 +342,7 @@
                                     </td>
                                     <td class="col-estado">
                                         <span class="estado activo">Activo</span>
-                                        <button class="registrar-devolucion">
+                                        <button class="registrar-devolucion" type="button">
                                             Registrar devolucion
                                         </button>
                                     </td>
@@ -364,7 +366,7 @@
                                     </td>
                                     <td class="col-estado">
                                         <span class="estado activo">Activo</span>
-                                        <button class="registrar-devolucion">
+                                        <button class="registrar-devolucion" type="button">
                                             Registrar devolucion
                                         </button>
                                     </td>
@@ -388,122 +390,137 @@
                                     </td>
                                     <td class="col-estado">
                                         <span class="estado activo">Activo</span>
-                                        <button class="registrar-devolucion" id="abrir-dialogo">
+                                        <button class="registrar-devolucion" type="button">
                                             Registrar devolucion
                                         </button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                        <dialog id="modalRegistro" class="modal-registro">
+                        <!-- CIERRA TABLA -->
+                        <!-- ABRE POP OUT DE REGISTRAR DEVOLUCION -->
+                    <dialog id="modalDevolucion" class="modal-registro">
+                        <!-- ENCABEZADO -->
                         <div class="modal-encabezado">
                             <div>
-                                <h2>Registrar prestamo</h2>
-                                <p>Ingresa la información para registrar un prestamo en SIGIP.</p>
+                                <h2>Registrar devolución</h2>
+                                <p class="modal-subtitulo">10 · PR-041 · Mariana López</p>
                             </div>
-                            <button
-                                type="button"
-                                id="btnCerrar"
-                                class="btn-cerrar"
-                                aria-label="Cerrar formulario"
-                            >
+                            <button type="button" id="btnCerrarDev" class="btn-cerrar" aria-label="Cerrar formulario">
                                 &times;
                             </button>
                         </div>
+                        <!-- INFORMACIÓN RESUMEN -->
+                        <div class="modal-info-resumen">
+                            <div class="resumen-col">
+                                <span class="label">Implemento / préstamo</span>
+                                <span class="valor">IMP-01 · Colchoneta · 2 unidades</span>
+                            </div>
+                            <div class="resumen-col">
+                                <span class="label">Salida / prevista</span>
+                                <span class="valor">22 oct · 10:15 / 11:15</span>
+                            </div>
+                        </div>
+                        <!-- FORMULARIO -->
                         <form id="formRegistro">
                             <div class="row g-3">
-                                <!-- USUARIO -->
+                                
+                                <!-- CANTIDAD RECIBIDA -->
                                 <div class="col-md-6">
-                                    <label for="documento" class="form-label">Documento</label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="documento"
-                                        name="documento"
-                                        placeholder="Ingrese el documento del usuario"
-                                        autocomplete="given-name"
-                                        required
-                                    >
+                                    <div class="campo-box">
+                                        <label for="documento" class="form-label">Cantidad recibida *</label>
+                                        <input 
+                                            type="number" 
+                                            class="form-control" 
+                                            id="documento" 
+                                            name="documento" 
+                                            value="2" 
+                                            required
+                                        >
+                                        <span class="ayuda-input">Pendientes de este préstamo: 2.</span>
+                                    </div>
                                 </div>
-                                <!-- DOCUMENTO OPERARIO -->
+                                <!-- FECHA / HORA REAL -->
                                 <div class="col-md-6">
-                                    <label for="documento_op" class="form-label">Documento del operador</label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="documento_op"
-                                        name="documento_op"
-                                        placeholder="Ingrese documento del operario"
-                                        autocomplete="given-name"
-                                        required
-                                    >
+                                    <div class="campo-box">
+                                        <label for="fecha_devolucion" class="form-label">Fecha / hora real *</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            id="fecha_devolucion" 
+                                            name="fecha_devolucion" 
+                                            value="22 oct 2026 · 11:05" 
+                                            required
+                                        >
+                                    </div>
                                 </div>
-                                <!-- FECHA DE PRESTAMO -->
-                                <div class="col-md-6">
-                                    <label for="fecha_prestamo" class="form-label">
-                                        Fecha de prestamo
-                                    </label>
-                                    <input
-                                        type="date"
-                                        class="form-control"
-                                        id="fecha_prestamo"
-                                        name="fecha_prestamo"
-                                        required
-                                    >
+                                <!-- ESTADO RECIBIDO -->
+                                <div class="col-md-12">
+                                    <div class="campo-box">
+                                        <label for="estado_prestamo" class="form-label">Estado recibido *</label>
+                                        <select class="form-select" id="estado_prestamo" name="estado_prestamo" required>
+                                            <option value="buen-estado" selected>Buen estado · Disponible</option>
+                                            <option value="danado">Dañado · Mantenimiento</option>
+                                            <option value="incompleto">Incompleto</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <!-- FECHA DE DEVOLUCION -->
-                                <div class="col-md-6">
-                                    <label for="fecha_devolucion" class="form-label">
-                                        Fecha de devolucion
-                                    </label>
-                                    <input
-                                        type="date"
-                                        class="form-control"
-                                        id="fecha_devolucion"
-                                        name="fecha_devolucion"
-                                        required
-                                    >
+                                <!-- OBSERVACIONES -->
+                                <div class="col-md-12">
+                                    <div class="campo-box">
+                                        <label for="documento_op" class="form-label">Observaciones</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            id="documento_op" 
+                                            name="documento_op" 
+                                            value="Devolución completa, sin novedades."
+                                        >
+                                    </div>
                                 </div>
-                                <!-- ESTADO -->
-                                <div class="col-md-6">
-                                    <label for="estado_prestamo" class="form-label">
-                                        Estado del usuario
-                                    </label>
-                                    <select
-                                        class="form-select"
-                                        id="estado_prestamo"
-                                        name="estado_prestamo"
-                                        required
-                                    >
-                                        <option value="" selected disabled>
-                                            Seleccionar estado
-                                        </option>
-                                        <option value="prendiente">Pendiente</option>
-                                        <option value="finalizado">Finalizado</option>
-                                        <option value="en-curso">En curso</option>
-                                    </select>
+                                <!-- OPERADOR QUE RECIBE (DESHABILITADO/READONLY) -->
+                                <div class="col-md-12">
+                                    <div class="campo-box campo-deshabilitado">
+                                        <label for="fecha_prestamo" class="form-label">Operador que recibe</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            id="fecha_prestamo" 
+                                            name="fecha_prestamo" 
+                                            value="Carlos Ruiz" 
+                                            readonly
+                                        >
+                                    </div>
+                                </div>
+                                <!-- ALERTA / BANNER VERDE -->
+                                <div class="col-md-12">
+                                    <div class="banner-confirmacion">
+                                        <div class="icono-check">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#137333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                            </svg>
+                                        </div>
+                                        <div class="texto-banner">
+                                            <strong>Al confirmar: préstamo Devuelto</strong>
+                                            <p>8 disponibles + 2 devueltas = 10 disponibles. Si hay daño, enviar a mantenimiento y no sumar esas unidades a disponibilidad.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- BOTONES -->
+                            <!-- ACCIONES Y BOTONES -->
                             <div class="modal-acciones">
-                                <button
-                                    type="button"
-                                    id="btnCancelar"
-                                    class="btn-cancelar"
-                                >
+                                <button type="button" id="btnCancelarDev" class="btn-cancelar">
                                     Cancelar
                                 </button>
-                                <button
-                                    type="submit"
-                                    class="btn-guardar"
-                                >
-                                    Guardar usuario
+                                <button type="submit" class="btn-guardar">
+                                    Confirmar devolución
                                 </button>
                             </div>
                         </form>
                     </dialog>
+                    <!-- CIERRA POP OUT DE REGISTRAR PRESTAMO -->
                     </div>
-                    <!-- CIERRA TABLA -->
                     <!-- ABRE PAGINACION -->
                     <div class="paginacion">
                         <p class="texto-registros">Mostrando 1-3 de 128 registros</p>

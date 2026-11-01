@@ -25,3 +25,4 @@ formulario.addEventListener("submit", (event) => {
     formulario.reset();
     modal.close();
 });
+
