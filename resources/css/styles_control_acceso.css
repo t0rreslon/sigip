@@ -128,7 +128,7 @@
 /* ESTILOS DEL CONTENEDOR DE VALIDACIÓN DE INGRESO */
 .validacion-ingreso {
     display: flex;
-    gap: 20px;
+    gap: 16px;
     margin-top: 24px;
     width: 100%;
     align-items: stretch;
@@ -137,7 +137,9 @@
 
 /* TARJETA DE DATOS (IZQUIERDA) */
 .tarjeta-usuario {
-    flex: 2;
+    flex: 1.2;
+    min-width: 0;
+    max-width: 55%;
     background-color: #ffffff;
     border: 1px solid #E0E0E0;
     border-radius: 12px;
@@ -253,7 +255,9 @@
 }
 
 .btn-registrar-ingreso {
+    flex: 1;
     width: 100%;
+    min-width: 0;
     height: 42px;
     background-color: #2463A6;
     color: #ffffff;
@@ -267,6 +271,7 @@
     justify-content: center;
     gap: 8px;
     cursor: pointer;
+    white-space: nowrap;
     transition: background-color 0.2s ease;
 }
 
@@ -357,4 +362,40 @@
 .historial-tabla .nombre-usuario {
     font-weight: 500;
     color: #0F172A;
+}
+
+/* CONTENEDOR DE LOS BOTONES */
+.acciones-acceso {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+/* BOTÓN REGISTRAR SALIDA */
+.btn-registrar-salida {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    align-items: center;
+    padding: 0 10px;
+    white-space: nowrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border: 1px solid #2463A6;
+    border-radius: 6px;
+    background-color: #FFFFFF;
+    color: #2463A6;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-registrar-salida:hover {
+    background-color: #EAF2FB;
 }
