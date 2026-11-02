@@ -21,4 +21,8 @@ Route::get('/usuarios', function () {
     return view('usuarios');
 });
 
+Route::get('/pagos', function () {
+    return view('pagos');
+});
+
 require __DIR__.'/auth.php';
