@@ -33,7 +33,7 @@
 /* TARJETA INDIVIDUAL */
 .tarjeta-metrica {
     background-color: #ffffff;
-    border: 1px solid #E0E0E0;
+    border: 1px solid var(--borde, #e8dcec);
     border-radius: 12px;
     padding: 20px;
     display: flex;
@@ -59,7 +59,7 @@
 
 .titulo-implemento {
     font-size: 13.5px;
-    color: #64748B;
+    color: var(--texto-suave, #77647f);
     font-weight: 500;
 }
 
@@ -78,14 +78,14 @@
 .tarjeta-metrica-cuerpo .cantidad {
     font-size: 28px;
     font-weight: 700;
-    color: #182C46;
+    color: var(--texto, #2a1633);
     line-height: 1.1;
     margin-bottom: 6px;
 }
 
 .tarjeta-metrica-cuerpo .detalle {
     font-size: 12px;
-    color: #64748B;
+    color: var(--texto-suave, #77647f);
 }
 
 /* COMBOBOX DE categoria */
@@ -108,8 +108,8 @@
     height: 42px;
     padding: 10px 14px;
     background-color: #FFFFFF;
-    color: #667085;
-    border: 1px solid #D0D5DD;
+    color: var(--texto-suave, #77647f);
+    border: 1px solid #dac9e0;
     border-radius: 6px;
     font-family: "Inter", sans-serif;
     font-size: 13px;
@@ -120,20 +120,20 @@
 
 /* Al seleccionar */
 .combobox-categoria:focus {
-    border-color: #2463A6;
-    box-shadow: 0 0 0 3px rgba(36, 99, 166, 0.12);
+    border-color: var(--morado-600, #692a7f);
+    box-shadow: 0 0 0 3px rgba(105, 42, 127, 0.12);
 }
 
 /* Opciones */
 .combobox-categoria option {
     background-color: #FFFFFF;
-    color: #17365D;
+    color: var(--morado-800, #441b54);
     padding: 10px;
 }
 
 /* Placeholder */
 .combobox-categoria option:disabled {
-    color: #98A2B3;
+    color: #a898b0;
 }
 
 /* COMBOBOX DE ESTADO */
@@ -154,8 +154,8 @@
     min-height: 42px;
     padding: 10px 14px;
     background-color: #FFFFFF;
-    color: #667085;
-    border: 1px solid #D0D5DD;
+    color: var(--texto-suave, #77647f);
+    border: 1px solid #dac9e0;
     border-radius: 6px;
     font-family: "Inter", sans-serif;
     font-size: 13px;
@@ -166,20 +166,20 @@
 
 /* Al seleccionar */
 .combobox-estado:focus {
-    border-color: #2463A6;
-    box-shadow: 0 0 0 3px rgba(36, 99, 166, 0.12);
+    border-color: var(--morado-600, #692a7f);
+    box-shadow: 0 0 0 3px rgba(105, 42, 127, 0.12);
 }
 
 /* Opciones */
 .combobox-estado option {
     background-color: #FFFFFF;
-    color: #17365D;
+    color: var(--morado-800, #441b54);
     padding: 10px;
 }
 
 /* Placeholder */
 .combobox-estado option:disabled {
-    color: #98A2B3;
+    color: #a898b0;
 }
 
 /* ESTILOS TABLA PRESTAMO */
@@ -193,8 +193,8 @@
 
 .tabla-prestamos thead th{
     padding: 14px 12px;
-    background-color: #F3F5F8;
-    border-bottom: 2px solid #D0D5DD;
+    background-color: var(--morado-50, #f8f1fa);
+    border-bottom: 2px solid #dac9e0;
     position: sticky;
     top: 0;
     z-index: 1; /* Mantiene el encabezado por encima del contenido */
@@ -202,7 +202,7 @@
     vertical-align: middle;
     white-space: normal;
     overflow-wrap: break-word;
-    color: #667085;
+    color: var(--texto-suave, #77647f);
     font-size: 12px;
     font-weight: 600;
 }
@@ -212,37 +212,37 @@
 
 .tabla-prestamos .col-identificacion{
     width: 14%;
-    color: #334155;
+    color: #4a3554;
     font-size: 13px;
 }
 
 .tabla-prestamos .col-categoria{
     width: 12%;
-    color: #334155;
+    color: #4a3554;
     font-size: 13px;
 }
 
 .tabla-prestamos .col-responsable{
     width: 12%;
-    color: #334155;
+    color: #4a3554;
     font-size: 13px;
 }
 
 .tabla-prestamos .col-prestamo{
     width: 10%;
-    color: #344054;
+    color: #4a3554;
     font-size: 13px;
 }
 
 .tabla-prestamos .col-estado{
     width: 10%;
-    color: #344054;
+    color: #4a3554;
     font-size: 13px;
 }
 
 .tabla-prestamos .col-devolucion{
     width: 11%;
-    color: #667085;
+    color: var(--texto-suave, #77647f);
     font-size: 12px;
 }
 
@@ -250,16 +250,16 @@
 .tabla-prestamos tbody td {
     padding: 14px 12px;
     vertical-align: middle;
-    color: #334155;
+    color: #4a3554;
     font-size: 12px;
     overflow-wrap: anywhere;
 }
 
 /* ESTILOS DEL BOTÓN: Registrar devolución */
 .registrar-devolucion {
-    background-color: #EBF5FF;
-    color: #2463A6;
-    border: 1px solid #C3D9FF;
+    background-color: var(--morado-100, #f0e1f3);
+    color: var(--morado-600, #692a7f);
+    border: 1px solid var(--morado-200, #e0c4e4);
     border-radius: 6px;
     padding: 6px 12px;
     font-family: inherit;
@@ -271,25 +271,25 @@
 }
 
 .registrar-devolucion:hover {
-    background-color: #2463A6;
+    background-color: var(--morado-600, #692a7f);
     color: #FFFFFF;
-    border-color: #2463A6;
-    box-shadow: 0 2px 4px rgba(36, 99, 166, 0.2);
+    border-color: var(--morado-600, #692a7f);
+    box-shadow: 0 2px 4px rgba(105, 42, 127, 0.2);
 }
 
 /* ESTILOS DE LAS FILAS */
 
 .tabla-prestamos tbody tr {
     background: #FFFFFF;
-    border-bottom: 1px solid #E4E7EC;
+    border-bottom: 1px solid var(--borde, #e8dcec);
     transition: background-color 0.2s ease;
 }
 
 .tabla-prestamos tbody tr:nth-child(even) {
-    background: #F9FAFB;
+    background: #fbf8fc;
 }
 .tabla-prestamos tbody tr:hover {
-    background: #F3F5F8;
+    background: var(--morado-50, #f8f1fa);
 }
 
 /* ESTILOS DE LA VENTANA MODAL REGISTRAR DEVOLUCION */
@@ -305,7 +305,7 @@
 }
 
 .modal-registro::backdrop {
-    background-color: rgba(15, 23, 42, 0.4);
+    background-color: rgba(46, 18, 57, 0.4);
     backdrop-filter: blur(2px);
 }
 
@@ -321,20 +321,20 @@
     margin: 0;
     font-size: 20px;
     font-weight: 700;
-    color: #0F172A;
+    color: var(--texto, #2a1633);
 }
 
 .modal-subtitulo {
     margin: 4px 0 0 0;
     font-size: 13px;
-    color: #64748B;
+    color: var(--texto-suave, #77647f);
 }
 
 .btn-cerrar {
     background: transparent;
     border: none;
     font-size: 24px;
-    color: #94A3B8;
+    color: #a898b0;
     cursor: pointer;
     line-height: 1;
     padding: 0;
@@ -342,7 +342,7 @@
 }
 
 .btn-cerrar:hover {
-    color: #0F172A;
+    color: var(--texto, #2a1633);
 }
 
 /* RESUMEN SUPERIOR */
@@ -360,19 +360,19 @@
 
 .resumen-col .label {
     font-size: 12px;
-    color: #64748B;
+    color: var(--texto-suave, #77647f);
     margin-bottom: 4px;
 }
 
 .resumen-col .valor {
     font-size: 14px;
     font-weight: 700;
-    color: #0F172A;
+    color: var(--texto, #2a1633);
 }
 
 /* CONTENEDORES DE CAMPOS CON BORDE FIJO */
 .campo-box {
-    border: 1px solid #E2E8F0;
+    border: 1px solid var(--borde, #e8dcec);
     border-radius: 8px;
     padding: 8px 12px;
     background-color: #FFFFFF;
@@ -380,13 +380,13 @@
 }
 
 .campo-box:focus-within {
-    border-color: #2463A6;
+    border-color: var(--morado-600, #692a7f);
 }
 
 .campo-box .form-label {
     display: block;
     font-size: 11.5px;
-    color: #64748B;
+    color: var(--texto-suave, #77647f);
     margin-bottom: 2px;
 }
 
@@ -396,7 +396,7 @@
     padding: 0 !important;
     font-size: 14px;
     font-weight: 500;
-    color: #0F172A;
+    color: var(--texto, #2a1633);
     box-shadow: none !important;
     background-color: transparent !important;
 }
@@ -404,14 +404,14 @@
 .ayuda-input {
     display: block;
     font-size: 12px;
-    color: #64748B;
+    color: var(--texto-suave, #77647f);
     margin-top: 4px;
 }
 
 /* CAMPO DESHABILITADO (OPERADOR) */
 .campo-deshabilitado {
-    background-color: #F8FAFC;
-    border-color: #F1F5F9;
+    background-color: #fbf8fc;
+    border-color: #f0e8f3;
 }
 
 /* BANNER DE INSTRUCCIÓN EN VERDE */
@@ -453,8 +453,8 @@
 
 .btn-cancelar {
     background-color: #FFFFFF;
-    color: #334155;
-    border: 1px solid #CBD5E1;
+    color: #4a3554;
+    border: 1px solid #dac9e0;
     border-radius: 6px;
     padding: 8px 16px;
     font-size: 13.5px;
@@ -464,11 +464,11 @@
 }
 
 .btn-cancelar:hover {
-    background-color: #F8FAFC;
+    background-color: #fbf8fc;
 }
 
 .btn-guardar {
-    background-color: #2463A6;
+    background-color: var(--morado-600, #692a7f);
     color: #FFFFFF;
     border: none;
     border-radius: 6px;
@@ -480,5 +480,5 @@
 }
 
 .btn-guardar:hover {
-    background-color: #17365D;
+    background-color: var(--morado-800, #441b54);
 }

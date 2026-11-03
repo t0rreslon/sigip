@@ -24,7 +24,7 @@
     gap: 8px;
     padding: 0 12px;
     box-sizing: border-box;
-    background-color: #2463A6;
+    background-color: var(--morado-600, #692a7f);
     color: #FFFFFF;
     font-family: inherit;
     font-size: 13px;
@@ -62,7 +62,7 @@
     justify-content: center;
     gap: 8px;
     border-radius: 6px;
-    background-color: #2463A6;
+    background-color: var(--morado-600, #692a7f);
     color: #ffffff;
     border: none;
     transition-duration: 0.3s;
@@ -73,7 +73,7 @@
 
 
 #consultar-identificacion:hover {
-    background-color: #17365D;
+    background-color: var(--morado-800, #441b54);
 }
 
 .consulta-identificacion button img{
@@ -99,10 +99,10 @@
     padding-left: 16px;
     padding-right: 16px;
     background-color: #ffffff;
-    color: #2463A6;
+    color: var(--morado-600, #692a7f);
     border: none;
     transition-duration: 0.3s;
-    border: solid 1px #DFE5ED;
+    border: solid 1px #dac9e0;
 }
 
 #lectura-qr:hover {
@@ -111,7 +111,7 @@
 }
 
 #lectura-qr img{
-    filter: invert(34%) sepia(51%) saturate(1171%) hue-rotate(185deg) brightness(91%) contrast(89%);
+    filter: brightness(0) saturate(100%) invert(34%) sepia(42%) saturate(705%) hue-rotate(240deg) brightness(78%) contrast(125%);
 }
 
 .consulta-identificacion button img{
@@ -128,7 +128,7 @@
 /* ESTILOS DEL CONTENEDOR DE VALIDACIÓN DE INGRESO */
 .validacion-ingreso {
     display: flex;
-    gap: 20px;
+    gap: 16px;
     margin-top: 24px;
     width: 100%;
     align-items: stretch;
@@ -137,9 +137,11 @@
 
 /* TARJETA DE DATOS (IZQUIERDA) */
 .tarjeta-usuario {
-    flex: 2;
+    flex: 1.2;
+    min-width: 0;
+    max-width: 55%;
     background-color: #ffffff;
-    border: 1px solid #E0E0E0;
+    border: 1px solid var(--borde, #e8dcec);
     border-radius: 12px;
     padding: 24px;
     display: flex;
@@ -152,13 +154,13 @@
     margin: 0;
     font-size: 20px;
     font-weight: 700;
-    color: #182C46;
+    color: var(--texto, #2a1633);
 }
 
 .usuario-id {
     margin: 4px 0 20px 0;
     font-size: 13px;
-    color: #64748B;
+    color: var(--texto-suave, #77647f);
 }
 
 .usuario-grid {
@@ -174,21 +176,21 @@
 
 .campo .label {
     font-size: 12px;
-    color: #64748B;
+    color: var(--texto-suave, #77647f);
     margin-bottom: 4px;
 }
 
 .campo .valor {
     font-size: 14px;
     font-weight: 700;
-    color: #182C46;
+    color: var(--texto, #2a1633);
 }
 
 .usuario-footer {
     margin-top: 24px;
     padding-top: 12px;
     font-size: 12px;
-    color: #64748B;
+    color: var(--texto-suave, #77647f);
 }
 
 .usuario-footer p {
@@ -242,20 +244,22 @@
 
 .info-fecha .label {
     font-size: 12px;
-    color: #5f6368;
+    color: var(--texto-suave, #77647f);
     margin-bottom: 2px;
 }
 
 .info-fecha .valor {
     font-size: 14px;
     font-weight: 700;
-    color: #344054;
+    color: #4a3554;
 }
 
 .btn-registrar-ingreso {
+    flex: 1;
     width: 100%;
+    min-width: 0;
     height: 42px;
-    background-color: #2463A6;
+    background-color: var(--morado-600, #692a7f);
     color: #ffffff;
     border: none;
     border-radius: 6px;
@@ -267,17 +271,18 @@
     justify-content: center;
     gap: 8px;
     cursor: pointer;
+    white-space: nowrap;
     transition: background-color 0.2s ease;
 }
 
 .btn-registrar-ingreso:hover {
-    background-color: #17365D;
+    background-color: var(--morado-800, #441b54);
 }
 
 .nota-advertencia {
     margin: 16px 0 0 0;
     font-size: 11.5px;
-    color: #5f6368;
+    color: var(--texto-suave, #77647f);
     line-height: 1.35;
 }
 
@@ -285,7 +290,7 @@
 .historial-accesos {
     width: 100%;
     background-color: #ffffff;
-    border: 1px solid #E0E0E0;
+    border: 1px solid var(--borde, #e8dcec);
     border-radius: 12px;
     margin-top: 24px;
     margin-bottom: 24px;
@@ -298,13 +303,13 @@
     margin: 0;
     font-size: 18px;
     font-weight: 700;
-    color: #0F172A;
+    color: var(--texto, #2a1633);
 }
 
 .historial-header p {
     margin: 4px 0 20px 0;
     font-size: 13px;
-    color: #64748B;
+    color: var(--texto-suave, #77647f);
 }
 
 /* CONTENEDOR CON SCROLL EN PANTALLAS PEQUEÑAS */
@@ -323,14 +328,14 @@
 
 /* ENCABEZADO DE LA TABLA (THEAD) */
 .historial-tabla thead tr {
-    background-color: #F8FAFC;
+    background-color: #fbf8fc;
 }
 
 .historial-tabla th {
     padding: 12px 16px;
     font-weight: 600;
-    color: #64748B;
-    border-bottom: 1px solid #E2E8F0;
+    color: var(--texto-suave, #77647f);
+    border-bottom: 1px solid var(--borde, #e8dcec);
 }
 
 .historial-tabla th.col-hora {
@@ -346,8 +351,8 @@
 /* FILAS DE LA TABLA (TBODY) */
 .historial-tabla td {
     padding: 16px;
-    color: #334155;
-    border-bottom: 1px solid #F1F5F9;
+    color: #4a3554;
+    border-bottom: 1px solid #f0e8f3;
 }
 
 .historial-tabla tbody tr:last-child td {
@@ -356,5 +361,41 @@
 
 .historial-tabla .nombre-usuario {
     font-weight: 500;
-    color: #0F172A;
+    color: var(--texto, #2a1633);
+}
+
+/* CONTENEDOR DE LOS BOTONES */
+.acciones-acceso {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+/* BOTÓN REGISTRAR SALIDA */
+.btn-registrar-salida {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    align-items: center;
+    padding: 0 10px;
+    white-space: nowrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border: 1px solid var(--morado-600, #692a7f);
+    border-radius: 6px;
+    background-color: #FFFFFF;
+    color: var(--morado-600, #692a7f);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-registrar-salida:hover {
+    background-color: var(--morado-100, #f0e1f3);
 }

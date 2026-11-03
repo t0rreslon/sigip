@@ -4,6 +4,7 @@
     <!-- meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- estilos de usuarios y estilos del panel izquierdo -->
     @vite(['resources/js/app.js'])
     <!-- javascrpit del pop-out -->
@@ -63,8 +64,9 @@
                             <!-- Campo de búsqueda -->
                             <input
                                 type="search"
+                                id="identificacion"
                                 class="barra-busqueda"
-                                placeholder="Buscar por nombre, identificación o correo..."
+                                placeholder="Buscar por identificación o correo..."
                                 aria-label="Buscar usuarios">
                         </div>
                         <!-- CIERRA BARRA DE BUSQUEDA -->
@@ -85,35 +87,37 @@
                     <div class="validacion-ingreso">
                         
                         <!-- TARJETA DE DATOS DEL USUARIO (IZQUIERDA) -->
-                        <div class="tarjeta-usuario">
+                        <div class="tarjeta-usuario" id="tarjeta-usuario">
                             <div class="usuario-header">
-                                <h2>Mariana López</h2>
-                                <p class="usuario-id">1032456789 · Estudiante</p>
+                                <h2 id="nombre-usuario">Sin usuario seleccionado</h2>
+                                <p class="usuario-id" id="identificacion-usuario">
+                                    Realiza una búsqueda para consultar los datos
+                                </p>
                             </div>
                             <div class="usuario-grid">
                                 <div class="campo">
                                     <span class="label">Estado del usuario</span>
-                                    <span class="valor">Activo</span>
+                                    <span class="valor" id="estado-usuario">Pendiente</span>
                                 </div>
                                 <div class="campo">
                                     <span class="label">Plan</span>
-                                    <span class="valor">Mensual universitario</span>
+                                    <span class="valor" id="plan-usuario">No consultado</span>
                                 </div>
                                 <div class="campo">
                                     <span class="label">Vigencia de suscripción</span>
-                                    <span class="valor">02 oct—31 oct 2026</span>
+                                    <span class="valor" id="vigencia-usuario">No disponible</span>
                                 </div>
                                 <div class="campo">
                                     <span class="label">Pago</span>
-                                    <span class="valor">$ 35.000 · Verificado</span>
+                                    <span class="valor" id="pago-usuario">No verificado</span>
                                 </div>
                                 <div class="campo">
                                     <span class="label">Correo</span>
-                                    <span class="valor">mariana.lopez@correo.demo</span>
+                                    <span class="valor" id="correo-usuario">-</span>
                                 </div>
                                 <div class="campo">
                                     <span class="label">Teléfono</span>
-                                    <span class="valor">300 456 7890</span>
+                                    <span class="valor" id="telefono-usuario">-</span>
                                 </div>
                             </div>
                             <div class="usuario-footer">
@@ -128,20 +132,46 @@
                                     <path d="m9 12 2 2 4-4"></path>
                                 </svg>
                             </div>
-                            <h3 class="titulo-estado">Acceso autorizado</h3>
-                            <p class="descripcion-estado">Usuario activo, suscripción vigente y pago verificado.</p>
+                            <h3 class="titulo-estado" id="titulo-estado">Esperando consulta</h3>
+                            <p class="descripcion-estado" id="descripcion-estado">Busca un usuario para verificar si cumple las condiciones de ingreso.</p>
                             <div class="info-fecha">
                                 <span class="label">Fecha y hora de consulta</span>
-                                <span class="valor">22 oct 2026 · 10:30</span>
+                                <span class="valor" id="fecha-consulta">22 oct 2026 · 10:30</span>
                             </div>
-                            <button type="button" class="btn-registrar-ingreso">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                                    <polyline points="10 17 15 12 10 7"></polyline>
-                                    <line x1="15" y1="12" x2="3" y2="12"></line>
-                                </svg>
-                                Registrar ingreso
-                            </button>
+                            <div class="acciones-acceso">
+                                <!-- BOTÓN REGISTRAR INGRESO -->
+                                <button type="button" class="btn-registrar-ingreso" id="registrar-ingreso" disabled>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        width="18" height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                                        <polyline points="10 17 15 12 10 7"></polyline>
+                                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                                    </svg>
+                                    Registrar ingreso
+                                </button>
+                                <!-- BOTÓN REGISTRAR SALIDA -->
+                                <button type="button" class="btn-registrar-salida" id="registrar-salida" disabled>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        width="18" height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    Registrar salida
+                                </button>
+                            </div>
                             <p class="nota-advertencia">
                                 Solo registrar cuando la persona ingrese. La consulta por sí sola no crea un acceso.
                             </p>
@@ -153,7 +183,9 @@
                         <!-- ENCABEZADO DEL PANEL -->
                         <div class="historial-header">
                             <h2>Historial reciente de accesos</h2>
-                            <p>Jornada de hoy · 64 ingresos autorizados</p>
+                            <p id="total-ingresos">
+                                Jornada de hoy · {{ $historial->count() }} registros
+                            </p>
                         </div>
 
                         <!-- TABLA DE REGISTROS -->
@@ -168,35 +200,38 @@
                                         <th class="col-operador">Operador</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>10:24</td>
-                                        <td>1032456789</td>
-                                        <td class="nombre-usuario">Mariana López</td>
-                                        <td>Autorizado · Suscripción vigente</td>
-                                        <td>Carlos Ruiz</td>
-                                    </tr>
-                                    <tr>
-                                        <td>10:18</td>
-                                        <td>1034567890</td>
-                                        <td class="nombre-usuario">Sara Restrepo</td>
-                                        <td>Autorizado · Suscripción vigente</td>
-                                        <td>Carlos Ruiz</td>
-                                    </tr>
-                                    <tr>
-                                        <td>10:12</td>
-                                        <td>1023456780</td>
-                                        <td class="nombre-usuario">Mateo Torres</td>
-                                        <td>Denegado · Suscripción vencida</td>
-                                        <td>Carlos Ruiz</td>
-                                    </tr>
-                                    <tr>
-                                        <td>09:55</td>
-                                        <td>1045678901</td>
-                                        <td class="nombre-usuario">Diego Ramírez</td>
-                                        <td>Requiere verificación · Pago pendiente</td>
-                                        <td>Carlos Ruiz</td>
-                                    </tr>
+                                <tbody id="historial-registros">
+                                    @forelse ($historial as $registro)
+                                        <tr>
+                                            <td>
+                                                {{ \Carbon\Carbon::parse($registro->fecha_ingreso)
+                                                    ->timezone('America/Bogota')
+                                                    ->format('h:i A') }}
+                                            </td>
+
+                                            <td>{{ $registro->documento }}</td>
+
+                                            <td class="nombre-usuario">
+                                                {{ $registro->nombre }} {{ $registro->apellido }}
+                                            </td>
+
+                                            <td>
+                                                @if ($registro->fecha_salida)
+                                                    Salida registrada
+                                                @else
+                                                    Ingreso registrado · Dentro del gimnasio
+                                                @endif
+                                            </td>
+
+                                            <td>—</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5">
+                                                No hay registros de acceso durante el día de hoy.
+                                            </td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>

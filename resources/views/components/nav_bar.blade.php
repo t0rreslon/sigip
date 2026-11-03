@@ -8,9 +8,6 @@
                 </div>
                 <!-- CIERRA RUTA DE NAVEGACION -->
                 <div class="acciones-superiores">
-                    <span class="badge etiqueta-demostracion">
-                        Demostración
-                    </span>
                     <!-- ABRE NOTIFICACIONES -->
                     <button class="btn-notificaciones" type="button"
                             aria-label="Notificaciones">

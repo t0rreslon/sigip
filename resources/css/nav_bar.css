@@ -68,8 +68,8 @@
             width: 24px;
             height: 24px;
             margin-left: -10px;
-            background-color: #e8f1ff;
-            color: #2463c5;
+            background-color: #f0e1f3;
+            color: #692a7f;
             border-radius: 50%;
             font-size: 12px;
             font-weight: 600;
@@ -95,8 +95,8 @@
             height: 38px;
             flex-shrink: 0;
             border-radius: 50%;
-            background-color: #e8f1ff;
-            color: #2463c5;
+            background-color: #f0e1f3;
+            color: #692a7f;
             font-size: 14px;
             font-weight: 600;
         }

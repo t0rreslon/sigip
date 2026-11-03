@@ -8,7 +8,7 @@
         }
 
         .panel-izq{
-        background-color: #17365D;
+        background-color: var(--morado-600, #692a7f);
         width: 236px;
         min-width: 236px;
         min-height: 100vh;
@@ -36,6 +36,10 @@
             margin-bottom: 15px;
         }
 
+        .encabezado img{
+            align-content:center;
+        }
+
         .encabezado h1 {
             margin: 0 0 6px;
             font-weight: 600;
@@ -59,7 +63,7 @@
                 justify-content: flex-start;
                 gap: 3px;
                 border-radius: 6px;
-                background-color: #17365D;
+                background-color: var(--morado-600, #692a7f);
                 min-height: 38px; /*esto es para que sea la altura estandar*/
                 height: auto; /*esto es para que si hay una doble linea en l boton este se adapte sin cambiar el espaciado de los demas botnes*/
                 width: 204px;
@@ -68,7 +72,7 @@
                 border: none;
                 transition-duration: 0.3s;
                 border-radius: 6px;
-                color: #C4D2E4;
+                color: var(--morado-200, #e0c4e4);
                 margin-bottom: none;
                 box-sizing: border-box;
                 transition: background-color 0.25s ease, color 0.25s ease;
@@ -89,16 +93,16 @@
                 min-width: 18px;
                 flex: 0 0 18px;
                 object-fit: contain;
-                /* Color inicial aproximado: #C4D2E4 */
+                /* Color inicial aproximado: #E0C4E4 */
                 filter: brightness(0) saturate(100%)
-                        invert(84%) sepia(10%) saturate(500%)
-                        hue-rotate(177deg) brightness(95%);
+                        invert(83%) sepia(25%) saturate(533%)
+                        hue-rotate(250deg) brightness(109%) contrast(77%);
                 transition: filter 0.25s ease;
             }
             /* HOVER DE LOS BOTONES DLE PANEL IZQUIERDO */
             .button-options:hover,
             .button-options:focus{
-                background-color: #294D78;
+                background-color: var(--morado-500, #8340a0);
                 color: white;
             }
             /* ICONOS BLANCOS AL PASAR EL CURSOR */
@@ -120,7 +124,7 @@
                 margin-top: 10px;
                 font-size: 10px;
                 text-align: center;
-                color: #e0c4e4;
+                color: var(--morado-200, #e0c4e4);
                 border-top: 1px;
                 padding-top: 10px;
             }

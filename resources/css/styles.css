@@ -1,0 +1,871 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    background-color: white;
+    font-family: "Inter", sans-serif;
+}
+
+.flexbox {
+ display: flex;
+ width: 100%;
+ height: 100vh;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+}
+
+.logo-imagen {
+    width: auto;
+    height: 200px;
+    align-items: center;
+}
+
+
+.logo-texto h3 {
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.logo-texto p {
+    font-size: 10px;
+    margin-top: 4px;
+    color: #d7b8e0;
+}
+
+.informacion h1 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.informacion h2 {
+    font-size: 19px;
+    line-height: 1.3;
+    margin-bottom: 12px;
+}
+
+.informacion p {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #e0c4e4;
+}
+
+.imagen-gimnasio {
+    width: 100%;
+    height: 220px;
+    border: 1px  ;
+    padding: 4px;
+}
+
+.footer {
+    margin-top: auto;
+    font-size: 10px;
+    text-align: center;
+    color: #e0c4e4;
+    border-top: 1px;
+    padding-top: 10px;
+}
+
+.panel-dere {
+    flex: 1;
+    min-width: 0;
+    min-height: 100vh;
+    background-color: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px;
+}
+
+/* Contenedor del formulario */
+.formulario-login {
+    width: 100%;
+    max-width: 560px;
+}
+
+/* Etiqueta superior */
+.etiqueta-login {
+    display: inline-block;
+    background-color: #e0c4e4;
+    color: #692a7f;
+
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+
+    padding: 6px 10px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+}
+
+/* Título principal */
+.formulario-login h1 {
+    color: black;
+    font-size: 27px;
+    margin-bottom: 8px;
+}
+
+/* Texto de bienvenida */
+.subtitulo {
+    color: #9a7795;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+/* Campos */
+.campo {
+    border: 1px solid #e0e6ef;
+    border-radius: 7px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+
+    display: flex;
+    flex-direction: column;
+
+    transition: border-color 0.2s;
+}
+
+.campo:focus-within {
+    border-color: #c728b4;
+}
+
+/* Etiquetas de los campos */
+.campo label {
+    font-size: 11px;
+    color: #77849a;
+    margin-bottom: 5px;
+}
+
+/* Entradas de texto */
+.campo input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    font-size: 13px;
+    color: #5a2455;
+    padding: 2px 0;
+}
+
+.campo input::placeholder {
+    color: #a3adbc;
+}
+
+/* Enlace de recuperación */
+.recuperar {
+    text-align: right;
+    margin: 14px 0 24px;
+}
+
+.recuperar a {
+    color: #b2279d;
+    text-decoration: none;
+    font-size: 11px;
+}
+
+.recuperar a:hover {
+    text-decoration: underline;
+}
+
+/* Botón */
+.boton-login {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    background-color: #a928a9;
+    color: white;
+
+    border: none;
+    border-radius: 5px;
+    padding: 12px 18px;
+
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+
+    transition: background-color 0.2s;
+}
+
+.boton-login:hover {
+    background-color: #871983;
+}
+
+/* Aviso de seguridad */
+.aviso-seguridad {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    background-color: #f1f4f8;
+    color: #74839a;
+
+    padding: 14px;
+    border-radius: 6px;
+    margin-top: 22px;
+}
+
+.aviso-seguridad span {
+    color: #c534a6;
+    font-size: 15px;
+}
+
+.aviso-seguridad p {
+    font-size: 11px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Soporte */
+.soporte {
+    margin-top: 24px;
+    color: #7d899d;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* Información inferior */
+.informacion-inferior {
+    margin-top: 28px;
+    color: #8a96a8;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* =====================================================
+   VISTA: PLANES Y SUSCRIPCIONES (panel administrativo)
+   Se reutiliza .flexbox del código anterior.
+   Cambia las variables para ajustar la paleta.
+   ===================================================== */
+:root {
+    /* Paleta basada en #692a7f y sus tonalidades */
+    --morado-900: #2e1239;
+    --morado-800: #441b54;
+    --morado-700: #55216a;
+    --morado-600: #692a7f;   /* color base */
+    --morado-500: #8340a0;
+    --morado-400: #a566bd;
+    --morado-300: #c79bd6;
+    --morado-200: #e0c4e4;
+    --morado-100: #f0e1f3;
+    --morado-50:  #f8f1fa;
+
+    /* Neutros con un toque de morado */
+    --texto: #2a1633;
+    --texto-suave: #77647f;
+    --borde: #e8dcec;
+    --fondo: #f8f5f9;
+}
+
+/* Zona de contenido 
+.contenido {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    overflow-y: auto;
+    background-color: var(--fondo);
+    color: var(--texto);
+}
+
+*/
+
+.contenido{
+    flex: 1 1 0;
+    min-width: 0;
+    width: 0;
+    min-height: 100vh;
+    height: auto;
+    background-color: var(--morado-50, #f8f1fa);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    overflow: visible;
+    margin-left: 236px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.ruta {
+    font-size: 12px;
+    color: var(--texto-suave);
+}
+
+.topbar-der {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.chip-demo {
+    background-color: var(--morado-100);
+    color: var(--texto-suave);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.notificaciones {
+    font-size: 12px;
+    color: var(--texto-suave);
+}
+
+.notificaciones b {
+    background-color: var(--morado-100);
+    color: var(--morado-500);
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin-left: 4px;
+}
+
+.usuario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--morado-100);
+    color: var(--morado-500);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.usuario strong {
+    display: block;
+    font-size: 12px;
+}
+
+.usuario small {
+    font-size: 11px;
+    color: var(--texto-suave);
+}
+
+/* Página */
+.pagina {
+    padding: 22px 24px 16px;
+}
+    
+
+.pagina-titulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+
+.pagina-titulo h1 {
+    font-size: 24px;
+    line-height: 1.2;
+}
+
+.pagina-titulo p {
+    font-size: 12px;
+    color: var(--texto-suave);
+    margin-top: 2px;
+}
+
+/* Botones */
+.btn-primario {
+    background-color: var(--morado-600);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 11px 18px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primario:hover {
+    background-color: var(--morado-700);
+}
+
+.btn-borde {
+    background-color: white;
+    color: var(--morado-500);
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-borde:hover {
+    border-color: var(--morado-500);
+}
+
+/* Tarjetas de planes */
+.planes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.tarjeta-plan {
+    background-color: white;
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    padding: 14px 12px;
+}
+
+.tarjeta-plan h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.plan-precio {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.plan-precio strong {
+    font-size: 22px;
+}
+
+.tarjeta-plan small {
+    display: block;
+    font-size: 10px;
+    color: var(--texto-suave);
+    margin-bottom: 10px;
+}
+
+.tarjeta-plan p {
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+.plan-acciones {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.plan-acciones a {
+    font-size: 11px;
+    color: var(--morado-500);
+    text-decoration: none;
+}
+
+.plan-acciones a:hover {
+    text-decoration: underline;
+}
+
+/* Etiquetas de estado */
+.badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.badge.verde    { background-color: #dcf3e4; color: #1b7a43; }
+.badge.amarillo { background-color: #fdf0c8; color: #946200; }
+.badge.rojo     { background-color: #fde2e2; color: #c0392b; }
+.badge.gris     { background-color: var(--morado-100); color: var(--texto-suave); }
+
+/* Suscripciones */
+.suscripciones {
+    background-color: white;
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    padding: 16px 12px 14px;
+}
+
+.susc-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.susc-cabecera h2 {
+    font-size: 15px;
+}
+
+.susc-cabecera small {
+    font-size: 10px;
+    color: var(--texto-suave);
+}
+
+.enlace {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--morado-500);
+    text-decoration: none;
+}
+
+.filtros {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.filtros input,
+.filtros select {
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--texto);
+    background-color: white;
+}
+
+.filtros input {
+    flex: 1;
+}
+
+.filtros select {
+    width: 150px;
+}
+
+.filtros input:focus,
+.filtros select:focus {
+    outline: none;
+    border-color: var(--morado-500);
+}
+
+/* Tabla */
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.tabla th {
+    text-align: left;
+    background-color: var(--morado-50);
+    color: var(--texto-suave);
+    font-weight: 500;
+    padding: 12px 10px;
+}
+
+.tabla td {
+    padding: 14px 10px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.iconos {
+    color: var(--texto-suave);
+    letter-spacing: 6px;
+}
+
+/* Paginación */
+.paginacion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.paginacion small {
+    font-size: 10px;
+    color: var(--texto-suave);
+}
+
+.paginacion div {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-pag {
+    background-color: white;
+    color: var(--morado-500);
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-pag.actual {
+    background-color: var(--morado-100);
+    border-color: var(--morado-100);
+}
+
+.btn-pag:disabled {
+    background-color: var(--morado-100);
+    color: var(--texto-suave);
+    cursor: default;
+}
+
+.pie-pagina {
+    font-size: 10px;
+    color: var(--texto-suave);
+    padding: 14px 0 0;
+}
+
+/* Adaptación a pantallas pequeñas */
+@media (max-width: 900px) {
+    .planes { grid-template-columns: 1fr; }
+    .tabla { display: block; overflow-x: auto; }
+}
+
+.aviso {
+    display: flex;
+    gap: 12px;
+    background-color: #fdf3d0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    color: #946200;
+    font-size: 12px;
+}
+ 
+.aviso strong {
+    display: block;
+    color: #7a5200;
+    margin-bottom: 2px;
+}
+ 
+.aviso-icono {
+    font-size: 15px;
+}
+ 
+/* Dos columnas: bandeja + detalle */
+.pagos-grid {
+    display: grid;
+    grid-template-columns: 1fr 290px;
+    gap: 16px;
+    align-items: start;
+}
+ 
+/* Tarjeta blanca genérica */
+.tarjeta {
+    background-color: white;
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    padding: 14px 12px;
+}
+ 
+.tarjeta h2 {
+    font-size: 15px;
+}
+ 
+.tarjeta-sub {
+    display: block;
+    font-size: 10px;
+    color: var(--texto-suave);
+    margin-bottom: 14px;
+}
+ 
+/* Detalles dentro de la tabla de pagos */
+.tabla .nombre {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+}
+ 
+.tabla td small {
+    display: block;
+    font-size: 11px;
+    color: var(--texto-suave);
+}
+ 
+.tabla td small.oscuro {
+    color: var(--texto);
+}
+ 
+.badge.largo {
+    display: block;
+    width: fit-content;
+    max-width: 130px;
+    white-space: normal;
+    line-height: 1.25;
+    padding: 6px 10px;
+    border-radius: 14px;
+}
+ 
+/* Panel de detalle */
+.soporte-demo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    background-color: var(--morado-50);
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    padding: 20px 14px;
+    margin-bottom: 14px;
+}
+ 
+.soporte-icono {
+    font-size: 20px;
+}
+ 
+.soporte-demo strong {
+    font-size: 12px;
+}
+ 
+.soporte-valor {
+    font-size: 22px;
+    font-weight: 700;
+}
+ 
+.soporte-demo p {
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--texto-suave);
+}
+ 
+.datos dt {
+    font-size: 11px;
+    color: var(--texto-suave);
+    margin-top: 10px;
+}
+ 
+.datos dd {
+    font-size: 13px;
+    font-weight: 700;
+}
+ 
+.detalle .btn-primario {
+    margin-top: 16px;
+}
+ 
+.nota {
+    display: block;
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--texto-suave);
+    margin-top: 12px;
+}
+ 
+@media (max-width: 900px) {
+    .pagos-grid { grid-template-columns: 1fr; }
+}
+
+/* =====================================================
+   VISTA: INVENTARIO
+   Reutiliza .tarjeta, .filtros, .tabla, .badge, .paginacion
+   y .btn-primario de las vistas anteriores.
+   ===================================================== */
+
+/* Resumen en etiquetas */
+.resumen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.chip {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+.chip.morado   { background-color: var(--morado-100); color: var(--morado-600); }
+.chip.verde    { background-color: #dcf3e4; color: #1b7a43; }
+.chip.amarillo { background-color: #fdf0c8; color: #946200; }
+.chip.rojo     { background-color: #fde2e2; color: #c0392b; }
+
+.resumen-texto {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--texto-suave);
+}
+
+/* Pestañas */
+.pestanas {
+    display: flex;
+    gap: 22px;
+    border-bottom: 1px solid var(--borde);
+    margin-bottom: 14px;
+}
+
+.pestanas button {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 8px 0 11px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--texto-suave);
+    cursor: pointer;
+}
+
+.pestanas button:hover {
+    color: var(--morado-600);
+}
+
+.pestanas button.activa {
+    color: var(--morado-600);
+    border-bottom-color: var(--morado-600);
+}
+
+/* Etiquetas anchas dentro de la tabla */
+.badge.morado {
+    background-color: var(--morado-100);
+    color: var(--morado-600);
+}
+
+.badge.ancho {
+    display: block;
+    width: 100%;
+    max-width: 135px;
+    padding: 5px 10px;
+}
+
+.tabla td small.alerta {
+    color: #946200;
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+/* Nota inferior */
+.observacion {
+    font-size: 11px;
+    color: var(--texto-suave);
+    padding: 14px 0 0;
+}

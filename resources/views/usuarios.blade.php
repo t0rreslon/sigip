@@ -5,12 +5,10 @@
     <!-- meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- estilos de usuarios y estilos del panel izquierdo -->
-    <!-- javascrpit del pop-out -->
+    <!-- estilos de usuarios y estilos del panel izquierdo y javascrpit del pop-out -->
     @vite(['resources/js/app.js', 'resources/js/pop_out.js'])
     <!-- bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
-    <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL" crossorigin="anonymous"></script>
     <!-- fuentes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,6 +33,11 @@
             <!-- ABRE CONTENIDO DE USUARIOS -->
             <main class="contenido-principal">
                 <div class="contenido-users">
+                    @if (session('success'))
+                    <div class="alerta-exito" role="alert">
+                        {{ session('success') }}
+                    </div>
+                    @endif
                     <div class="encabezado-seccion">
                         <h1>Usuarios</h1>
                         <p>Consulta y administra cuentas, roles y condiciones de la comunidad.</p>
@@ -145,8 +148,12 @@
                                         id="documento"
                                         name="documento"
                                         placeholder="Ingrese el documento"
-                                        maxlength="12"
+                                        maxlength="11"
+                                        minlength="8"
+                                        pattern="[0-9]{8,11}"
+                                        inputmode="numeric"
                                         autocomplete="off"
+                                        title="El documento debe contener entre 8 y 11 números, sin letras ni espacios."
                                         value="{{ old('documento') }}"
                                         required>
 
@@ -219,17 +226,18 @@
                                         class="form-control @error('correo') is-invalid @enderror"
                                         id="correo"
                                         name="correo"
-                                        placeholder="usuario@correo.com"
+                                        placeholder="usuario@dominio.com"
                                         autocomplete="email"
                                         maxlength="80"
                                         value="{{ old('correo') }}"
+                                        pattern="[A-Za-z0-9]+([._%+-][A-Za-z0-9]+)*@[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}"
+                                        title="Ingrese un correo válido, por ejemplo usuario@dominio.com"
                                         required>
 
                                     @error('correo')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-
                                 <!-- TELÉFONO -->
                                 <div class="col-md-6">
                                     <label for="telefono" class="form-label">Teléfono</label>
@@ -362,52 +370,118 @@
                         </p>
                     </div>
                     <div class="panel">
-                        <div class="pestanas">
-                            <button type="button">Todos los usuarios</button>
-                            <button type="button">Personal del gimansio</button>
-                        </div>
+
+                        @if (request()->hasAny(['buscar', 'rol', 'estado']))
+                        <a href="{{ route('usuarios') }}" class="btn-limpiar">
+                            <div class="pestanas">
+                                <button type="button">Todos los usuarios</button>
+                            </div>
+                        </a>
+                        @endif
+
                         <div class="busquedas">
-                            <div class="buscar">
-                                <svg
-                                    class="icono-busqueda"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    aria-hidden="true">
-                                    <circle cx="11" cy="11" r="7"></circle>
-                                    <path d="m20 20-4-4"></path>
-                                </svg>
-                                <!-- Campo de búsqueda -->
-                                <input
-                                    type="search"
-                                    class="barra-busqueda"
-                                    placeholder="Buscar por nombre, identificación o correo..."
-                                    aria-label="Buscar usuarios">
-                            </div>
-                            <div class="rol">
-                                <select id="rol" name="rol" class="combobox-rol" required>
-                                    <option value="" disabled selected>Rol: Seleccionar rol</option>
-                                    <option value="administrador">Administrador</option>
-                                    <option value="operador">Operador</option>
-                                    <option value="instructor">Instructor</option>
-                                </select>
-                            </div>
-                            <div class="estados">
-                                <select id="estado" name="estado" class="combobox-estado" required>
-                                    <option value="" disabled selected>Estado: Seleccionar estado</option>
-                                    <option value="activo">Activo</option>
-                                    <option value="inactivo">Inactivo</option>
-                                </select>
-                            </div>
+
+                            {{-- Formulario funcional sin alterar el diseño --}}
+                            <form action="{{ route('usuarios') }}"
+                                method="GET"
+                                id="formFiltros"
+                                style="display: contents;">
+
+                                {{-- Búsqueda --}}
+                                <div class="buscar">
+                                    <svg
+                                        class="icono-busqueda"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true">
+                                        <circle cx="11" cy="11" r="7"></circle>
+                                        <path d="m20 20-4-4"></path>
+                                    </svg>
+
+                                    <input
+                                        type="search"
+                                        class="barra-busqueda"
+                                        id="buscar"
+                                        name="buscar"
+                                        placeholder="Buscar por nombre, identificación o correo..."
+                                        aria-label="Buscar usuarios"
+                                        value="{{ request('buscar') }}">
+                                </div>
+
+                                {{-- Filtro por rol --}}
+                                <div class="rol">
+                                    <select
+                                        id="rol"
+                                        name="rol"
+                                        class="combobox-rol"
+                                        onchange="document.getElementById('formFiltros').requestSubmit()">
+
+                                        <option value="">Rol: Todos</option>
+
+                                        @foreach ($rolesUsuario as $rol)
+                                        <option
+                                            value="{{ $rol->rol_usuario_id }}"
+                                            @selected(request('rol')==$rol->rol_usuario_id)>
+                                            {{ $rol->nombre }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+
+                                {{-- Filtro por institución --}}
+                                <div class="institucion">
+                                    <select
+                                        id="institucion"
+                                        name="institucion"
+                                        class="combobox-institucion"
+                                        onchange="document.getElementById('formFiltros').requestSubmit()">
+
+                                        <option value="">Institución: Todas</option>
+
+                                        @foreach ($instituciones as $institucion)
+                                        <option
+                                            value="{{ $institucion->institucion_id }}"
+                                            @selected(request('institucion')==$institucion->institucion_id)>
+                                            {{ $institucion->nombre_institucion }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+
+                                {{-- Filtro por estado --}}
+                                <div class="estados">
+                                    <select
+                                        id="estado"
+                                        name="estado"
+                                        class="combobox-estado"
+                                        onchange="document.getElementById('formFiltros').requestSubmit()">
+
+                                        <option value="">Estado: Todos</option>
+
+                                        <option value="1" @selected(request('estado')==='1' )>
+                                            Activo
+                                        </option>
+
+                                        <option value="0" @selected(request('estado')==='0' )>
+                                            Inactivo
+                                        </option>
+                                    </select>
+                                </div>
+
+                            </form>
 
                         </div>
                         <!-- CIERRA BUSQUEDAS -->
+
                         <!-- ABRE TABLA -->
                         <div class="tabla">
                             <table class="tabla-users">
@@ -417,7 +491,7 @@
                                         <th class="col-usuario">Nombre/Correo</th>
                                         <th class="col-telefono">Teléfono</th>
                                         <th class="col-rol">Rol</th>
-                                        <th class="col-tipo">Tipo</th>
+                                        <th class="col-tipo">Institucion</th>
                                         <th class="col-estado">Estado</th>
                                         <th class="col-suscripcion">Suscripcion</th>
                                         <th class="col-acciones">Acciones</th>
@@ -450,13 +524,13 @@
 
                                         <td class="col-rol">
                                             <div class="dato-principal">
-                                                {{ $usuario->rol_usuario_id }}
+                                                {{ $usuario->nombre_rol ?? 'Sin rol' }}
                                             </div>
                                         </td>
 
                                         <td class="col-tipo">
                                             <div class="dato-principal">
-                                                -
+                                                {{ $usuario->nombre_institucion ?? 'Sin institución' }}
                                             </div>
                                         </td>
 
@@ -483,7 +557,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="8">
+                                        <td colspan="8" class="sin-registros">
                                             No hay usuarios registrados.
                                         </td>
                                     </tr>
@@ -491,15 +565,70 @@
                                 </tbody>
                             </table>
                         </div>
+
                         <!-- CIERRA TABLA -->
+
                         <!-- ABRE PAGINACION -->
                         <div class="paginacion">
+
                             <p class="texto-registros">
                                 Mostrando {{ $usuarios->firstItem() ?? 0 }}-{{ $usuarios->lastItem() ?? 0 }}
                                 de {{ $usuarios->total() }} registros
                             </p>
 
-                            {{ $usuarios->links() }}
+                            <nav aria-label="Navegación de páginas">
+                                <ul class="pagination">
+
+                                    {{-- Botón anterior --}}
+                                    @if ($usuarios->onFirstPage())
+                                    <li>
+                                        <span class="page-link pagina-anterior disabled">
+                                            &laquo; Anterior
+                                        </span>
+                                    </li>
+                                    @else
+                                    <li>
+                                        <a href="{{ $usuarios->previousPageUrl() }}"
+                                            class="page-link pagina-anterior">
+                                            &laquo; Anterior
+                                        </a>
+                                    </li>
+                                    @endif
+
+                                    {{-- Números de página --}}
+                                    @foreach ($usuarios->getUrlRange(1, $usuarios->lastPage()) as $pagina => $url)
+                                    <li>
+                                        @if ($pagina == $usuarios->currentPage())
+                                        <span class="page-link active" aria-current="page">
+                                            {{ $pagina }}
+                                        </span>
+                                        @else
+                                        <a href="{{ $url }}" class="page-link">
+                                            {{ $pagina }}
+                                        </a>
+                                        @endif
+                                    </li>
+                                    @endforeach
+
+                                    {{-- Botón siguiente --}}
+                                    @if ($usuarios->hasMorePages())
+                                    <li>
+                                        <a href="{{ $usuarios->nextPageUrl() }}"
+                                            class="page-link pagina-siguiente">
+                                            Siguiente &raquo;
+                                        </a>
+                                    </li>
+                                    @else
+                                    <li>
+                                        <span class="page-link pagina-siguiente disabled">
+                                            Siguiente &raquo;
+                                        </span>
+                                    </li>
+                                    @endif
+
+                                </ul>
+                            </nav>
+
                         </div>
                         <!-- CIERRA PAGINACION -->
                     </div>
