@@ -1,0 +1,401 @@
+/* CONTENIDO PRINCIPAL DE CONTROL DE ACCESOS */
+.contenido-control-acceso{
+    height: auto;
+    max-height: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding-top: 24px;
+    padding-right: 32px;
+    padding-left: 32px;
+    box-sizing: border-box;
+}
+
+/* ESTILOS DE BARRA DE BUSQUEDA */
+#consultar-identificacion {
+    width: auto;
+    min-height: 40px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    display: flex;
+    margin-top: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    background-color: var(--morado-600, #692a7f);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.buscar{
+    position: relative;
+    min-width: 280px;
+}
+
+.consulta-identificacion{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 16px;
+    flex-wrap: wrap; /* Permite adaptarse bien en pantallas pequeñas */
+}
+
+/* ESTILO DE BOTON DE BUSCAR */
+.consulta-identificacion button{
+    height: 40px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 6px;
+    background-color: var(--morado-600, #692a7f);
+    color: #ffffff;
+    border: none;
+    transition-duration: 0.3s;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+
+
+#consultar-identificacion:hover {
+    background-color: var(--morado-800, #441b54);
+}
+
+.consulta-identificacion button img{
+    display: block;
+                width: 18px;
+                height: 18px;
+                min-width: 16px;
+                flex: 0 0 18px;
+                object-fit: contain;
+                /* Color inicial aproximado: #C4D2E4 */
+                filter: brightness(0) invert(1);
+                transition: filter 0.25s ease;
+}
+
+/* ESTILOS DE BOTON DE QR */
+
+#lectura-qr {
+    width: auto;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    border-radius: 6px;
+    padding-left: 16px;
+    padding-right: 16px;
+    background-color: #ffffff;
+    color: var(--morado-600, #692a7f);
+    border: none;
+    transition-duration: 0.3s;
+    border: solid 1px #dac9e0;
+}
+
+#lectura-qr:hover {
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+}
+
+#lectura-qr img{
+    filter: brightness(0) saturate(100%) invert(34%) sepia(42%) saturate(705%) hue-rotate(240deg) brightness(78%) contrast(125%);
+}
+
+.consulta-identificacion button img{
+    display: block;
+    width: 18px;
+    height: 18px;
+    min-width: 16px;
+    flex: 0 0 18px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: filter 0.25s ease;
+}
+
+/* ESTILOS DEL CONTENEDOR DE VALIDACIÓN DE INGRESO */
+.validacion-ingreso {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+    width: 100%;
+    align-items: stretch;
+    box-sizing: border-box;
+}
+
+/* TARJETA DE DATOS (IZQUIERDA) */
+.tarjeta-usuario {
+    flex: 1.2;
+    min-width: 0;
+    max-width: 55%;
+    background-color: #ffffff;
+    border: 1px solid var(--borde, #e8dcec);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.usuario-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--texto, #2a1633);
+}
+
+.usuario-id {
+    margin: 4px 0 20px 0;
+    font-size: 13px;
+    color: var(--texto-suave, #77647f);
+}
+
+.usuario-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 24px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+}
+
+.campo .label {
+    font-size: 12px;
+    color: var(--texto-suave, #77647f);
+    margin-bottom: 4px;
+}
+
+.campo .valor {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--texto, #2a1633);
+}
+
+.usuario-footer {
+    margin-top: 24px;
+    padding-top: 12px;
+    font-size: 12px;
+    color: var(--texto-suave, #77647f);
+}
+
+.usuario-footer p {
+    margin: 0;
+}
+
+/* TARJETA DE ESTADO DE ACCESO (DERECHA) */
+.tarjeta-estado-acceso {
+    flex: 1;
+    min-width: 300px;
+    background-color: #EDF7ED;
+    border: 1px solid #B7E1CD;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.icono-estado {
+    width: 40px;
+    height: 40px;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #CEEAD6;
+    margin-bottom: 16px;
+}
+
+.titulo-estado {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #137333;
+}
+
+.descripcion-estado {
+    margin: 8px 0 20px 0;
+    font-size: 13px;
+    color: #1e7e34;
+    line-height: 1.4;
+}
+
+.info-fecha {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.info-fecha .label {
+    font-size: 12px;
+    color: var(--texto-suave, #77647f);
+    margin-bottom: 2px;
+}
+
+.info-fecha .valor {
+    font-size: 14px;
+    font-weight: 700;
+    color: #4a3554;
+}
+
+.btn-registrar-ingreso {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    background-color: var(--morado-600, #692a7f);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+.btn-registrar-ingreso:hover {
+    background-color: var(--morado-800, #441b54);
+}
+
+.nota-advertencia {
+    margin: 16px 0 0 0;
+    font-size: 11.5px;
+    color: var(--texto-suave, #77647f);
+    line-height: 1.35;
+}
+
+/* ESTILOS DEL PANEL HISTORIAL RECIENTE DE ACCESOS */
+.historial-accesos {
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid var(--borde, #e8dcec);
+    border-radius: 12px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    padding: 24px 24px 12px 24px;
+    box-sizing: border-box;
+}
+
+/* ENCABEZADO */
+.historial-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--texto, #2a1633);
+}
+
+.historial-header p {
+    margin: 4px 0 20px 0;
+    font-size: 13px;
+    color: var(--texto-suave, #77647f);
+}
+
+/* CONTENEDOR CON SCROLL EN PANTALLAS PEQUEÑAS */
+.historial-tabla-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* ESTILOS DE LA TABLA */
+.historial-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13px;
+}
+
+/* ENCABEZADO DE LA TABLA (THEAD) */
+.historial-tabla thead tr {
+    background-color: #fbf8fc;
+}
+
+.historial-tabla th {
+    padding: 12px 16px;
+    font-weight: 600;
+    color: var(--texto-suave, #77647f);
+    border-bottom: 1px solid var(--borde, #e8dcec);
+}
+
+.historial-tabla th.col-hora {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.historial-tabla th.col-operador {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+/* FILAS DE LA TABLA (TBODY) */
+.historial-tabla td {
+    padding: 16px;
+    color: #4a3554;
+    border-bottom: 1px solid #f0e8f3;
+}
+
+.historial-tabla tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.historial-tabla .nombre-usuario {
+    font-weight: 500;
+    color: var(--texto, #2a1633);
+}
+
+/* CONTENEDOR DE LOS BOTONES */
+.acciones-acceso {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+/* BOTÓN REGISTRAR SALIDA */
+.btn-registrar-salida {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    align-items: center;
+    padding: 0 10px;
+    white-space: nowrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border: 1px solid var(--morado-600, #692a7f);
+    border-radius: 6px;
+    background-color: #FFFFFF;
+    color: var(--morado-600, #692a7f);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-registrar-salida:hover {
+    background-color: var(--morado-100, #f0e1f3);
+}
