@@ -35,7 +35,7 @@
                 <span>Pagos QR</span>
             </a>
 
-            <a href="{{ route('controlacceso') }}" class="button-options">
+            <a href="{{ route('control-acceso.index') }}" class="button-options">
                 <img src="https://img.icons8.com/fluency-systems-regular/24/door-opened.png"
                     alt="">
                 <span>Control de acceso</span>

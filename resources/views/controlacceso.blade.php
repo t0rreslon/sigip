@@ -4,6 +4,7 @@
     <!-- meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- estilos de usuarios y estilos del panel izquierdo -->
     @vite(['resources/js/app.js'])
     <!-- javascrpit del pop-out -->
@@ -63,6 +64,7 @@
                             <!-- Campo de búsqueda -->
                             <input
                                 type="search"
+                                id="identificacion"
                                 class="barra-busqueda"
                                 placeholder="Buscar por nombre, identificación o correo..."
                                 aria-label="Buscar usuarios">
@@ -87,33 +89,33 @@
                         <!-- TARJETA DE DATOS DEL USUARIO (IZQUIERDA) -->
                         <div class="tarjeta-usuario">
                             <div class="usuario-header">
-                                <h2>Mariana López</h2>
-                                <p class="usuario-id">1032456789 · Estudiante</p>
+                                <h2 id="nombre-usuario">Mariana López</h2>
+                                <p class="usuario-id" id="identificacion-usuario">1032456789 · Estudiante</p>
                             </div>
                             <div class="usuario-grid">
                                 <div class="campo">
                                     <span class="label">Estado del usuario</span>
-                                    <span class="valor">Activo</span>
+                                    <span class="valor" id="estado-usuario">Activo</span>
                                 </div>
                                 <div class="campo">
                                     <span class="label">Plan</span>
-                                    <span class="valor">Mensual universitario</span>
+                                    <span class="valor" id="plan-usuario">Mensual universitario</span>
                                 </div>
                                 <div class="campo">
                                     <span class="label">Vigencia de suscripción</span>
-                                    <span class="valor">02 oct—31 oct 2026</span>
+                                    <span class="valor" id="vigencia-usuario">02 oct—31 oct 2026</span>
                                 </div>
                                 <div class="campo">
                                     <span class="label">Pago</span>
-                                    <span class="valor">$ 35.000 · Verificado</span>
+                                    <span class="valor" id="pago-usuario">$ 35.000 · Verificado</span>
                                 </div>
                                 <div class="campo">
                                     <span class="label">Correo</span>
-                                    <span class="valor">mariana.lopez@correo.demo</span>
+                                    <span class="valor" id="correo-usuario">mariana.lopez@correo.demo</span>
                                 </div>
                                 <div class="campo">
                                     <span class="label">Teléfono</span>
-                                    <span class="valor">300 456 7890</span>
+                                    <span class="valor" id="telefono-usuario">300 456 7890</span>
                                 </div>
                             </div>
                             <div class="usuario-footer">
@@ -128,15 +130,15 @@
                                     <path d="m9 12 2 2 4-4"></path>
                                 </svg>
                             </div>
-                            <h3 class="titulo-estado">Acceso autorizado</h3>
-                            <p class="descripcion-estado">Usuario activo, suscripción vigente y pago verificado.</p>
+                            <h3 class="titulo-estado" id="titulo-estado">Acceso autorizado</h3>
+                            <p class="descripcion-estado" id="descripcion-estado">Usuario activo, suscripción vigente y pago verificado.</p>
                             <div class="info-fecha">
                                 <span class="label">Fecha y hora de consulta</span>
-                                <span class="valor">22 oct 2026 · 10:30</span>
+                                <span class="valor" id="fecha-consulta">22 oct 2026 · 10:30</span>
                             </div>
                             <div class="acciones-acceso">
                                 <!-- BOTÓN REGISTRAR INGRESO -->
-                                <button type="button" class="btn-registrar-ingreso">
+                                <button type="button" class="btn-registrar-ingreso" id="registrar-ingreso">
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         width="18" height="18"
                                         viewBox="0 0 24 24"
@@ -152,7 +154,7 @@
                                     Registrar ingreso
                                 </button>
                                 <!-- BOTÓN REGISTRAR SALIDA -->
-                                <button type="button" class="btn-registrar-salida">
+                                <button type="button" class="btn-registrar-salida" id="registrar-salida">
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         width="18" height="18"
                                         viewBox="0 0 24 24"

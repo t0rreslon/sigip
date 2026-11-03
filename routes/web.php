@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ControlAccesoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,6 +25,22 @@ Route::get('/usuarios', function () {
 Route::get('/control-acceso', function () {
     return view('controlacceso');
 })->name('controlacceso');
+
+/* RUTAS DE TIPO GET Y POST DE CONTROL DE ACCESO USANDO EL CONTROLADOR */
+// para mostrar la vista
+Route::get('/control-acceso', [ControlAccesoController::class, 'index'])
+    ->name('control-acceso.index');
+// para consultar los registros
+Route::get('/control-acceso/consultar', [ControlAccesoController::class, 'consultar'])
+    ->name('control-acceso.consultar');
+// Registrar un ingreso
+Route::post('/control-acceso/ingreso', [ControlAccesoController::class, 'registrarIngreso'])
+    ->name('control-acceso.ingreso');
+// Registrar una salida
+Route::post('/control-acceso/salida/{usuario_id}', [ControlAccesoController::class, 'registrarSalida'])
+    ->name('control-acceso.salida');
+
+/* CIERRAN RUTAS DE TIPO GET Y POST DE CONTROL DE ACCESO USANDO CONTROLADORES */
 
 Route::get('/prestamos', function () {
     return view('prestamos');
