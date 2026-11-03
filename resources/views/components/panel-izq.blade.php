@@ -11,13 +11,13 @@
     <nav class="opciones" aria-label="Navegación principal">
         <div class="d-grid gap-2 mx-auto">
 
-            <a href="#" class="button-options">
+            <a href="Index" class="button-options">
                 <img src="https://img.icons8.com/puffy/32/dashboard-layout.png"
                     alt="">
                 <span>Inicio</span>
             </a>
 
-            <a href="#" class="button-options">
+            <a href="Usuarios" class="button-options">
                 <img src="https://img.icons8.com/pastel-glyph/64/conference-call.png"
                     alt="">
                 <span>Usuarios</span>

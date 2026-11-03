@@ -1,0 +1,484 @@
+/* CONTENIDO PRINCIPAL DE PRESTAMOS */
+.contenido-prestamos{
+    height: auto;
+    max-height: none;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding-top: 24px;
+    padding-right: 32px;
+    padding-left: 32px;
+    box-sizing: border-box;
+}
+
+/* ESTRUCTURA GENERAL DE LA SECCIÓN DE PRESTAMOS */
+.contenido-prestamos {
+    width: 100%;
+    padding-top: 24px;
+    padding-right: 32px;
+    padding-left: 32px;
+    box-sizing: border-box;
+}
+
+/* CONTENEDOR GRID DE TARJETAS */
+.disponibilidad-elementos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    width: 100%;
+    margin-top: 24px;
+    box-sizing: border-box;
+}
+
+/* TARJETA INDIVIDUAL */
+.tarjeta-metrica {
+    background-color: #ffffff;
+    border: 1px solid var(--borde, #e8dcec);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 120px;
+    box-sizing: border-box;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.tarjeta-metrica:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+/* ENCABEZADO DE LA TARJETA (Título + Icono) */
+.tarjeta-metrica-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.titulo-implemento {
+    font-size: 13.5px;
+    color: var(--texto-suave, #77647f);
+    font-weight: 500;
+}
+
+.icono-metrica {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* CUERPO DE LA TARJETA (Número grande + Detalle) */
+.tarjeta-metrica-cuerpo {
+    display: flex;
+    flex-direction: column;
+}
+
+.tarjeta-metrica-cuerpo .cantidad {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--texto, #2a1633);
+    line-height: 1.1;
+    margin-bottom: 6px;
+}
+
+.tarjeta-metrica-cuerpo .detalle {
+    font-size: 12px;
+    color: var(--texto-suave, #77647f);
+}
+
+/* COMBOBOX DE categoria */
+/* Contenedor */
+.categoria {
+    flex: 0 1 190px;
+    /* display: flex; */
+    flex-direction: column;
+    gap: 6px;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+}
+
+/* Combo-box */
+.combobox-categoria {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    padding: 10px 14px;
+    background-color: #FFFFFF;
+    color: var(--texto-suave, #77647f);
+    border: 1px solid #dac9e0;
+    border-radius: 6px;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Al seleccionar */
+.combobox-categoria:focus {
+    border-color: var(--morado-600, #692a7f);
+    box-shadow: 0 0 0 3px rgba(105, 42, 127, 0.12);
+}
+
+/* Opciones */
+.combobox-categoria option {
+    background-color: #FFFFFF;
+    color: var(--morado-800, #441b54);
+    padding: 10px;
+}
+
+/* Placeholder */
+.combobox-categoria option:disabled {
+    color: #a898b0;
+}
+
+/* COMBOBOX DE ESTADO */
+/* Contenedor */
+.estados{
+    /* display: flex; */
+    flex: 01 190px;
+    flex-direction: column;
+    gap: 6px;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+}
+
+/* Combo-box */
+.combobox-estado {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 14px;
+    background-color: #FFFFFF;
+    color: var(--texto-suave, #77647f);
+    border: 1px solid #dac9e0;
+    border-radius: 6px;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Al seleccionar */
+.combobox-estado:focus {
+    border-color: var(--morado-600, #692a7f);
+    box-shadow: 0 0 0 3px rgba(105, 42, 127, 0.12);
+}
+
+/* Opciones */
+.combobox-estado option {
+    background-color: #FFFFFF;
+    color: var(--morado-800, #441b54);
+    padding: 10px;
+}
+
+/* Placeholder */
+.combobox-estado option:disabled {
+    color: #a898b0;
+}
+
+/* ESTILOS TABLA PRESTAMO */
+
+.tabla-prestamos{
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.tabla-prestamos thead th{
+    padding: 14px 12px;
+    background-color: var(--morado-50, #f8f1fa);
+    border-bottom: 2px solid #dac9e0;
+    position: sticky;
+    top: 0;
+    z-index: 1; /* Mantiene el encabezado por encima del contenido */
+    text-align: left;
+    vertical-align: middle;
+    white-space: normal;
+    overflow-wrap: break-word;
+    color: var(--texto-suave, #77647f);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* estilos independientes de cada columna */
+/* MANEJO DE LAS COLUMNAS INDEPENDIENTES */
+
+.tabla-prestamos .col-identificacion{
+    width: 14%;
+    color: #4a3554;
+    font-size: 13px;
+}
+
+.tabla-prestamos .col-categoria{
+    width: 12%;
+    color: #4a3554;
+    font-size: 13px;
+}
+
+.tabla-prestamos .col-responsable{
+    width: 12%;
+    color: #4a3554;
+    font-size: 13px;
+}
+
+.tabla-prestamos .col-prestamo{
+    width: 10%;
+    color: #4a3554;
+    font-size: 13px;
+}
+
+.tabla-prestamos .col-estado{
+    width: 10%;
+    color: #4a3554;
+    font-size: 13px;
+}
+
+.tabla-prestamos .col-devolucion{
+    width: 11%;
+    color: var(--texto-suave, #77647f);
+    font-size: 12px;
+}
+
+/* Espaciado de las celdas */
+.tabla-prestamos tbody td {
+    padding: 14px 12px;
+    vertical-align: middle;
+    color: #4a3554;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+/* ESTILOS DEL BOTÓN: Registrar devolución */
+.registrar-devolucion {
+    background-color: var(--morado-100, #f0e1f3);
+    color: var(--morado-600, #692a7f);
+    border: 1px solid var(--morado-200, #e0c4e4);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.registrar-devolucion:hover {
+    background-color: var(--morado-600, #692a7f);
+    color: #FFFFFF;
+    border-color: var(--morado-600, #692a7f);
+    box-shadow: 0 2px 4px rgba(105, 42, 127, 0.2);
+}
+
+/* ESTILOS DE LAS FILAS */
+
+.tabla-prestamos tbody tr {
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--borde, #e8dcec);
+    transition: background-color 0.2s ease;
+}
+
+.tabla-prestamos tbody tr:nth-child(even) {
+    background: #fbf8fc;
+}
+.tabla-prestamos tbody tr:hover {
+    background: var(--morado-50, #f8f1fa);
+}
+
+/* ESTILOS DE LA VENTANA MODAL REGISTRAR DEVOLUCION */
+.modal-registro {
+    width: 100%;
+    max-width: 580px;
+    border: none;
+    border-radius: 12px;
+    padding: 24px;
+    background-color: #FFFFFF;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+}
+
+.modal-registro::backdrop {
+    background-color: rgba(46, 18, 57, 0.4);
+    backdrop-filter: blur(2px);
+}
+
+/* ENCABEZADO */
+.modal-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.modal-encabezado h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--texto, #2a1633);
+}
+
+.modal-subtitulo {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: var(--texto-suave, #77647f);
+}
+
+.btn-cerrar {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #a898b0;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.btn-cerrar:hover {
+    color: var(--texto, #2a1633);
+}
+
+/* RESUMEN SUPERIOR */
+.modal-info-resumen {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.resumen-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.resumen-col .label {
+    font-size: 12px;
+    color: var(--texto-suave, #77647f);
+    margin-bottom: 4px;
+}
+
+.resumen-col .valor {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--texto, #2a1633);
+}
+
+/* CONTENEDORES DE CAMPOS CON BORDE FIJO */
+.campo-box {
+    border: 1px solid var(--borde, #e8dcec);
+    border-radius: 8px;
+    padding: 8px 12px;
+    background-color: #FFFFFF;
+    transition: border-color 0.2s ease;
+}
+
+.campo-box:focus-within {
+    border-color: var(--morado-600, #692a7f);
+}
+
+.campo-box .form-label {
+    display: block;
+    font-size: 11.5px;
+    color: var(--texto-suave, #77647f);
+    margin-bottom: 2px;
+}
+
+.campo-box .form-control,
+.campo-box .form-select {
+    border: none !important;
+    padding: 0 !important;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--texto, #2a1633);
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.ayuda-input {
+    display: block;
+    font-size: 12px;
+    color: var(--texto-suave, #77647f);
+    margin-top: 4px;
+}
+
+/* CAMPO DESHABILITADO (OPERADOR) */
+.campo-deshabilitado {
+    background-color: #fbf8fc;
+    border-color: #f0e8f3;
+}
+
+/* BANNER DE INSTRUCCIÓN EN VERDE */
+.banner-confirmacion {
+    background-color: #EDF7ED;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.icono-check {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.texto-banner strong {
+    display: block;
+    font-size: 13px;
+    color: #137333;
+    margin-bottom: 2px;
+}
+
+.texto-banner p {
+    margin: 0;
+    font-size: 12px;
+    color: #2D6A4F;
+    line-height: 1.35;
+}
+
+/* BOTONES DE ACCIÓN */
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancelar {
+    background-color: #FFFFFF;
+    color: #4a3554;
+    border: 1px solid #dac9e0;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-cancelar:hover {
+    background-color: #fbf8fc;
+}
+
+.btn-guardar {
+    background-color: var(--morado-600, #692a7f);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-guardar:hover {
+    background-color: var(--morado-800, #441b54);
+}
