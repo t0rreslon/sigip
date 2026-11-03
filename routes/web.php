@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-<<<<<<< HEAD
+
 use App\Http\Controllers\ControlAccesoController;
-=======
+
 use App\Http\Controllers\UsuarioController;
->>>>>>> origin/anyi
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -44,8 +44,8 @@ Route::get('/control-acceso', [ControlAccesoController::class, 'index'])
 Route::get('/control-acceso/consultar', [ControlAccesoController::class, 'consultar'])
     ->name('control-acceso.consultar');
 // Registrar un ingreso
-Route::post('/control-acceso/ingreso', [ControlAccesoController::class, 'registrarIngreso'])
-    ->name('control-acceso.ingreso');
+Route::post('/control-acceso/registrar-ingreso', [ControlAccesoController::class, 'registrarIngreso'])
+    ->name('control-acceso.registrar-ingreso');
 // Registrar una salida
 Route::post('/control-acceso/salida/{usuario_id}', [ControlAccesoController::class, 'registrarSalida'])
     ->name('control-acceso.salida');

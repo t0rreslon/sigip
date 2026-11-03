@@ -12,3 +12,6 @@ import '../css/panel_izq.css';
 import '../css/nav_bar.css';
 import '../css/styles_control_acceso.css';
 import '../css/styles_prestamos.css';
+
+//importar el js
+import './control-acceso.js';

@@ -7,13 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Usuario extends Model
 {
     protected $table = 'usuario';
-<<<<<<< HEAD
     protected $primaryKey = 'usuario_id';
-=======
-
-    protected $primaryKey = 'usuario_id';
-
->>>>>>> origin/anyi
     public $timestamps = false;
 
     protected $fillable = [
@@ -38,8 +32,8 @@ class Usuario extends Model
             'estado_usuario' => 'boolean',
         ];
     }
-<<<<<<< HEAD
+
 }
-=======
-}
->>>>>>> origin/anyi
+
+
+
