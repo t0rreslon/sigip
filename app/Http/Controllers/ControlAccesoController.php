@@ -58,7 +58,7 @@ class ControlAccesoController extends Controller
         ]);
     }
 
-    
+
     // REGISTRAR INGRESO
     public function registrarIngreso(Request $request)
     {
@@ -92,6 +92,7 @@ class ControlAccesoController extends Controller
             ->orderByDesc('s.fecha_inicio')
             ->select(
                 's.suscripcion_id',
+                's.plan_id',
                 's.fecha_inicio',
                 's.fecha_fin',
                 's.cantidad_dias_restantes',
@@ -110,18 +111,28 @@ class ControlAccesoController extends Controller
         }
 
         // Verificar pago confirmado
-        $pagoConfirmado = DB::table('pago')
+        // Verificar que el valor total del plan esté pagado
+        $totalPagado = DB::table('pago')
             ->where('suscripcion_id', $suscripcion->suscripcion_id)
-            ->where('esta_confirmado', true)
-            ->exists();
+            ->where('estado_pago', 'Verificado')
+            ->sum('monto');
 
-        if (!$pagoConfirmado) {
+        // Obtener el costo del plan
+        $costoPlan = DB::table('plan')
+            ->where('plan_id', $suscripcion->plan_id)
+            ->value('costo');
+
+        $pagoCompleto = (float) $totalPagado >= (float) $costoPlan;
+
+        if (!$pagoCompleto) {
             return response()->json([
                 'success' => false,
-                'message' => 'El pago de la suscripción no está confirmado.'
+                'message' => 'El usuario no ha completado el pago de su plan. Valor pagado: $' .
+                    number_format((float) $totalPagado, 0, ',', '.') .
+                    ' de $' .
+                    number_format((float) $costoPlan, 0, ',', '.')
             ], 403);
         }
-
         // Validar condiciones según el tipo de plan
         if ($suscripcion->tipo_plan === 'suscripcion') {
 
@@ -143,7 +154,6 @@ class ControlAccesoController extends Controller
                     'message' => 'La suscripción se encuentra fuera de su periodo de vigencia.'
                 ], 403);
             }
-
         } elseif ($suscripcion->tipo_plan === 'tiquetera') {
 
             if ($suscripcion->cantidad_dias_restantes <= 0) {
@@ -152,7 +162,6 @@ class ControlAccesoController extends Controller
                     'message' => 'El usuario no tiene entradas disponibles.'
                 ], 403);
             }
-
         } else {
             return response()->json([
                 'success' => false,
@@ -221,11 +230,10 @@ class ControlAccesoController extends Controller
                 'suscripcion_id' => $suscripcion->suscripcion_id,
                 'plan' => $suscripcion->nombre_plan,
                 'entradas_restantes' =>
-                    $suscripcion->tipo_plan === 'tiquetera'
-                        ? $suscripcion->cantidad_dias_restantes - 1
-                        : null
+                $suscripcion->tipo_plan === 'tiquetera'
+                    ? $suscripcion->cantidad_dias_restantes - 1
+                    : null
             ]);
-
         } catch (\RuntimeException $e) {
             return response()->json([
                 'success' => false,
@@ -281,6 +289,7 @@ class ControlAccesoController extends Controller
                 ->where('s.usuario_id', $usuario->usuario_id)
                 ->select(
                     's.suscripcion_id',
+                    's.plan_id',
                     's.fecha_inicio',
                     's.fecha_fin',
                     's.cantidad_dias_restantes',
@@ -291,13 +300,25 @@ class ControlAccesoController extends Controller
                     'pl.costo'
                 )
                 ->selectRaw("
-                    EXISTS (
-                        SELECT 1
-                        FROM pago p
-                        WHERE p.suscripcion_id = s.suscripcion_id
-                        AND p.esta_confirmado = TRUE
-                    ) AS pago_confirmado
-                ")
+    COALESCE((
+        SELECT SUM(p.monto)
+        FROM pago p
+        WHERE p.suscripcion_id = s.suscripcion_id
+        AND p.estado_pago = 'Verificado'
+    ), 0) AS total_pagado
+")
+                ->selectRaw("
+    CASE
+        WHEN COALESCE((
+            SELECT SUM(p.monto)
+            FROM pago p
+            WHERE p.suscripcion_id = s.suscripcion_id
+            AND p.estado_pago = 'Verificado'
+        ), 0) >= pl.costo
+        THEN TRUE
+        ELSE FALSE
+    END AS pago_confirmado
+")
                 ->orderByDesc('s.fecha_inicio')
                 ->get();
 

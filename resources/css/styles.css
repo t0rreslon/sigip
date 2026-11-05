@@ -8,6 +8,17 @@ body{
     font-family: "Inter", sans-serif;
 }
 
+.panel-izq_index{
+background-color: #692a7f;
+width: 30%;
+height: 100%;
+color: white;
+display: flex;
+flex-direction: column;
+padding: 50px;
+gap: 25px;
+}
+
 .flexbox {
  display: flex;
  width: 100%;
@@ -295,22 +306,6 @@ body{
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .ruta {
     font-size: 12px;
     color: var(--texto-suave);
@@ -397,6 +392,24 @@ body{
     color: var(--texto-suave);
     margin-top: 2px;
 }
+
+.btn-plan-activo{
+    background-color: var(--morado-600);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 11px 18px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-plan-activo:hover {
+    background-color: var(--morado-700);
+}
+
 
 /* Botones */
 .btn-primario {
@@ -868,4 +881,930 @@ body{
     font-size: 11px;
     color: var(--texto-suave);
     padding: 14px 0 0;
+}
+
+
+
+/* Ocultar ubicación y último mantenimiento en Todos e Implementos */
+table:not(.solo-maquinas) .col-ubicacion,
+table:not(.solo-maquinas) .col-mantenimiento {
+    display: none;
+}
+
+/* =====================================================
+   VENTANAS EMERGENTES: CREAR PLAN / EDITAR PLAN
+   Usan la etiqueta <dialog>. Reutilizan .aviso, .btn-borde
+   y .btn-primario de las vistas anteriores.
+   Todo va con el prefijo .modal-plan para no chocar con
+   las clases .modal-registro de otras páginas.
+   ===================================================== */
+ 
+tbody{
+    color: #2a1633;
+}
+   
+.modal-plan {
+    width: 560px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+    padding: 0;
+    margin: auto;
+    border: none;
+    border-radius: 12px;
+    background-color: white;
+    color: var(--texto);
+    box-shadow: 0 20px 60px rgba(46, 18, 57, 0.25);
+    overflow-y: auto;
+}
+ 
+.modal-plan::backdrop {
+    background-color: rgba(46, 18, 57, 0.5);
+    backdrop-filter: blur(2px);
+}
+ 
+.modal-plan-cuerpo {
+    padding: 22px 24px;
+}
+ 
+/* Encabezado */
+.modal-plan-cab {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+ 
+.modal-plan-cab h2 {
+    font-size: 20px;
+    color: var(--morado-800);
+}
+ 
+.modal-plan-cab p {
+    font-size: 11px;
+    color: var(--texto-suave);
+    margin-top: 4px;
+}
+ 
+.modal-plan-cerrar {
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--texto-suave);
+    cursor: pointer;
+    padding: 2px 4px;
+    transition: color 0.2s ease;
+}
+ 
+.modal-plan-cerrar:hover {
+    color: var(--morado-600);
+}
+ 
+/* Campos: caja con borde, etiqueta pequeña arriba y valor abajo */
+.fila-plan {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+ 
+.fila-plan.una {
+    grid-template-columns: 1fr;
+}
+ 
+.campo-plan {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    background-color: white;
+    cursor: text;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+ 
+.campo-plan:focus-within {
+    border-color: var(--morado-500);
+    box-shadow: 0 0 0 3px rgba(105, 42, 127, 0.12);
+}
+ 
+.campo-plan span {
+    font-size: 11px;
+    color: var(--texto-suave);
+}
+ 
+.campo-plan input,
+.campo-plan select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--texto);
+    padding: 0;
+}
+ 
+.campo-plan select {
+    cursor: pointer;
+}
+ 
+.campo-plan input::placeholder {
+    color: #a898b0;
+}
+ 
+.nota-plan {
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--texto-suave);
+    margin-bottom: 18px;
+}
+ 
+/* Aviso amarillo: la clase hidden debe ganarle al display:flex */
+.modal-plan .aviso {
+    margin-bottom: 14px;
+}
+ 
+.aviso[hidden] {
+    display: none;
+}
+ 
+.modal-plan .btn-desactivar {
+    margin-bottom: 16px;
+}
+ 
+/* Botones de abajo */
+.modal-plan-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 6px;
+}
+ 
+@media (max-width: 560px) {
+    .fila-plan { grid-template-columns: 1fr; }
+}
+ 
+/* =====================================================
+   VENTANA EMERGENTE: REGISTRAR ELEMENTO (Inventario)
+   Reutiliza las clases .modal-plan, .campo-plan, .fila-plan,
+   .nota-plan y .modal-plan-acciones de la ventana de planes.
+   ===================================================== */
+ 
+/* Para que el atributo hidden oculte el campo de cantidad */
+.campo-plan[hidden] {
+    display: none;
+}
+
+.modal-revision {
+    width: 500px;
+}
+
+.modal-revision .modal-plan-cuerpo {
+    padding: 24px;
+}
+
+.modal-revision .campo-plan {
+    cursor: default;
+}
+
+.modal-revision .campo-plan select,
+.modal-revision .campo-plan input {
+    cursor: pointer;
+}
+
+.modal-revision .modal-plan-acciones .btn-primario {
+    margin-top: 0;
+}
+
+@media (max-width: 560px) {
+    .modal-revision {
+        max-width: calc(100vw - 24px);
+    }
+
+    .modal-revision .modal-plan-cuerpo {
+        padding: 20px 16px;
+    }
+}
+
+/* =====================================================
+   VISTA: PLANES Y SUSCRIPCIONES form
+   ===================================================== */
+   
+.modal-plan {
+    width: 560px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+    padding: 0;
+    margin: auto;
+    border: none;
+    border-radius: 12px;
+    background-color: white;
+    color: var(--texto);
+    box-shadow: 0 20px 60px rgba(46, 18, 57, 0.25);
+    overflow-y: auto;
+}
+ 
+.modal-plan::backdrop {
+    background-color: rgba(46, 18, 57, 0.5);
+    backdrop-filter: blur(2px);
+}
+ 
+.modal-plan-cuerpo {
+    padding: 22px 24px;
+}
+ 
+/* Encabezado */
+.modal-plan-cab {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+ 
+.modal-plan-cab h2 {
+    font-size: 20px;
+    color: var(--morado-800);
+}
+ 
+.modal-plan-cab p {
+    font-size: 11px;
+    color: var(--texto-suave);
+    margin-top: 4px;
+}
+ 
+.modal-plan-cerrar {
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--texto-suave);
+    cursor: pointer;
+    padding: 2px 4px;
+    transition: color 0.2s ease;
+}
+ 
+.modal-plan-cerrar:hover {
+    color: var(--morado-600);
+}
+ 
+/* Campos: caja con borde, etiqueta pequeña arriba y valor abajo */
+.fila-plan {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+ 
+.fila-plan.una {
+    grid-template-columns: 1fr;
+}
+ 
+.campo-plan {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    background-color: white;
+    cursor: text;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+ 
+.campo-plan:focus-within {
+    border-color: var(--morado-500);
+    box-shadow: 0 0 0 3px rgba(105, 42, 127, 0.12);
+}
+ 
+.campo-plan span {
+    font-size: 11px;
+    color: var(--texto-suave);
+}
+ 
+.campo-plan input,
+.campo-plan select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--texto);
+    padding: 0;
+}
+ 
+.campo-plan select {
+    cursor: pointer;
+}
+ 
+.campo-plan input::placeholder {
+    color: #a898b0;
+}
+ 
+.nota-plan {
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--texto-suave);
+    margin-bottom: 18px;
+}
+ 
+/* Aviso amarillo: la clase hidden debe ganarle al display:flex */
+.modal-plan .aviso {
+    margin-bottom: 14px;
+}
+ 
+.aviso[hidden] {
+    display: none;
+}
+ 
+.modal-plan .btn-desactivar {
+    margin-bottom: 16px;
+}
+ 
+/* Botones de abajo */
+.modal-plan-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 6px;
+}
+ 
+@media (max-width: 560px) {
+    .fila-plan { grid-template-columns: 1fr; }
+}
+ 
+
+/* Ajustes de los formularios Crear / Editar plan */
+.modal-plan form {
+    margin: 0;
+}
+
+.modal-plan .campo-plan input[type="number"] {
+    appearance: textfield;
+}
+
+.modal-plan .campo-plan input[type="number"]::-webkit-inner-spin-button,
+.modal-plan .campo-plan input[type="number"]::-webkit-outer-spin-button {
+    margin: 0;
+}
+
+.modal-plan .btn-desactivar {
+    font-family: inherit;
+}
+
+.modal-plan .modal-plan-acciones button {
+    min-height: 36px;
+}
+
+@media (max-width: 560px) {
+    .modal-plan-cuerpo {
+        padding: 20px 16px;
+    }
+
+    .modal-plan-acciones {
+        flex-wrap: wrap;
+    }
+
+    .modal-plan-acciones button {
+        flex: 1;
+    }
+}
+
+
+
+/* Contenedor principal del carrusel de planes */
+.planes-contenedor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Área visible del carrusel */
+.planes {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Fila horizontal de tarjetas */
+.planes-track {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    width: 100%;
+    transition: transform 0.4s ease-in-out;
+}
+
+/* Cada tarjeta conserva su tamaño */
+.planes-track .tarjeta-plan {
+    flex: 0 0 280px;
+    min-width: 280px;
+}
+
+
+/* Diseño compartido de las flechas de los carruseles */
+.flecha-carrusel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background-color: #e4d0fc;
+    color: #6d2fa6;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+/* Flecha morada oscura */
+.flecha-carrusel i {
+    font-size: 16px;
+    color: #5e2891;
+}
+
+/* Efecto al pasar el cursor */
+.flecha-carrusel:hover:not(:disabled) {
+    background-color: #DCC8F0;
+    transform: scale(1.08);
+}
+
+/* Flechas deshabilitadas */
+.flecha-carrusel:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+
+
+
+
+/* ==========================================
+   MÓDULO DE PAGOS
+========================================== */
+
+.pagos-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(280px, 0.85fr);
+    gap: 22px;
+    align-items: start;
+}
+
+.bandeja-pagos,
+.formulario-pago {
+    min-width: 0;
+}
+
+.encabezado-tarjeta-pagos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.resumen-pagos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.resumen-pago {
+    background: #fff;
+    border: 1px solid #e9e3f2;
+    border-radius: 12px;
+    padding: 15px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.resumen-pago span {
+    color: #71677e;
+    font-size: 13px;
+}
+
+.resumen-pago strong {
+    color: #6741a5;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* Filtros */
+
+.filtros-pagos {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    margin-bottom: 20px;
+}
+
+.filtro-busqueda,
+.filtros-pagos-secundarios label,
+.campo-pago {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.filtros-pagos label,
+.campo-pago label {
+    color: #51465f;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.filtro-busqueda input,
+.filtros-pagos input,
+.filtros-pagos select,
+.campo-pago input,
+.campo-pago select {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    border: 1px solid #ded5eb;
+    border-radius: 8px;
+    padding: 9px 11px;
+    background: #fff;
+    color: #30283b;
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.filtro-busqueda input:focus,
+.filtros-pagos input:focus,
+.filtros-pagos select:focus,
+.campo-pago input:focus,
+.campo-pago select:focus {
+    border-color: #8054bd;
+    box-shadow: 0 0 0 3px rgba(128, 84, 189, 0.12);
+}
+
+.filtros-pagos-secundarios {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.acciones-filtros-pagos {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.acciones-filtros-pagos a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 8px 14px;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+/* Tabla */
+
+.tabla-contenedor-pagos {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-pagos {
+    width: 100%;
+    min-width: 650px;
+    border-collapse: collapse;
+}
+
+.tabla-pagos th {
+    color: #66547f;
+    background: #f7f3fb;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    padding: 12px 10px;
+    white-space: nowrap;
+}
+
+.tabla-pagos td {
+    padding: 13px 10px;
+    border-bottom: 1px solid #eee9f3;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.tabla-pagos td small {
+    display: block;
+    margin-top: 4px;
+    color: #80778c;
+    font-size: 11px;
+}
+
+.tabla-pagos .nombre {
+    display: block;
+    color: #342a40;
+    font-weight: 600;
+}
+
+.tabla-pagos .plan-pago {
+    color: #7753a5;
+    font-weight: 500;
+}
+
+.valor-pago {
+    display: block;
+    color: #352a43;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.sin-pagos {
+    text-align: center;
+    color: #81768e;
+    padding: 30px !important;
+}
+
+/* Estados */
+
+.estado-pago {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.estado-pago.pendiente {
+    color: #8a6415;
+    background: #fff3d6;
+}
+
+.estado-pago.verificado {
+    color: #28734d;
+    background: #e1f4e9;
+}
+
+.estado-pago.rechazado {
+    color: #a65b61;
+    background: #fbeaec;
+}
+
+/* Botones de revisión */
+
+.btn-revision {
+    border: 0;
+    border-radius: 8px;
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-revision.pendiente {
+    background: #7045a5;
+    color: #fff;
+}
+
+.btn-revision.pendiente:hover {
+    background: #5c348d;
+    transform: translateY(-1px);
+}
+
+.btn-revision.rechazado {
+    background: #f8e7e9;
+    color: #a65b61;
+    border: 1px solid #efd0d4;
+}
+
+.btn-revision.rechazado:hover {
+    background: #f2dadd;
+}
+
+.btn-revision.desactivado,
+.btn-revision:disabled {
+    background: #e9e7ec;
+    color: #918b98;
+    border: 1px solid #dedbe2;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+/* Formulario de registro */
+
+.formulario-pago h2 {
+    margin-bottom: 5px;
+}
+
+.formulario-pago form {
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+    margin-top: 20px;
+}
+
+.campo-pago small {
+    color: #82778f;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.saldo-pago {
+    background: #f4effa;
+    border: 1px solid #e4d8f1;
+    color: #68439b;
+    border-radius: 9px;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.nota-registro-pago {
+    background: #f8f5fb;
+    border-left: 3px solid #8054bd;
+    border-radius: 6px;
+    padding: 12px;
+}
+
+.nota-registro-pago strong {
+    display: block;
+    color: #6741a5;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.nota-registro-pago p {
+    color: #756b80;
+    font-size: 11px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.btn-registrar-pago {
+    width: 100%;
+    min-height: 42px;
+}
+
+/* Mensajes */
+
+.mensaje-pago,
+.mensaje-error-pago {
+    padding: 13px 16px;
+    border-radius: 9px;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+
+.mensaje-pago {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: #eee8f7;
+    border: 1px solid #ded1ef;
+    color: #65418f;
+}
+
+.mensaje-pago span {
+    font-weight: 800;
+}
+
+.mensaje-error-pago {
+    background: #fff0f0;
+    border: 1px solid #f1d0d0;
+    color: #a34f55;
+}
+
+.mensaje-error-pago ul {
+    margin: 7px 0 0;
+    padding-left: 20px;
+}
+
+/* Paginación */
+
+.paginacion-pagos {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.paginacion-pagos > small {
+    color: #80778c;
+    font-size: 11px;
+}
+
+.paginacion-pagos nav {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.paginacion-pagos nav div:first-child {
+    display: none;
+}
+
+.paginacion-pagos nav div:last-child {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.paginacion-pagos nav a,
+.paginacion-pagos nav span[aria-current="page"] span,
+.paginacion-pagos nav span[aria-disabled="true"] span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 5px 9px;
+    border: 1px solid #e4dcec;
+    border-radius: 7px;
+    color: #6741a5;
+    background: #fff;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.paginacion-pagos nav span[aria-current="page"] span {
+    background: #7045a5;
+    border-color: #7045a5;
+    color: #fff;
+}
+
+.paginacion-pagos nav span[aria-disabled="true"] span {
+    color: #aaa3b2;
+    background: #f3f1f5;
+}
+
+/* Modal de revisión */
+
+.resumen-revision {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 5px;
+    background: #f8f5fb;
+    border-radius: 9px;
+    padding: 13px;
+    margin-bottom: 18px;
+}
+
+.resumen-revision span {
+    color: #82778f;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.resumen-revision strong {
+    color: #49345f;
+    font-size: 13px;
+}
+
+/* Adaptación a pantallas pequeñas */
+
+@media (max-width: 1100px) {
+    .pagos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filtros-pagos-secundarios {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .resumen-pagos {
+        gap: 8px;
+    }
+
+    .resumen-pago {
+        padding: 12px;
+    }
+
+    .resumen-pago strong {
+        font-size: 20px;
+    }
+
+    .filtros-pagos-secundarios {
+        grid-template-columns: 1fr;
+    }
+
+    .paginacion-pagos {
+        align-items: flex-start;
+        flex-direction: column;
+    }
 }

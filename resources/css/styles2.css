@@ -22,14 +22,6 @@ body{
     height: auto;
 }
 
-aside, .panel-izquierdo { 
-    height: 100vh;
-    flex-shrink: 0;
-    overflow-y: auto; /* Permite scroll en el sidebar solo si el menú es muy largo */
-    position: sticky;
-    top: 0;
-}
-
 /* las secciones derechas e izquieras se van a separar con # pero las subsecciones se separaran con - */
 
 /* ########################################################### */
@@ -335,7 +327,7 @@ aside, .panel-izquierdo {
 .combobox-rol {
     display: block;
     width: 100%;
-    min-width: 0;
+    min-width: 260px;
     height: 42px;
     padding: 10px 14px;
     background-color: #FFFFFF;
@@ -356,7 +348,7 @@ aside, .panel-izquierdo {
     gap: 6px;
     width: auto;
     min-width: 0;
-    margin: 0;
+    margin-left: 70px;
 }
 
 
@@ -364,7 +356,7 @@ aside, .panel-izquierdo {
 .combobox-institucion {
     display: block;
     width: 100%;
-    min-width: 0;
+    min-width: 300px;
     height: 42px;
     padding: 10px 14px;
     background-color: #FFFFFF;
@@ -406,13 +398,13 @@ aside, .panel-izquierdo {
     gap: 6px;
     width: auto;
     min-width: 0;
-    margin: 0;
+    margin-left: 110px;
 }
 
 /* Combo-box */
 .combobox-estado {
     width: auto;
-    min-width: 0;
+    min-width: 225px;
     min-height: 42px;
     padding: 10px 14px;
     background-color: #FFFFFF;

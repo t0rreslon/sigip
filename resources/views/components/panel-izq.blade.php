@@ -30,13 +30,13 @@
                 <span>Usuarios</span>
             </a>
 
-            <a href="{{ route('planes') }}" class="button-options">
+            <a href="{{ route('planes.index') }}" class="button-options">
                 <img src="https://img.icons8.com/windows/32/verified-account.png"
                     alt="">
                 <span>Planes y suscripciones</span>
             </a>
 
-            <a href="{{ route('pago') }}" class="button-options">
+            <a href="{{ route('pago.index') }}" class="button-options">
                 <img src="https://img.icons8.com/external-anggara-glyph-anggara-putra/32/external-scan-user-interface-anggara-basic-outline-anggara-putra-2.png"
                     alt="">
                 <span>Pagos QR</span>
@@ -60,7 +60,7 @@
                 <span>Préstamos y devoluciones</span>
             </a>
 
-            <a href="{{ route('inventario') }}" class="button-options">
+            <a href="{{ route('inventario.index') }}" class="button-options">
                 <img src="https://img.icons8.com/windows/32/dumbbell.png"
                     alt="">
                 <span>Inventario</span>

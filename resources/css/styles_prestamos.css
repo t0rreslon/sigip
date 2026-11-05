@@ -1,3 +1,311 @@
+/* DATOS GENERALES DEL CUERPO */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body{
+    margin: 0;
+    min-height: 100%;
+    background-color: var(--morado-50, #f8f1fa);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+/* ACOMODAR EL ESPACIO ENTRE PANELES Y TABBLAS */
+.flexbox {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+}
+
+
+
+
+
+/* CONTENIDO DEL ENCABEZADO */
+
+.encabezado-seccion{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.encabezado-seccion h1{
+    width: 100%;
+    color: var(--morado-800, #441b54);
+    font-weight: 600;
+    padding: 0;
+    margin: 0;
+    font-size: 28px;
+    margin-bottom: 0px;
+}
+
+.encabezado-seccion P{
+    color: var(--texto-suave, #77647f);
+    font-size: 400;
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+}
+
+
+#abrir-dialogo {
+    width: 172px;
+    min-height: 40px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 0 12px;
+    box-sizing: border-box;
+
+    background-color: var(--morado-600, #692a7f);
+    color: #FFFFFF;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.encabezado-seccion button{
+    width: 172px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    border-radius: 6px;
+    padding-left: 16px;
+    padding-right: 16px;
+    background-color: var(--morado-600, #692a7f);
+    color: #ffffff;
+    border: none;
+    transition-duration: 0.3s;
+}
+
+.encabezado-seccion button img{
+    display: block;
+                width: 18px;
+                height: 18px;
+                min-width: 16px;
+                flex: 0 0 18px;
+                object-fit: contain;
+                /* Color inicial aproximado: #C4D2E4 */
+                filter: brightness(0) invert(1);
+                transition: filter 0.25s ease;
+}
+
+#abrir-dialogo:hover {
+    background-color: var(--morado-800, #441b54);
+    color: #FFFFFF;
+}
+
+
+
+
+
+
+
+/* PAGINACION */
+
+/* Contenedor de la paginación */
+.paginacion {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: nowrap;
+    padding: 18px 20px;
+    box-sizing: border-box;
+    background-color: #FFFFFF;
+    border-top: 1px solid var(--borde, #e8dcec);
+    border-radius: 0 0 10px 10px;
+    margin-top: 12px;
+}
+
+/* Texto de registros */
+.paginacion .texto-registros {
+    margin: 0;
+    color: var(--texto-suave, #77647f);
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Lista de páginas */
+.paginacion .pagination {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 6px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+}
+
+/* Botones */
+.paginacion .page-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 6px 9px;
+    box-sizing: border-box;
+    color: #4a3554;
+    background-color: #FFFFFF;
+    border: 1px solid #dac9e0;
+    border-radius: 6px;
+    text-decoration: none;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    white-space: nowrap;
+    transition: background-color 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease;
+}
+
+/* Hover */
+.paginacion .page-link:hover {
+    color: var(--morado-800, #441b54);
+    background-color: var(--morado-100, #f0e1f3);
+    border-color: #a898b0;
+}
+
+/* Página activa */
+.paginacion .page-link.active {
+    color: #FFFFFF;
+    background-color: var(--morado-600, #692a7f);
+    border-color: var(--morado-600, #692a7f);
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.paginacion nav{
+    min-width: 0;
+    max-width: 100%;
+}
+
+.paginacion .paginacion{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+}
+
+
+
+/* BARRA DE BUSQUEDA */
+/* Contenedor de la barra */
+.buscar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 280px;
+    width: auto;
+    min-width: 0;
+    height: 42px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    padding: 12px 36px 12px 12px;
+    background-color: #FFFFFF;
+    border: 1px solid #dac9e0;
+    border-radius: 6px;
+    color: var(--texto-suave, #77647f);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin: 0;
+}
+
+/* Icono SVG */
+.icono-busqueda {
+    flex-shrink: 0;
+    color: var(--texto-suave, #77647f);
+}
+
+/* Campo de texto */
+.barra-busqueda {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 10px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--morado-800, #441b54);
+    font-size: 13px;
+}
+
+/* Texto de ejemplo */
+.barra-busqueda::placeholder {
+    font-weight: 400;
+    font-size: 14px;
+    font-style: normal;
+    color: var(--texto-suave, #77647f);
+}
+
+/* Efecto al seleccionar la barra */
+.contenedor-busqueda:focus-within {
+    border-color: var(--morado-600, #692a7f);
+    box-shadow: 0 0 0 3px rgba(105, 42, 127, 0.12);
+}
+
+/* Evita que el navegador muestre una decoración extra */
+.barra-busqueda::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
+
+
+/* las secciones derechas e izquieras se van a separar con # pero las subsecciones se separaran con - */
+
+/* ########################################################### */
+
+/* PANEL DERECHO */
+.panel-dere {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 0;
+    min-height: 100vh;
+    height: auto;
+    background-color: var(--morado-50, #f8f1fa);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    overflow: visible;
+    margin-left: 236px;
+}
+
+/* ----------------------------------------------------------------------- */
+
+
 /* CONTENIDO PRINCIPAL DE PRESTAMOS */
 .contenido-prestamos{
     height: auto;
@@ -20,15 +328,116 @@
     box-sizing: border-box;
 }
 
-/* CONTENEDOR GRID DE TARJETAS */
+
+/* VENTANA VISIBLE DEL CARRUSEL */
 .disponibilidad-elementos {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
     width: 100%;
     margin-top: 24px;
+    overflow: hidden;
     box-sizing: border-box;
 }
+
+
+/* Contenedor del carrusel de préstamos */
+.prestamos-carrusel-contenedor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Área visible */
+.disponibilidad-elementos {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Fila horizontal de categorías */
+.carrusel-categorias-track {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    width: 100%;
+    transition: transform 0.4s ease-in-out;
+}
+
+/* Tamaño de cada tarjeta */
+.carrusel-categorias-track .tarjeta-metrica {
+    flex: 0 0 280px;
+    min-width: 280px;
+}
+
+
+/* FILA HORIZONTAL DE TARJETAS */
+.carrusel-categorias-track {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    width: 100%;
+    transition: transform 0.6s ease-in-out;
+}
+
+/* CADA TARJETA OCUPA UNA CUARTA PARTE DEL ESPACIO */
+.carrusel-categorias-track .tarjeta-metrica {
+    flex: 0 0 calc((100% - 48px) / 4);
+    min-width: 0;
+}
+
+/* ADAPTACIÓN A DIFERENTES TAMAÑOS DE PANTALLA */
+@media (max-width: 992px) {
+    .carrusel-categorias-track .tarjeta-metrica {
+        flex-basis: calc((100% - 32px) / 3);
+    }
+}
+
+@media (max-width: 768px) {
+    .carrusel-categorias-track .tarjeta-metrica {
+        flex-basis: calc((100% - 16px) / 2);
+    }
+}
+
+@media (max-width: 480px) {
+    .carrusel-categorias-track .tarjeta-metrica {
+        flex-basis: 100%;
+    }
+}
+
+
+/* Tamaño de las flechas del carrusel de préstamos */
+.prestamos-carrusel-contenedor .flecha-carrusel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background-color: #e4d0fc;
+    color: #6d2fa6;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.prestamos-carrusel-contenedor .flecha-carrusel i {
+    font-size: 18px;
+}
+
+
+/* Efecto al pasar el cursor */
+.flecha-carrusel:hover:not(:disabled) {
+    background-color: #DCC8F0;
+    transform: scale(1.08);
+}
+
+/* Flechas deshabilitadas */
+.flecha-carrusel:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
 
 /* TARJETA INDIVIDUAL */
 .tarjeta-metrica {
@@ -277,6 +686,116 @@
     box-shadow: 0 2px 4px rgba(105, 42, 127, 0.2);
 }
 
+/* ESTILOS DEL BOTÓN: VER DETALLES*/
+.ver-detalles {
+    background-color: transparent;
+    color: var(--morado-600, #692a7f);
+    border: 1px solid var(--morado-200, #e0c4e4);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.ver-detalles:hover {
+    background-color: var(--morado-100, #f0e1f3);
+    border-color: var(--morado-600, #692a7f);
+}
+
+/* ESTILOS DEL BOTÓN: PRESTAMO FINALIZADO */
+.prestamo-finalizado,
+.prestamo-finalizado:disabled {
+    background-color: #F3F4F6;
+    color: #9CA3AF;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: not-allowed;
+    white-space: nowrap;
+    opacity: 0.7;
+    box-shadow: none;
+}
+
+.prestamo-finalizado:hover {
+    /* Mantiene los mismos estilos sin cambios al hacer hover */
+    background-color: #F3F4F6;
+    color: #9CA3AF;
+    border-color: #E5E7EB;
+    box-shadow: none;
+}
+
+/*Estilo para el mensaje*/
+.mensaje-implementos {
+    width: 100%;
+    height: 40px;
+    padding: 5px 15px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border: 1px dashed #ced4da;
+    border-radius: 8px;
+}
+
+/* Mensaje cuando no hay implementos */
+.lista-implementos .mensaje-implementos {
+    grid-column: 1 / -1;
+}
+
+/* Contenedor general de los implementos */
+.lista-implementos {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0%;
+    width: 100%;
+}
+
+/* Cada implemento */
+.implemento-opcion {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    min-height: 0%;
+    padding: 3px 2px;
+    margin: 0;
+    cursor: pointer;
+    border-radius: 6px;
+    background-color: transparent;
+}
+
+/* Cuadradito del checkbox */
+.implemento-opcion input[type="checkbox"] {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Nombre del implemento */
+.implemento-opcion strong {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+/* Adaptación para pantallas pequeñas */
+@media (max-width: 576px) {
+    .lista-implementos {
+        grid-template-columns: 1fr;
+    }
+}
+    
 /* ESTILOS DE LAS FILAS */
 
 .tabla-prestamos tbody tr {
@@ -481,4 +1000,449 @@
 
 .btn-guardar:hover {
     background-color: var(--morado-800, #441b54);
+}
+
+/*MENSAJE DE ERROR DE EL FORMULARIO: REGISTRO PRESTAMO*/
+
+.mensaje-error {
+    display: block;
+    width: 100%;
+    margin-top: 5px;
+    color: #dc3545;
+    font-size: 13px;
+}
+
+
+/* Mensaje cuando no hay implementos */
+.lista-implementos .mensaje-error {
+    grid-column: 1 / -1;
+}
+
+
+
+
+/* BARRA DE PROGRESO DE DEVOLUCIÓN */
+
+.resumen-progreso {
+    flex: 1;
+    min-width: 0;
+}
+
+.progreso-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 9px;
+}
+
+.progreso-encabezado .label {
+    margin-bottom: 0;
+}
+
+.progreso-encabezado .valor {
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.barra-progreso {
+    width: 100%;
+    height: 10px;
+    background-color: #eee5f2;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.barra-progreso-llenado {
+    width: 0%;
+    height: 100%;
+    background-color: var(--morado-600, #692a7f);
+    border-radius: 20px;
+    transition: width 0.4s ease;
+}
+
+.progreso-detalle {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--texto-suave, #77647f);
+}
+
+
+/* MENSAJE DE OPERACIÓN EXITOSA */
+.mensaje-exito {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    color: #137333;
+    background-color: #edf7ed;
+    border: 1px solid #c8e6c9;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.icono-exito {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    color: #ffffff;
+    background-color: #2e7d32;
+    border-radius: 50%;
+    font-weight: 700;
+}
+
+/* MENSAJE DE ERROR GENERAL */
+.mensaje-error-general {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    color: #842029;
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+
+/* FILTRO DE PERIODO Y CALENDARIO */
+.filtro-fecha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 1 220px;
+    min-width: 0;
+    position: relative;
+}
+
+.filtro-fecha select {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Botón del calendario */
+.btn-calendario {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    color: var(--texto-suave, #77647f);
+    background-color: #FFFFFF;
+    border: 1px solid #dac9e0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-calendario:hover {
+    color: var(--morado-600, #692a7f);
+    border-color: var(--morado-600, #692a7f);
+}
+
+/* Ocultar el campo de fecha sin deshabilitarlo */
+.fecha-oculta {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+    left: 0;
+    bottom: 0;
+}
+
+/* DISTRIBUCIÓN GENERAL DE LOS FILTROS */
+.busquedas {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 30px;
+}
+
+/* BÚSQUEDA GENERAL */
+.busquedas .buscar {
+    flex: 1 1 260px;
+    min-width: 220px;
+    position: relative;
+}
+
+/* INPUT DE BÚSQUEDA */
+.busquedas .barra-busqueda {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* FILTROS DE TIPO, CATEGORÍA Y ESTADO */
+.busquedas .categoria,
+.busquedas .estados {
+    flex: 1 1 160px;
+    min-width: 140px;
+}
+
+/* PERIODO Y CALENDARIO */
+.busquedas .filtro-fecha {
+    flex: 1 1 200px;
+    min-width: 180px;
+}
+
+/* PESTAÑAS DEL PANEL DE PRÉSTAMOS */
+.pestanas {
+    display: flex;
+    gap: 22px;
+    border-bottom: 1px solid var(--borde);
+    margin-bottom: 14px;
+}
+
+/* ENLACE TODOS LOS PRÉSTAMOS */
+.pestanas a.btn-todos-prestamos {
+    display: inline-flex;
+    align-items: center;
+    background: none;
+    border: none;
+    border-bottom: 2px solid var(--morado-600);
+    margin-bottom: -1px;
+    padding: 8px 0 11px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--morado-600) !important;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+.pestanas a.btn-todos-prestamos:hover {
+    color: var(--morado-600) !important;
+    background: none;
+    border-bottom-color: var(--morado-600);
+}
+
+
+/* ----------POP OUT DE FORMULARIO DE REGISTROS */
+
+
+/* VENTANA DE REGISTRO */
+.modal-registro {
+    width: 668px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+
+    padding: 28px;
+    margin: auto;
+
+    border: none;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    color: var(--morado-800, #441b54);
+
+    box-shadow: 0 20px 60px rgba(46, 18, 57, 0.20);
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* FONDO OSCURO */
+.modal-registro::backdrop {
+    background-color: rgba(46, 18, 57, 0.55);
+    backdrop-filter: blur(2px);
+}
+
+/* ENCABEZADO */
+.modal-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+
+    padding-bottom: 20px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--borde, #e8dcec);
+}
+
+.modal-encabezado h2 {
+    margin: 0 0 6px;
+    color: var(--morado-800, #441b54);
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.modal-encabezado p {
+    margin: 0;
+    color: var(--texto-suave, #77647f);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* BOTÓN CERRAR */
+.btn-cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 32px;
+    height: 32px;
+
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--texto-suave, #77647f);
+
+    font-size: 25px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-cerrar:hover {
+    background-color: var(--morado-100, #f0e1f3);
+    color: var(--morado-800, #441b54);
+}
+
+/* ETIQUETAS */
+.modal-registro .form-label {
+    display: block;
+    margin-bottom: 6px;
+
+    color: #4a3554;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* CAMPOS DE TEXTO Y LISTAS */
+.modal-registro .form-control,
+.modal-registro .form-select {
+    width: 100%;
+    min-height: 42px;
+    box-sizing: border-box;
+
+    border: 1px solid #dac9e0;
+    border-radius: 6px;
+    background-color: #FFFFFF;
+
+    color: #4a3554;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.modal-registro .form-control {
+    padding: 10px 12px;
+}
+
+.modal-registro .form-select {
+    padding: 8px 32px 8px 12px;
+}
+
+.modal-registro .form-control::placeholder {
+    color: #a898b0;
+}
+
+/* ESTADO DE FOCO */
+.modal-registro .form-control:focus,
+.modal-registro .form-select:focus {
+    border-color: var(--morado-600, #692a7f);
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(105, 42, 127, 0.12);
+}
+
+/* ZONA DE ACCIONES */
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+
+    padding-top: 22px;
+    margin-top: 24px;
+    border-top: 1px solid var(--borde, #e8dcec);
+}
+
+/* BOTÓN CANCELAR */
+.btn-cancelar {
+    min-height: 40px;
+    padding: 0 16px;
+
+    border: 1px solid #dac9e0;
+    border-radius: 6px;
+    background-color: #FFFFFF;
+    color: #4a3554;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-cancelar:hover {
+    background-color: var(--morado-50, #f8f1fa);
+}
+
+/* BOTÓN GUARDAR */
+.btn-guardar {
+    min-height: 40px;
+    padding: 0 16px;
+
+    border: 1px solid var(--morado-600, #692a7f);
+    border-radius: 6px;
+    background-color: var(--morado-600, #692a7f);
+    color: #FFFFFF;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-guardar:hover {
+    border-color: var(--morado-800, #441b54);
+    background-color: var(--morado-800, #441b54);
+}
+
+.alerta-exito {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border: 1px solid #a3cfbb;
+    border-radius: 8px;
+    background-color: #d1e7dd;
+    color: #0f5132;
+    font-size: 14px;
+}
+
+.btn-limpiar{
+    text-decoration: none;
+}
+
+/* PANTALLAS PEQUEÑAS */
+@media (max-width: 576px) {
+    .modal-registro {
+        max-width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+        padding: 20px;
+    }
+
+    .modal-encabezado h2 {
+        font-size: 20px;
+    }
+
+    .modal-acciones {
+        flex-wrap: wrap;
+    }
+
+    .btn-cancelar,
+    .btn-guardar {
+        flex: 1;
+    }
 }

@@ -146,12 +146,21 @@ class UsuarioController extends Controller
                 'integer',
                 'exists:tipo_documento,tipo_documento_id'
             ],
-
             'documento' => [
                 'required',
                 'string',
                 'regex:/^[0-9]{8,11}$/',
-                'unique:usuario,documento'
+                'unique:usuario,documento',
+
+                function ($attribute, $value, $fail) {
+                    $existeEnPersonal = DB::table('personal')
+                        ->whereRaw('BTRIM(documento) = ?', [trim($value)])
+                        ->exists();
+
+                    if ($existeEnPersonal) {
+                        $fail('Este documento ya se encuentra registrado en el personal del gimnasio.');
+                    }
+                },
             ],
 
             'genero_id' => [

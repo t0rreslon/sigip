@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- estilos de usuarios y estilos del panel izquierdo y javascrpit del pop-out -->
-    @vite(['resources/js/app.js', 'resources/js/pop_out.js'])
+    @vite(['resources/css/styles2.css', 'resources/js/app.js', 'resources/js/pop_out.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css'])
     <!-- bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
     <!-- fuentes -->
@@ -493,7 +493,6 @@
                                         <th class="col-rol">Rol</th>
                                         <th class="col-tipo">Institucion</th>
                                         <th class="col-estado">Estado</th>
-                                        <th class="col-suscripcion">Suscripcion</th>
                                         <th class="col-acciones">Acciones</th>
                                     </tr>
                                 </thead>
@@ -540,12 +539,6 @@
                                             @else
                                             <span class="estado inactivo">Inactivo</span>
                                             @endif
-                                        </td>
-
-                                        <td class="col-suscripcion">
-                                            <div class="dato-principal">
-                                                No aplica
-                                            </div>
                                         </td>
 
                                         <td class="col-acciones">

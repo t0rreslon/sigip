@@ -10,12 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <title>Sistema de informacion | SIGIP</title>
-  @vite(['resources/js/app.js'])
+  @vite(['resources/css/styles.css', 'resources/js/app.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css'])
 </head>
 
 <body>
     <div class="flexbox">
-        <div class="panel-izq">
+        <div class="panel-izq_index">
             <div class="logo">
                 <img src="imagenes/Logoo.png" alt="logo" class="logo-imagen">
 
@@ -26,7 +26,7 @@
             </div>
 
             <div class="informacion">
-                <h1>SIGIP</h1>
+               
 
                 <h2>
                     Sistema de Información para la

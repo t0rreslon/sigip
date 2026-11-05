@@ -1,3 +1,50 @@
+/* DATOS GENERALES DEL CUERPO */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body{
+    margin: 0;
+    min-height: 100%;
+    background-color: var(--morado-50, #f8f1fa);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+/* ACOMODAR EL ESPACIO ENTRE PANELES Y TABBLAS */
+.flexbox {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+}
+
+/* las secciones derechas e izquieras se van a separar con # pero las subsecciones se separaran con - */
+
+/* ########################################################### */
+
+/* PANEL DERECHO */
+.panel-dere {
+    flex: 1 1 0;
+    min-width: 0;
+    width: 0;
+    min-height: 100vh;
+    height: auto;
+    background-color: var(--morado-50, #f8f1fa);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    overflow: visible;
+    margin-left: 236px;
+}
+
+/* ----------------------------------------------------------------------- */
+
+
 /* CONTENIDO PRINCIPAL DE CONTROL DE ACCESOS */
 .contenido-control-acceso{
     height: auto;
@@ -39,10 +86,69 @@
         box-shadow 0.25s ease;
 }
 
-.buscar{
-    position: relative;
-    min-width: 280px;
+.buscar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 280px;
+    width: auto;
+    min-width: 0;
+    height: 42px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    padding: 12px 36px 12px 12px;
+    background-color: #FFFFFF;
+    border: 1px solid #dac9e0;
+    border-radius: 6px;
+    color: var(--texto-suave, #77647f);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin: 0;
 }
+
+
+/* Icono SVG */
+.icono-busqueda {
+    flex-shrink: 0;
+    color: var(--texto-suave, #77647f);
+}
+
+/* Campo de texto */
+.barra-busqueda {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 10px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--morado-800, #441b54);
+    font-size: 13px;
+}
+
+/* Texto de ejemplo */
+.barra-busqueda::placeholder {
+    font-weight: 400;
+    font-size: 14px;
+    font-style: normal;
+    color: var(--texto-suave, #77647f);
+}
+
+/* Efecto al seleccionar la barra */
+.contenedor-busqueda:focus-within {
+    border-color: var(--morado-600, #692a7f);
+    box-shadow: 0 0 0 3px rgba(105, 42, 127, 0.12);
+}
+
+/* Evita que el navegador muestre una decoración extra */
+.barra-busqueda::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
+
+
+
+
 
 .consulta-identificacion{
     display: flex;
@@ -69,8 +175,6 @@
     white-space: nowrap;
     box-sizing: border-box;
 }
-
-
 
 #consultar-identificacion:hover {
     background-color: var(--morado-800, #441b54);
