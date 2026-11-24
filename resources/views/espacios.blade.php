@@ -127,6 +127,7 @@
                   </button>
                   @endif
                   @endif
+                  <a class="btn-borde" href="{{ route('espacios.show', $espacio->espacio_id) }}">Ver detalle</a>
                   <a class="btn-borde" href="{{ route('reservas.index', ['espacio' => $espacio->espacio_id]) }}">Ver reservas</a>
                 </td>
               </tr>

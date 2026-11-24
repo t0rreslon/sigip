@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'tipo_cuenta' => \App\Http\Middleware\TipoCuenta::class,
         ]);
 
+        // HU-207: registra las acciones que modifican datos.
+        $middleware->web(append: [
+            \App\Http\Middleware\RegistrarMovimiento::class,
+        ]);
+
         // Los invitados que intenten entrar a una ruta protegida van al login.
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn () => route('index'));

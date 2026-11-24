@@ -23,7 +23,11 @@
             <h1>Reservas de espacios</h1>
             <p>Consulta la disponibilidad por horario y registra reservas para usuarios o instructores. Horario: {{ $horaApertura }} a {{ $horaCierre }}.</p>
           </div>
-          <button class="btn-primario" id="abrir-registrar-reserva">+ Registrar reserva</button>
+          <div class="acciones-titulo">
+            <a href="{{ route('reservas.historial') }}" class="btn-borde">Historial</a>
+            <a href="{{ route('reservas.exportar') }}" class="btn-exportar">Exportar PDF</a>
+            <button class="btn-primario" id="abrir-registrar-reserva">+ Registrar reserva</button>
+          </div>
         </div>
 
         @if (session('success'))
@@ -38,6 +42,45 @@
             @endforeach
           </ul>
         </div>
+        @endif
+
+        {{-- HU-170 / HU-199: solicitudes de reserva pendientes --}}
+        @if ($solicitudes->isNotEmpty())
+        <section class="tarjeta">
+          <h2>Solicitudes por responder ({{ $solicitudes->count() }})</h2>
+          <table class="tabla">
+            <thead>
+              <tr><th>Espacio</th><th>Solicitante</th><th>Fecha</th><th>Horario</th><th>Solicitada</th><th>Respuesta</th></tr>
+            </thead>
+            <tbody>
+              @foreach ($solicitudes as $solicitud)
+              <tr>
+                <td>{{ $solicitud->nombre_espacio }}</td>
+                <td>{{ $solicitud->nombre_destinatario }}<br><small>{{ $solicitud->tipo_destinatario }}</small></td>
+                <td>{{ \Illuminate\Support\Carbon::parse($solicitud->fecha_inicio)->format('d/m/Y') }}</td>
+                <td>{{ \Illuminate\Support\Carbon::parse($solicitud->fecha_inicio)->format('h:i a') }} – {{ \Illuminate\Support\Carbon::parse($solicitud->fecha_fin)->format('h:i a') }}</td>
+                <td>{{ \Illuminate\Support\Carbon::parse($solicitud->fecha_creacion)->diffForHumans() }}</td>
+                <td>
+                  <div class="acciones-fila">
+                    <form method="POST" action="{{ route('reservas.responder', $solicitud->reserva_id) }}">
+                      @csrf
+                      @method('PATCH')
+                      <input type="hidden" name="accion" value="confirmar">
+                      <button type="submit" class="btn-primario">Confirmar</button>
+                    </form>
+                    <form method="POST" action="{{ route('reservas.responder', $solicitud->reserva_id) }}" onsubmit="return confirm('¿Rechazar esta solicitud?')">
+                      @csrf
+                      @method('PATCH')
+                      <input type="hidden" name="accion" value="rechazar">
+                      <button type="submit" class="btn-borde">Rechazar</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </section>
         @endif
 
         {{-- HU-48: disponibilidad según el horario --}}
@@ -66,7 +109,7 @@
           <p class="nota-plan">
             {{ $fecha->format('d/m/Y') }}
             @if ($rangoConsultado)
-            · espacios libres entre {{ $rangoConsultado[0]->format('h:i a') }} y {{ $rangoConsultado[1]->format('h:i a') }} marcados en verde.
+            · espacios libres entre {{ $horaInicio }} y {{ $horaFin }} marcados en verde.
             @else
             · indica un rango de horas para ver qué espacios están libres.
             @endif
@@ -88,14 +131,14 @@
               @endif
 
               @if ($espacio->reservas->isEmpty())
-              <ul><li>Sin reservas este día.</li></ul>
+              <ul><li>Sin reservas ni actividades este día.</li></ul>
               @else
               <ul>
                 @foreach ($espacio->reservas as $reserva)
                 <li>
                   {{ \Illuminate\Support\Carbon::parse($reserva->fecha_inicio)->format('h:i a') }} –
                   {{ \Illuminate\Support\Carbon::parse($reserva->fecha_fin)->format('h:i a') }}
-                  · {{ $reserva->nombre_destinatario }}
+                  · {{ $reserva->descripcion }}
                 </li>
                 @endforeach
               </ul>

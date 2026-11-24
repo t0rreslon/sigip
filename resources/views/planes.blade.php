@@ -36,6 +36,24 @@
           <button class="btn-primario" id="abrir-crear-plan">+ Crear plan</button>
         </div>
 
+        {{-- HU-152: filtrar los planes registrados --}}
+        <form class="filtros" method="GET" action="{{ route('planes.index') }}">
+          <input type="search" name="p_buscar" value="{{ request('p_buscar') }}" placeholder="Buscar plan por nombre o descripción">
+          <select name="p_tipo" onchange="this.form.requestSubmit()">
+            <option value="">Tipo: todos</option>
+            <option value="tiquetera" @selected(request('p_tipo') === 'tiquetera')>Tiquetera</option>
+            <option value="suscripcion" @selected(request('p_tipo') === 'suscripcion')>Suscripción</option>
+          </select>
+          <select name="p_estado" onchange="this.form.requestSubmit()">
+            <option value="">Estado: todos</option>
+            <option value="1" @selected(request('p_estado') === '1')>Activos</option>
+            <option value="0" @selected(request('p_estado') === '0')>Inactivos</option>
+          </select>
+          @if (request()->hasAny(['p_buscar', 'p_tipo', 'p_estado']))
+          <a href="{{ route('planes.index') }}" class="btn-borde">Limpiar</a>
+          @endif
+        </form>
+
         <section class="planes-contenedor">
 
           <button
@@ -93,6 +111,8 @@
                     data-activas="{{ $plan->suscripciones_activas_count }}">
                     Consultar / editar
                   </button>
+
+                  <a href="{{ route('planes.historial', $plan->plan_id) }}" class="btn-borde">Historial</a>
 
                   @if ($plan->estado_plan)
 
@@ -157,7 +177,7 @@
             </select>
             <select name="plan" data-autoenviar>
               <option value="">Plan: todos</option>
-              @foreach ($planes as $plan)
+              @foreach ($todosLosPlanes as $plan)
               <option value="{{ $plan->plan_id }}" @selected((string) request('plan') === (string) $plan->plan_id)>
                 {{ $plan->nombre_plan }}
               </option>
@@ -536,7 +556,7 @@
         <div class="fila-plan una">
           <label class="campo-plan"><span>Plan asociado *</span>
             <select name="plan_id" id="editar-suscripcion-plan" required>
-              @foreach ($planes as $plan)
+              @foreach ($todosLosPlanes as $plan)
               <option value="{{ $plan->plan_id }}" data-tipo="{{ $plan->tipo_plan }}" data-cantidad="{{ $plan->cantidad_entradas }}" data-activo="{{ $plan->estado_plan ? 1 : 0 }}" @selected((string) old('plan_id') === (string) $plan->plan_id) @disabled(!$plan->estado_plan)>
                 {{ $plan->nombre_plan }} · ${{ number_format($plan->costo, 0, ',', '.') }}{{ $plan->estado_plan ? '' : ' (inactivo)' }}
               </option>

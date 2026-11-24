@@ -1449,3 +1449,18 @@ body{
         flex: 1;
     }
 }
+.btn-exportar {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 8px 14px;
+    border: 1px solid #7a3b9a;
+    border-radius: 8px;
+    color: #7a3b9a;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a.ver-detalles {
+    text-decoration: none;
+    display: inline-block;
+}

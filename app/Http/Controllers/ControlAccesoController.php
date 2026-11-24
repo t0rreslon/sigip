@@ -340,4 +340,112 @@ class ControlAccesoController extends Controller
             'usuarios' => $resultado
         ]);
     }
+
+    // HU-153 a HU-157: historial de accesos con filtros, conteos y usuarios sin salida.
+    public function historial(Request $request)
+    {
+        [$desde, $hasta] = $this->periodo($request);
+
+        $consulta = $this->consultaHistorial($request, $desde, $hasta);
+
+        // HU-156: cantidad de ingresos en el periodo.
+        $totales = (clone $consulta)
+            ->reorder()
+            ->select(DB::raw('COUNT(*) AS ingresos, COUNT(DISTINCT a.usuario_id) AS usuarios, COUNT(*) FILTER (WHERE a.fecha_salida IS NULL) AS sin_salida'))
+            ->first();
+
+        $accesos = $consulta->paginate(15)->withQueryString();
+
+        // HU-157: usuarios con un ingreso sin salida (sin importar la fecha).
+        $sinSalida = DB::table('acceso as a')
+            ->join('usuario as u', 'a.usuario_id', '=', 'u.usuario_id')
+            ->whereNull('a.fecha_salida')
+            ->orderBy('a.fecha_ingreso')
+            ->select('a.acceso_id', 'a.usuario_id', 'a.fecha_ingreso', 'u.nombre', 'u.apellido', 'u.documento')
+            ->get();
+
+        $usuarioSeleccionado = $request->filled('usuario_id')
+            ? DB::table('usuario')->where('usuario_id', $request->input('usuario_id'))->first()
+            : null;
+
+        return view('accesos', compact('accesos', 'totales', 'sinSalida', 'desde', 'hasta', 'usuarioSeleccionado'));
+    }
+
+    // HU-198: exportar el informe de accesos a PDF.
+    public function exportar(Request $request)
+    {
+        [$desde, $hasta] = $this->periodo($request);
+        $accesos = $this->consultaHistorial($request, $desde, $hasta)->get();
+
+        \App\Support\Auditoria::movimiento('Exportar', ['reporte' => 'accesos', 'filtros' => $request->query()]);
+
+        $pdf = \App\Support\PdfReporte::tabla(
+            'Informe de accesos',
+            [
+                ['titulo' => 'Documento', 'ancho' => 90],
+                ['titulo' => 'Usuario', 'ancho' => 220],
+                ['titulo' => 'Ingreso', 'ancho' => 140],
+                ['titulo' => 'Salida', 'ancho' => 140],
+                ['titulo' => 'Permanencia', 'ancho' => 100],
+                ['titulo' => 'Estado', 'ancho' => 92],
+            ],
+            $accesos->map(function ($a) {
+                $ingreso = \Illuminate\Support\Carbon::parse($a->fecha_ingreso);
+                $salida = $a->fecha_salida ? \Illuminate\Support\Carbon::parse($a->fecha_salida) : null;
+
+                return [
+                    $a->documento,
+                    "{$a->nombre} {$a->apellido}",
+                    $ingreso->format('d/m/Y h:i a'),
+                    $salida?->format('d/m/Y h:i a') ?? '—',
+                    $salida ? $ingreso->diff($salida)->format('%H h %I min') : '—',
+                    $salida ? 'Con salida' : 'Sin salida',
+                ];
+            }),
+            [
+                'Periodo: ' . $desde->format('d/m/Y') . ' a ' . $hasta->format('d/m/Y'),
+                'Ingresos: ' . $accesos->count() . ' · Usuarios distintos: ' . $accesos->pluck('usuario_id')->unique()->count()
+                    . ' · Sin salida: ' . $accesos->whereNull('fecha_salida')->count(),
+            ]
+        );
+
+        return \App\Support\PdfReporte::descargar($pdf, 'accesos-' . $desde->format('Ymd') . '-' . $hasta->format('Ymd') . '.pdf');
+    }
+
+    private function periodo(Request $request): array
+    {
+        $leer = function (?string $valor, $porDefecto) {
+            try {
+                return $valor ? \Illuminate\Support\Carbon::createFromFormat('Y-m-d', $valor) : $porDefecto;
+            } catch (\Throwable) {
+                return $porDefecto;
+            }
+        };
+
+        $desde = $leer($request->input('fecha_desde'), now()->subDays(6))->startOfDay();
+        $hasta = $leer($request->input('fecha_hasta'), now())->endOfDay();
+
+        if ($hasta->lt($desde)) {
+            [$desde, $hasta] = [$hasta->copy()->startOfDay(), $desde->copy()->endOfDay()];
+        }
+
+        return [$desde, $hasta];
+    }
+
+    private function consultaHistorial(Request $request, $desde, $hasta)
+    {
+        return DB::table('acceso as a')
+            ->join('usuario as u', 'a.usuario_id', '=', 'u.usuario_id')
+            ->whereBetween('a.fecha_ingreso', [$desde, $hasta])
+            ->when($request->filled('usuario_id'), fn ($q) => $q->where('a.usuario_id', $request->input('usuario_id')))
+            ->when($request->filled('buscar'), function ($q) use ($request) {
+                $buscar = trim($request->input('buscar'));
+                $q->where(fn ($w) => $w->where('u.documento', 'ILIKE', "%{$buscar}%")
+                    ->orWhereRaw("CONCAT_WS(' ', u.nombre, u.apellido) ILIKE ?", ["%{$buscar}%"]));
+            })
+            ->when($request->input('estado') === 'sin_salida', fn ($q) => $q->whereNull('a.fecha_salida'))
+            ->when($request->input('estado') === 'con_salida', fn ($q) => $q->whereNotNull('a.fecha_salida'))
+            ->select('a.acceso_id', 'a.usuario_id', 'a.fecha_ingreso', 'a.fecha_salida', 'u.nombre', 'u.apellido', 'u.documento')
+            ->orderByDesc('a.fecha_ingreso');
+    }
 }

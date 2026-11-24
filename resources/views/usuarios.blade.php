@@ -45,6 +45,8 @@
                             <img width="24" height="24" src="https://img.icons8.com/external-thin-kawalan-studio/24/external-user-plus-users-thin-kawalan-studio.png" alt="external-user-plus-users-thin-kawalan-studio" />
                             Registrar usuario
                         </button>
+                        {{-- HU-192: exporta los usuarios con los filtros aplicados --}}
+                        <a href="{{ route('usuarios.exportar', request()->query()) }}" class="btn-exportar">Exportar PDF</a>
                     </div>
 
                     <!-- MODAL DE REGISTRO DE USUARIOS -->
@@ -710,6 +712,18 @@
                                                     data-estado_usuario="{{ $usuario->estado_usuario ? 1 : 0 }}">
                                                     Ver / Editar
                                                 </button>
+                                                <a href="{{ route('usuarios.historial', $usuario->usuario_id) }}">Historial</a>
+                                                {{-- HU-144: cambiar el estado del usuario --}}
+                                                <form method="POST" action="{{ route('usuarios.estado', $usuario->usuario_id) }}" style="display:inline" onsubmit="return confirm('¿{{ $usuario->estado_usuario ? 'Desactivar' : 'Activar' }} a este usuario?')">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    @foreach (['buscar', 'rol', 'estado', 'institucion', 'genero', 'page'] as $filtro)
+                                                    @if (request()->filled($filtro))
+                                                    <input type="hidden" name="{{ $filtro }}" value="{{ request($filtro) }}">
+                                                    @endif
+                                                    @endforeach
+                                                    <button type="submit" class="btn-enlace">{{ $usuario->estado_usuario ? 'Desactivar' : 'Activar' }}</button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>

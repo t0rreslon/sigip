@@ -25,9 +25,14 @@
             <h1>Inventario</h1>
             <p>Catálogo de máquinas e implementos. Las máquinas no son unidades prestables.</p>
           </div>
-          <button class="btn-primario" id="abrir-registrar-elemento">
-            + Registrar elemento
-          </button>
+          <div class="acciones-titulo">
+            <a href="{{ route('inventario.exportar', request()->query()) }}" class="btn-exportar">Exportar PDF</a>
+            @if (auth()->user()->tieneTipo('Administrador'))
+            <button class="btn-primario" id="abrir-registrar-elemento">
+              + Registrar elemento
+            </button>
+            @endif
+          </div>
         </div>
         {{-- Mensajes de confirmación y errores --}}
         @if (session('success'))
@@ -145,6 +150,16 @@
             </form>
           </div>
         </dialog>
+        {{-- HU-159: categorías por debajo del stock mínimo --}}
+        @if ($stockBajo->isNotEmpty())
+        <div class="alerta-stock">
+          <strong>Stock por debajo del mínimo:</strong>
+          @foreach ($stockBajo as $categoria)
+          {{ $categoria->nombre_categoria }} ({{ $categoria->activos }} de {{ $categoria->stock_minimo }}){{ $loop->last ? '.' : ',' }}
+          @endforeach
+        </div>
+        @endif
+
         <div class="resumen">
           <span class="chip morado">
             {{ $totalMaquinas }} máquinas
@@ -261,8 +276,8 @@
                   @endif
                 </td>
 
-                <td class="iconos">
-                  👁 ✎ ⋯
+                <td>
+                  <a class="btn-borde" href="{{ route('inventario.show', ['maquina', $maquina->maquina_id]) }}">Ver / editar</a>
                 </td>
               </tr>
               @endforeach
@@ -283,8 +298,8 @@
 
                 <td class="col-mantenimiento">No aplica</td>
 
-                <td class="iconos">
-                  👁 ✎ ⋯
+                <td>
+                  <a class="btn-borde" href="{{ route('inventario.show', ['implemento', $implemento->implemento_id]) }}">Ver / editar</a>
                 </td>
               </tr>
               @endforeach

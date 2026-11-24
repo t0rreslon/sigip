@@ -12,8 +12,17 @@
         'inventario' => 'Inventario',
         'espacios' => 'Espacios',
         'reservas' => 'Reservas de espacios',
+        'actividades' => 'Actividades',
+        'programaciones' => 'Actividades',
+        'instructores' => 'Instructores y turnos',
+        'operadores' => 'Operadores',
+        'notificaciones' => 'Notificaciones',
+        'perfil' => 'Mi perfil',
+        'mi' => 'Mi espacio',
     ];
     $seccionActual = $secciones[request()->segment(1)] ?? 'Inicio';
+    // HU-199 / HU-204: solicitudes pendientes para el personal.
+    $pendientes = $cuenta && $cuenta->tieneTipo('Administrador', 'Operador') ? \App\Http\Controllers\NotificacionController::pendientes() : 0;
 @endphp
 <!-- ABRE NAVBAR -->
 <nav class="navbar barra-superior">
@@ -24,14 +33,26 @@
     </div>
 
     <div class="acciones-superiores">
-        <!-- PERFIL DE LA CUENTA -->
-        <div class="perfil-administrador">
+        @if ($cuenta && $cuenta->tieneTipo('Administrador', 'Operador'))
+        <a class="btn-notificaciones" href="{{ route('notificaciones') }}" aria-label="Notificaciones: {{ $pendientes }} pendientes" title="Solicitudes pendientes">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+                <path d="M10 21h4" />
+            </svg>
+        </a>
+        @if ($pendientes > 0)
+        <span class="contador-notificaciones">{{ $pendientes }}</span>
+        @endif
+        @endif
+
+        <!-- PERFIL DE LA CUENTA (HU-189) -->
+        <a class="perfil-administrador" href="{{ route('perfil') }}" title="Mi perfil">
             <span class="avatar-administrador">{{ $iniciales ?: '?' }}</span>
             <span class="datos-administrador">
                 <strong>{{ $nombreCuenta }}</strong>
                 <small>{{ $cuenta?->nombreTipo() ?? '' }}</small>
             </span>
-        </div>
+        </a>
 
         @auth
         <form method="POST" action="{{ route('logout') }}">

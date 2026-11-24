@@ -58,6 +58,8 @@
                             <img width="24" height="24" src="https://img.icons8.com/android/24/plus.png" alt="plus" />
                             Registrar prestamo
                         </button>
+                        {{-- HU-166 --}}
+                        <a href="{{ route('prestamos.exportar', request()->query()) }}" class="btn-exportar">Exportar PDF</a>
                     </div>
                     <!-- CIERRA ENCABEZADO SECCION -->
                     <!-- ABRE VENTANA MODAL PARA REGISTRAR PRESTAMO -->
@@ -475,12 +477,13 @@
 
                                         {{-- Consultar detalles --}}
                                         <td>
-                                            <button
-                                                type="button"
+                                            {{-- HU-164 --}}
+                                            <a
+                                                href="{{ route('prestamos.show', $prestamo->prestamo_id) }}"
                                                 class="ver-detalles"
                                                 data-prestamo="{{ $prestamo->prestamo_id }}">
                                                 Ver detalles
-                                            </button>
+                                            </a>
                                         </td>
 
                                         {{-- Registrar devolución --}}

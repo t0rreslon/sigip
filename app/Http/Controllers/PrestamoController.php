@@ -24,7 +24,204 @@ class PrestamoController extends Controller
         $periodo = request('periodo');
 
         // 1. Consultar todos los préstamos, priorizando los activos.
-        $prestamos = DB::table('prestamo as p')
+        $prestamos = $this->consultaPrestamos($buscar, $tipo, $categoria, $estado, $fecha, $periodo)
+            ->paginate(10);
+
+        // 2. Consultar los implementos asociados a esos préstamos.
+        $idsPrestamos = $prestamos->pluck('prestamo_id');
+
+        $detalles = DB::table('prestamo_implemento as pi')
+            ->join('implemento as i', 'i.implemento_id', '=', 'pi.implemento_id')
+            ->leftJoin(
+                'categoria_implemento as ci',
+                'ci.categoria_implemento_id',
+                '=',
+                'i.categoria_implemento_id'
+            )
+            ->join(
+                'estado_implemento as ei',
+                'ei.estado_implemento_id',
+                '=',
+                'i.estado_implemento_id'
+            )
+            ->join(
+                'estado_implemento_devuelto as eid',
+                'eid.estado_implemento_devuelto_id',
+                '=',
+                'pi.estado_implemento_devuelto_id'
+            )
+            ->whereIn('pi.prestamo_id', $idsPrestamos)
+            ->select(
+                'pi.prestamo_id',
+                'pi.prestamo_implemento_id',
+                'i.implemento_id',
+                'i.nombre_implemento',
+                'ci.nombre_categoria',
+                'ei.nombre_estado as estado_implemento',
+                'eid.nombre_estado as estado_devolucion'
+            )
+            ->orderBy('i.nombre_implemento')
+            ->get()
+            ->groupBy('prestamo_id');
+
+        // 3. Asociar los implementos a cada préstamo.
+        $prestamos->getCollection()->transform(function ($prestamo) use ($detalles) {
+            $prestamo->implementos = $detalles->get(
+                $prestamo->prestamo_id,
+                collect()
+            );
+
+            $prestamo->cantidad_implementos = $prestamo->implementos->count();
+
+            return $prestamo;
+        });
+
+        // 4. Consultar las cantidades disponibles por categoría.
+        $categorias = DB::table('categoria_implemento as ci')
+            ->leftJoin('implemento as i', 'i.categoria_implemento_id', '=', 'ci.categoria_implemento_id')
+            ->leftJoin('estado_implemento as ei', 'ei.estado_implemento_id', '=', 'i.estado_implemento_id')
+            ->select(
+                'ci.categoria_implemento_id',
+                'ci.nombre_categoria',
+                DB::raw("
+            COUNT(i.implemento_id) FILTER (
+                WHERE ei.nombre_estado = 'Ocupado'
+            ) AS ocupados
+        "),
+                DB::raw("
+            COUNT(i.implemento_id) FILTER (
+                WHERE ei.nombre_estado = 'Disponible'
+            ) AS disponibles
+        "),
+                DB::raw("
+            COUNT(i.implemento_id) FILTER (
+                WHERE ei.nombre_estado IN ('Disponible', 'Ocupado')
+            ) AS total
+        ")
+            )
+            ->groupBy('ci.categoria_implemento_id', 'ci.nombre_categoria')
+            ->orderBy('ci.nombre_categoria')
+            ->get();
+
+
+        // 5. Consultar los implementos disponibles para registrar préstamos.
+        $implementosDisponibles = DB::table('implemento as i')
+            ->join(
+                'estado_implemento as ei',
+                'ei.estado_implemento_id',
+                '=',
+                'i.estado_implemento_id'
+            )
+            ->leftJoin(
+                'categoria_implemento as ci',
+                'ci.categoria_implemento_id',
+                '=',
+                'i.categoria_implemento_id'
+            )
+            ->where('ei.nombre_estado', 'Disponible')
+            ->select(
+                'i.implemento_id',
+                'i.nombre_implemento',
+                'i.categoria_implemento_id',
+                'ci.nombre_categoria'
+            )
+            ->orderBy('ci.nombre_categoria')
+            ->orderBy('i.nombre_implemento')
+            ->get();
+
+        // 6. Consultar el total de préstamos activos.
+        $totalPrestamosActivos = DB::table('prestamo')
+            ->where('activo', true)
+            ->count();
+
+        return view('prestamos', compact(
+            'prestamos',
+            'categorias',
+            'totalPrestamosActivos',
+            'implementosDisponibles',
+            'tiposUsuario'
+        ));
+    }
+
+    // HU-164: información completa de un préstamo.
+    public function show($id)
+    {
+        $prestamo = DB::table('prestamo as p')
+            ->leftJoin('usuario as u', 'u.usuario_id', '=', 'p.usuario_id')
+            ->leftJoin('rol_usuario as ru', 'ru.rol_usuario_id', '=', 'u.rol_usuario_id')
+            ->leftJoin('personal as per', 'per.personal_id', '=', 'p.personal_id')
+            ->where('p.prestamo_id', $id)
+            ->select(
+                'p.*',
+                DB::raw("COALESCE(NULLIF(CONCAT_WS(' ', u.nombre, u.apellido), ''), CONCAT_WS(' ', per.nombre, per.apellido)) AS destinatario"),
+                DB::raw('COALESCE(u.documento, per.documento) AS documento'),
+                DB::raw('COALESCE(u.correo, per.correo) AS correo'),
+                DB::raw('COALESCE(u.telefono, per.telefono) AS telefono'),
+                DB::raw("CASE WHEN p.usuario_id IS NOT NULL THEN CONCAT('Usuario · ', ru.nombre) ELSE 'Instructor' END AS tipo_destinatario")
+            )
+            ->first();
+
+        abort_if(!$prestamo, 404);
+
+        $implementos = DB::table('prestamo_implemento as pi')
+            ->join('implemento as i', 'i.implemento_id', '=', 'pi.implemento_id')
+            ->leftJoin('categoria_implemento as ci', 'ci.categoria_implemento_id', '=', 'i.categoria_implemento_id')
+            ->join('estado_implemento as ei', 'ei.estado_implemento_id', '=', 'i.estado_implemento_id')
+            ->join('estado_implemento_devuelto as eid', 'eid.estado_implemento_devuelto_id', '=', 'pi.estado_implemento_devuelto_id')
+            ->where('pi.prestamo_id', $id)
+            ->orderBy('i.nombre_implemento')
+            ->select('i.implemento_id', 'i.nombre_implemento', 'ci.nombre_categoria', 'ei.nombre_estado as estado_actual', 'eid.nombre_estado as estado_devolucion')
+            ->get();
+
+        return view('prestamo-detalle', compact('prestamo', 'implementos'));
+    }
+
+    // HU-166: reporte PDF de los préstamos con los filtros aplicados.
+    public function exportar(Request $request)
+    {
+        $prestamos = $this->consultaPrestamos(
+            $request->input('buscar'), $request->input('tipo'), $request->input('categoria'),
+            $request->input('estado'), $request->input('fecha'), $request->input('periodo')
+        )->get();
+
+        $implementos = DB::table('prestamo_implemento as pi')
+            ->join('implemento as i', 'i.implemento_id', '=', 'pi.implemento_id')
+            ->whereIn('pi.prestamo_id', $prestamos->pluck('prestamo_id'))
+            ->orderBy('i.nombre_implemento')
+            ->get(['pi.prestamo_id', 'i.nombre_implemento'])
+            ->groupBy('prestamo_id');
+
+        \App\Support\Auditoria::movimiento('Exportar', ['reporte' => 'préstamos', 'filtros' => $request->query()]);
+
+        $pdf = \App\Support\PdfReporte::tabla('Préstamos de implementos', [
+            ['titulo' => 'N.°', 'ancho' => 40],
+            ['titulo' => 'Destinatario', 'ancho' => 160],
+            ['titulo' => 'Tipo', 'ancho' => 100],
+            ['titulo' => 'Implementos', 'ancho' => 230],
+            ['titulo' => 'Prestado', 'ancho' => 95],
+            ['titulo' => 'Devuelto', 'ancho' => 95],
+            ['titulo' => 'Estado', 'ancho' => 62],
+        ], $prestamos->map(fn ($p) => [
+            $p->prestamo_id,
+            trim("{$p->nombre} {$p->apellido}"),
+            $p->tipo_destinatario,
+            $implementos->get($p->prestamo_id, collect())->pluck('nombre_implemento')->implode(', '),
+            \Illuminate\Support\Carbon::parse($p->fecha_prestado)->format('d/m/Y h:i a'),
+            $p->fecha_devuelto ? \Illuminate\Support\Carbon::parse($p->fecha_devuelto)->format('d/m/Y h:i a') : '—',
+            $p->activo ? 'Activo' : 'Finalizado',
+        ]), [
+            'Préstamos: ' . $prestamos->count() . ' · Activos: ' . $prestamos->where('activo', true)->count(),
+        ]);
+
+        return \App\Support\PdfReporte::descargar($pdf, 'prestamos-' . now()->format('Ymd-His') . '.pdf');
+    }
+
+    /**
+     * Préstamos con los filtros de la vista (HU-44); la usan el listado y el PDF (HU-166).
+     */
+    private function consultaPrestamos($buscar, $tipo, $categoria, $estado, $fecha, $periodo)
+    {
+        return DB::table('prestamo as p')
             ->leftJoin('usuario as u', 'u.usuario_id', '=', 'p.usuario_id')
             ->leftJoin('rol_usuario as ru', 'ru.rol_usuario_id', '=', 'u.rol_usuario_id')
             ->leftJoin('personal as per', 'per.personal_id', '=', 'p.personal_id')
@@ -164,124 +361,7 @@ class PrestamoController extends Controller
             ->orderByRaw("CASE WHEN p.activo = TRUE THEN 0 ELSE 1 END")
 
             // Dentro de cada grupo, los más recientes primero.
-            ->orderByDesc('p.fecha_prestado')
-
-            ->paginate(10);
-
-        // 2. Consultar los implementos asociados a esos préstamos.
-        $idsPrestamos = $prestamos->pluck('prestamo_id');
-
-        $detalles = DB::table('prestamo_implemento as pi')
-            ->join('implemento as i', 'i.implemento_id', '=', 'pi.implemento_id')
-            ->leftJoin(
-                'categoria_implemento as ci',
-                'ci.categoria_implemento_id',
-                '=',
-                'i.categoria_implemento_id'
-            )
-            ->join(
-                'estado_implemento as ei',
-                'ei.estado_implemento_id',
-                '=',
-                'i.estado_implemento_id'
-            )
-            ->join(
-                'estado_implemento_devuelto as eid',
-                'eid.estado_implemento_devuelto_id',
-                '=',
-                'pi.estado_implemento_devuelto_id'
-            )
-            ->whereIn('pi.prestamo_id', $idsPrestamos)
-            ->select(
-                'pi.prestamo_id',
-                'pi.prestamo_implemento_id',
-                'i.implemento_id',
-                'i.nombre_implemento',
-                'ci.nombre_categoria',
-                'ei.nombre_estado as estado_implemento',
-                'eid.nombre_estado as estado_devolucion'
-            )
-            ->orderBy('i.nombre_implemento')
-            ->get()
-            ->groupBy('prestamo_id');
-
-        // 3. Asociar los implementos a cada préstamo.
-        $prestamos->getCollection()->transform(function ($prestamo) use ($detalles) {
-            $prestamo->implementos = $detalles->get(
-                $prestamo->prestamo_id,
-                collect()
-            );
-
-            $prestamo->cantidad_implementos = $prestamo->implementos->count();
-
-            return $prestamo;
-        });
-
-        // 4. Consultar las cantidades disponibles por categoría.
-        $categorias = DB::table('categoria_implemento as ci')
-            ->leftJoin('implemento as i', 'i.categoria_implemento_id', '=', 'ci.categoria_implemento_id')
-            ->leftJoin('estado_implemento as ei', 'ei.estado_implemento_id', '=', 'i.estado_implemento_id')
-            ->select(
-                'ci.categoria_implemento_id',
-                'ci.nombre_categoria',
-                DB::raw("
-            COUNT(i.implemento_id) FILTER (
-                WHERE ei.nombre_estado = 'Ocupado'
-            ) AS ocupados
-        "),
-                DB::raw("
-            COUNT(i.implemento_id) FILTER (
-                WHERE ei.nombre_estado = 'Disponible'
-            ) AS disponibles
-        "),
-                DB::raw("
-            COUNT(i.implemento_id) FILTER (
-                WHERE ei.nombre_estado IN ('Disponible', 'Ocupado')
-            ) AS total
-        ")
-            )
-            ->groupBy('ci.categoria_implemento_id', 'ci.nombre_categoria')
-            ->orderBy('ci.nombre_categoria')
-            ->get();
-
-
-        // 5. Consultar los implementos disponibles para registrar préstamos.
-        $implementosDisponibles = DB::table('implemento as i')
-            ->join(
-                'estado_implemento as ei',
-                'ei.estado_implemento_id',
-                '=',
-                'i.estado_implemento_id'
-            )
-            ->leftJoin(
-                'categoria_implemento as ci',
-                'ci.categoria_implemento_id',
-                '=',
-                'i.categoria_implemento_id'
-            )
-            ->where('ei.nombre_estado', 'Disponible')
-            ->select(
-                'i.implemento_id',
-                'i.nombre_implemento',
-                'i.categoria_implemento_id',
-                'ci.nombre_categoria'
-            )
-            ->orderBy('ci.nombre_categoria')
-            ->orderBy('i.nombre_implemento')
-            ->get();
-
-        // 6. Consultar el total de préstamos activos.
-        $totalPrestamosActivos = DB::table('prestamo')
-            ->where('activo', true)
-            ->count();
-
-        return view('prestamos', compact(
-            'prestamos',
-            'categorias',
-            'totalPrestamosActivos',
-            'implementosDisponibles',
-            'tiposUsuario'
-        ));
+            ->orderByDesc('p.fecha_prestado');
     }
 
     public function store(Request $request)

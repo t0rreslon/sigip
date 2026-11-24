@@ -137,3 +137,9 @@
 .btn-cerrar-sesion:hover {
     background: #f2f4f7;
 }
+
+a.btn-notificaciones,
+a.perfil-administrador {
+    text-decoration: none;
+    color: inherit;
+}

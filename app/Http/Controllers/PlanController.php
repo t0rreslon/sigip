@@ -6,6 +6,7 @@ use App\Models\Plan;
 use App\Models\Suscripcion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Support\Auditoria;
 
 class PlanController extends Controller
 {
@@ -13,7 +14,14 @@ class PlanController extends Controller
     public function index(Request $request)
     {
         // Planes con el número de suscripciones asociadas (detalle del plan).
+        // HU-152: filtros de planes (prefijo "p_" para no chocar con los de suscripciones).
         $planes = Plan::query()
+            ->when($request->filled('p_buscar'), function ($q) use ($request) {
+                $buscar = trim($request->input('p_buscar'));
+                $q->where(fn ($w) => $w->where('nombre_plan', 'ILIKE', "%{$buscar}%")->orWhere('descripcion', 'ILIKE', "%{$buscar}%"));
+            })
+            ->when(in_array($request->input('p_tipo'), ['tiquetera', 'suscripcion'], true), fn ($q) => $q->where('tipo_plan', $request->input('p_tipo')))
+            ->when(in_array($request->input('p_estado'), ['1', '0'], true), fn ($q) => $q->where('estado_plan', $request->input('p_estado') === '1'))
             ->withCount([
                 'suscripciones',
                 'suscripciones as suscripciones_activas_count' => function ($consulta) {
@@ -90,11 +98,13 @@ class PlanController extends Controller
             })
             ->count();
 
-        $planesActivos = $planes->where('estado_plan', true)->values();
+        $todosLosPlanes = Plan::orderBy('nombre_plan')->get();
+        $planesActivos = $todosLosPlanes->where('estado_plan', true)->values();
 
         return view('planes', [
             'planes' => $planes,
             'planesActivos' => $planesActivos,
+            'todosLosPlanes' => $todosLosPlanes,
             'suscripciones' => $suscripciones,
             'activas' => (int) ($conteos['activa'] ?? 0),
             'porActivar' => (int) ($conteos['por_activar'] ?? 0),
@@ -114,7 +124,9 @@ class PlanController extends Controller
 
         $datosValidos['estado_plan'] = true;
 
-        Plan::create($datosValidos);
+        $plan = Plan::create($datosValidos);
+
+        Auditoria::cambio('plan', 'INSERT', $plan->plan_id, null, $plan->getAttributes());
 
         return redirect()
             ->route('planes.index')
@@ -132,9 +144,12 @@ class PlanController extends Controller
 
         $datosValidos = $request->validateWithBag('editarPlan', $this->reglas($plan->plan_id));
 
+        $antes = $plan->getAttributes();
         $plan->fill($datosValidos);
         $plan->ultima_actualizacion = now();
         $plan->save();
+
+        Auditoria::cambio('plan', 'UPDATE', $plan->plan_id, $antes, $plan->getAttributes());
 
         return redirect()
             ->route('planes.index')
@@ -150,6 +165,8 @@ class PlanController extends Controller
         $plan->ultima_actualizacion = now();
         $plan->save();
 
+        Auditoria::cambio('plan', 'ESTADO', $plan->plan_id, ['estado_plan' => !false], ['estado_plan' => false]);
+
         return redirect()
             ->route('planes.index')
             ->with('mensaje', 'Plan desactivado exitosamente. Las suscripciones existentes conservan su vigencia.');
@@ -164,9 +181,24 @@ class PlanController extends Controller
         $plan->ultima_actualizacion = now();
         $plan->save();
 
+        Auditoria::cambio('plan', 'ESTADO', $plan->plan_id, ['estado_plan' => !true], ['estado_plan' => true]);
+
         return redirect()
             ->route('planes.index')
             ->with('mensaje', 'Plan reactivado exitosamente.');
+    }
+
+    // HU-197: historial de cambios de un plan.
+    public function historial($id)
+    {
+        $plan = Plan::findOrFail($id);
+
+        return view('historial', [
+            'titulo' => 'Historial del plan',
+            'subtitulo' => $plan->nombre_plan,
+            'volver' => route('planes.index'),
+            'registros' => Auditoria::historial('plan', $plan->plan_id),
+        ]);
     }
 
     private function reglas(?int $planId = null): array

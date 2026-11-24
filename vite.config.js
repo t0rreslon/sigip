@@ -22,6 +22,7 @@ export default defineConfig({
                 'resources/js/pop_out.js',
                 'resources/js/prestamo-categorias.js',
                 'resources/js/registrar-inventario.js',
+                'resources/js/sigip.js',
             ],
             refresh: true,
         }),

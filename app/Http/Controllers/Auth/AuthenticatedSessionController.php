@@ -28,6 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        \App\Support\Auditoria::movimiento('Iniciar sesión');
+
         return redirect()->intended(route('index', absolute: false));
     }
 
@@ -36,6 +38,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        \App\Support\Auditoria::movimiento('Cerrar sesión');
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

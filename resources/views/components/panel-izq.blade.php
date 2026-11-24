@@ -1,6 +1,31 @@
+@php
+    $cuenta = auth()->user();
+    $esAdmin = $cuenta?->tieneTipo('Administrador');
+    $esPersonal = $cuenta?->tieneTipo('Administrador', 'Operador');
+    $esInstructor = $cuenta?->tieneTipo('Instructor');
+
+    // Opciones del menú según el tipo de cuenta: [ruta, ícono, texto, visible].
+    $opciones = [
+        ['usuarios', 'https://img.icons8.com/pastel-glyph/64/conference-call.png', 'Usuarios', $esPersonal],
+        ['planes.index', 'https://img.icons8.com/windows/32/verified-account.png', 'Planes y suscripciones', $esPersonal],
+        ['pago.index', 'https://img.icons8.com/external-anggara-glyph-anggara-putra/32/external-scan-user-interface-anggara-basic-outline-anggara-putra-2.png', 'Pagos', $esPersonal],
+        ['control-acceso.index', 'https://img.icons8.com/fluency-systems-regular/24/door-opened.png', 'Control de acceso', $esPersonal],
+        ['reservas.index', 'https://img.icons8.com/material-outlined/24/tear-off-calendar.png', 'Reservas de espacios', $esPersonal],
+        ['espacios.index', 'https://img.icons8.com/windows/32/room.png', 'Espacios', $esPersonal],
+        ['prestamos', 'https://img.icons8.com/pulsar-line/48/handshake.png', 'Préstamos y devoluciones', $esPersonal],
+        ['inventario.index', 'https://img.icons8.com/windows/32/dumbbell.png', 'Inventario y mantenimiento', $esPersonal],
+        ['actividades.index', 'https://img.icons8.com/fluency-systems-regular/24/activity.png', 'Actividades', $esPersonal],
+        ['instructores.index', 'https://img.icons8.com/external-anggara-basic-outline-anggara-putra/24/external-contact-user-interface-anggara-basic-outline-anggara-putra.png', 'Instructores y turnos', $esAdmin],
+        ['operadores.index', 'https://img.icons8.com/ios/50/admin-settings-male.png', 'Operadores', $esAdmin],
+        ['actividades.reporte', 'https://img.icons8.com/pastel-glyph/64/bar-chart--v2.png', 'Reportes', $esPersonal],
+        ['portal.horario', 'https://img.icons8.com/material-outlined/24/tear-off-calendar.png', 'Mi horario', $esInstructor],
+        ['portal.actividades', 'https://img.icons8.com/fluency-systems-regular/24/activity.png', 'Mis actividades', $esInstructor],
+        ['portal.reservas', 'https://img.icons8.com/windows/32/room.png', 'Mis reservas', $esInstructor],
+        ['perfil', 'https://img.icons8.com/pastel-glyph/64/conference-call.png', 'Mi perfil', (bool) $cuenta],
+    ];
+@endphp
 <aside class="panel-izq">
     <div class="encabezado">
-
         <div align=center>
             <img src="{{ asset('imagenes/Logoo.png') }}" alt="logo" style="width: 80px; height: auto;">
             <p>
@@ -8,94 +33,19 @@
                 Pascual Bravo, Medellín
             </p>
         </div>
-
         <br>
-
-
-
     </div>
 
     <nav class="opciones" aria-label="Navegación principal">
         <div class="d-grid gap-2 mx-auto">
-
-            <a href="{{ route('index') }}" class="button-options">
-                <img src="https://img.icons8.com/puffy/32/dashboard-layout.png"
-                    alt="">
-                <span>Inicio</span>
+            @foreach ($opciones as [$ruta, $icono, $texto, $visible])
+            @if ($visible)
+            <a href="{{ route($ruta) }}" class="button-options {{ request()->routeIs(\Illuminate\Support\Str::before($ruta, '.') . '*') ? 'activa' : '' }}">
+                <img src="{{ $icono }}" alt="">
+                <span>{{ $texto }}</span>
             </a>
-
-            <a href="{{ route('usuarios') }}" class="button-options">
-                <img src="https://img.icons8.com/pastel-glyph/64/conference-call.png"
-                    alt="">
-                <span>Usuarios</span>
-            </a>
-
-            <a href="{{ route('planes.index') }}" class="button-options">
-                <img src="https://img.icons8.com/windows/32/verified-account.png"
-                    alt="">
-                <span>Planes y suscripciones</span>
-            </a>
-
-            <a href="{{ route('pago.index') }}" class="button-options">
-                <img src="https://img.icons8.com/external-anggara-glyph-anggara-putra/32/external-scan-user-interface-anggara-basic-outline-anggara-putra-2.png"
-                    alt="">
-                <span>Pagos QR</span>
-            </a>
-
-            <a href="{{ route('control-acceso.index') }}" class="button-options">
-                <img src="https://img.icons8.com/fluency-systems-regular/24/door-opened.png"
-                    alt="">
-                <span>Control de acceso</span>
-            </a>
-
-            <a href="{{ route('reservas.index') }}" class="button-options">
-                <img src="https://img.icons8.com/material-outlined/24/tear-off-calendar.png"
-                    alt="">
-                <span>Reservas de espacios</span>
-            </a>
-
-            <a href="{{ route('espacios.index') }}" class="button-options">
-                <img src="https://img.icons8.com/windows/32/room.png"
-                    alt="">
-                <span>Espacios</span>
-            </a>
-
-            <a href="{{ route('prestamos') }}" class="button-options">
-                <img src="https://img.icons8.com/pulsar-line/48/handshake.png"
-                    alt="">
-                <span>Préstamos y devoluciones</span>
-            </a>
-
-            <a href="{{ route('inventario.index') }}" class="button-options">
-                <img src="https://img.icons8.com/windows/32/dumbbell.png"
-                    alt="">
-                <span>Inventario</span>
-            </a>
-
-            <a href="#" class="button-options">
-                <img src="https://img.icons8.com/pastel-glyph/64/support.png"
-                    alt="">
-                <span>Mantenimiento</span>
-            </a>
-
-            <a href="#" class="button-options">
-                <img src="https://img.icons8.com/fluency-systems-regular/24/activity.png"
-                    alt="">
-                <span>Actividades</span>
-            </a>
-
-            <a href="#" class="button-options">
-                <img src="https://img.icons8.com/external-anggara-basic-outline-anggara-putra/24/external-contact-user-interface-anggara-basic-outline-anggara-putra.png"
-                    alt="">
-                <span>Instructores y turnos</span>
-            </a>
-
-            <a href="#" class="button-options">
-                <img src="https://img.icons8.com/pastel-glyph/64/bar-chart--v2.png"
-                    alt="">
-                <span>Reportes y consultas</span>
-            </a>
-
+            @endif
+            @endforeach
         </div>
     </nav>
 

@@ -911,3 +911,18 @@ body{
     cursor: pointer;
     text-decoration: underline;
 }
+
+.btn-exportar {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 8px 14px;
+    border: 1px solid #2463A6;
+    border-radius: 8px;
+    color: #2463A6;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.btn-exportar:hover {
+    background: #eef4fb;
+}

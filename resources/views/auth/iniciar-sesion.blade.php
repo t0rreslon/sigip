@@ -75,6 +75,10 @@
                 <form action="{{ route('login') }}" method="POST">
                     @csrf
 
+                    @if (session('status'))
+                    <div class="alert alert-success" role="status">{{ session('status') }}</div>
+                    @endif
+
                     @if ($errors->any())
                     <div class="alert alert-danger" role="alert">
                         @foreach ($errors->all() as $error)
@@ -115,7 +119,7 @@
 
                     <!-- Recuperar contraseña -->
                     <div class="recuperar">
-                        <span>¿Necesitas ayuda para ingresar? Comunícate con Bienestar Universitario.</span>
+                        <a href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
                     </div>
 
                     <!-- Botón de inicio de sesión -->

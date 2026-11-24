@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Auth\RecuperarClaveController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -19,16 +20,20 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+    // HU-195 / HU-206: recuperación de contraseña por usuario (cuenta) y correo del personal.
+    Route::get('forgot-password', [RecuperarClaveController::class, 'solicitar'])
         ->name('password.request');
 
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+    Route::post('forgot-password', [RecuperarClaveController::class, 'enviar'])
+        ->middleware('throttle:10,1')
         ->name('password.email');
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+    Route::get('reset-password/{cuenta}/{token}', [RecuperarClaveController::class, 'formulario'])
+        ->whereNumber('cuenta')
         ->name('password.reset');
 
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
+    Route::post('reset-password', [RecuperarClaveController::class, 'guardar'])
+        ->middleware('throttle:10,1')
         ->name('password.store');
 });
 
