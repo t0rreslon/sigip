@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="styles.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +40,7 @@
 
             </div>
             <div class="imagen-gimnasio">
-                <img src=""
+                <img src="imagenes/Logoo.png"
                     alt="Gimnasio universitario">
             </div>
 
@@ -73,37 +72,50 @@
                 </p>
 
                 <!-- Formulario -->
-                <form action="#" method="post">
+                <form action="{{ route('login') }}" method="POST">
+                    @csrf
+
+                    @if ($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        @foreach ($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                        @endforeach
+                    </div>
+                    @endif
 
                     <div class="campo">
-                        <label for="correo">
-                            Correo institucional o identificación *
+                        <label for="login">
+                            Usuario *
                         </label>
 
                         <input
                             type="text"
-                            id="correo"
-                            name="correo"
-                            placeholder="Ingresa tu correo o identificación"
+                            id="login"
+                            name="login"
+                            value="{{ old('login') }}"
+                            placeholder="Ingresa tu usuario"
+                            autocomplete="username"
+                            autofocus
                             required>
                     </div>
 
                     <div class="campo">
-                        <label for="contrasena">
+                        <label for="password">
                             Contraseña *
                         </label>
 
                         <input
                             type="password"
-                            id="contrasena"
-                            name="contrasena"
+                            id="password"
+                            name="password"
                             placeholder="Ingresa tu contraseña"
+                            autocomplete="current-password"
                             required>
                     </div>
 
                     <!-- Recuperar contraseña -->
                     <div class="recuperar">
-                        <a href="#">¿Necesitas ayuda para ingresar?</a>
+                        <span>¿Necesitas ayuda para ingresar? Comunícate con Bienestar Universitario.</span>
                     </div>
 
                     <!-- Botón de inicio de sesión -->

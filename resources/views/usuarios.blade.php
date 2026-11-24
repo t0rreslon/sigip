@@ -356,6 +356,135 @@
                         </form>
                     </dialog>
                     <!-- CIERRA POP-UP DEL FORMULARIO DE REGISTRO -->
+
+                    <!-- HU-29: MODAL DE CONSULTA Y EDICIÓN DE USUARIOS -->
+                    @php($erroresEditar = $errors->editar)
+                    <dialog id="modalEditar" class="modal-registro">
+                        <div class="modal-encabezado">
+                            <div>
+                                <h2>Editar usuario</h2>
+                                <p>Consulta y modifica la información del usuario seleccionado.</p>
+                            </div>
+                            <button type="button" class="btn-cerrar" data-cerrar-editar aria-label="Cerrar formulario">&times;</button>
+                        </div>
+
+                        <form
+                            id="formEditar"
+                            method="POST"
+                            action="{{ old('usuario_id') ? route('usuarios.update', old('usuario_id')) : '' }}"
+                            data-accion-base="{{ url('/usuarios') }}">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="usuario_id" id="editar_usuario_id" value="{{ old('usuario_id') }}">
+                            @foreach (['buscar', 'rol', 'estado', 'institucion', 'genero', 'page'] as $filtro)
+                            @if (request()->filled($filtro))
+                            <input type="hidden" name="{{ $filtro }}" value="{{ request($filtro) }}">
+                            @endif
+                            @endforeach
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="editar_nombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control @if($erroresEditar->has('nombre')) is-invalid @endif" id="editar_nombre" name="nombre" maxlength="50" value="{{ old('nombre') }}" required>
+                                    @if($erroresEditar->has('nombre'))<div class="invalid-feedback">{{ $erroresEditar->first('nombre') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_apellido" class="form-label">Apellido</label>
+                                    <input type="text" class="form-control @if($erroresEditar->has('apellido')) is-invalid @endif" id="editar_apellido" name="apellido" maxlength="50" value="{{ old('apellido') }}" required>
+                                    @if($erroresEditar->has('apellido'))<div class="invalid-feedback">{{ $erroresEditar->first('apellido') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_tipo_documento_id" class="form-label">Tipo de documento</label>
+                                    <select class="form-select @if($erroresEditar->has('tipo_documento_id')) is-invalid @endif" name="tipo_documento_id" id="editar_tipo_documento_id" required>
+                                        @foreach ($tiposDocumento as $tipoDocumento)
+                                        <option value="{{ $tipoDocumento->tipo_documento_id }}" @selected(old('tipo_documento_id') == $tipoDocumento->tipo_documento_id)>{{ $tipoDocumento->nombre_tipo_documento }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if($erroresEditar->has('tipo_documento_id'))<div class="invalid-feedback">{{ $erroresEditar->first('tipo_documento_id') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_documento" class="form-label">Número de documento</label>
+                                    <input type="text" class="form-control @if($erroresEditar->has('documento')) is-invalid @endif" id="editar_documento" name="documento" minlength="8" maxlength="11" pattern="[0-9]{8,11}" inputmode="numeric" title="El documento debe contener entre 8 y 11 números." value="{{ old('documento') }}" required>
+                                    @if($erroresEditar->has('documento'))<div class="invalid-feedback">{{ $erroresEditar->first('documento') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_genero_id" class="form-label">Género</label>
+                                    <select class="form-select @if($erroresEditar->has('genero_id')) is-invalid @endif" name="genero_id" id="editar_genero_id" required>
+                                        @foreach ($generos as $genero)
+                                        <option value="{{ $genero->genero_id }}" @selected(old('genero_id') == $genero->genero_id)>{{ $genero->nombre_genero }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if($erroresEditar->has('genero_id'))<div class="invalid-feedback">{{ $erroresEditar->first('genero_id') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_eps_id" class="form-label">EPS</label>
+                                    <select class="form-select @if($erroresEditar->has('eps_id')) is-invalid @endif" name="eps_id" id="editar_eps_id">
+                                        <option value="">Sin EPS</option>
+                                        @foreach ($eps as $item)
+                                        <option value="{{ $item->eps_id }}" @selected(old('eps_id') == $item->eps_id)>{{ $item->nombre_eps }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if($erroresEditar->has('eps_id'))<div class="invalid-feedback">{{ $erroresEditar->first('eps_id') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_correo" class="form-label">Correo electrónico</label>
+                                    <input type="email" class="form-control @if($erroresEditar->has('correo')) is-invalid @endif" id="editar_correo" name="correo" maxlength="80" value="{{ old('correo') }}" required>
+                                    @if($erroresEditar->has('correo'))<div class="invalid-feedback">{{ $erroresEditar->first('correo') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_telefono" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control @if($erroresEditar->has('telefono')) is-invalid @endif" id="editar_telefono" name="telefono" maxlength="11" pattern="[0-9]{7,11}" inputmode="numeric" title="El teléfono debe contener entre 7 y 11 números." value="{{ old('telefono') }}">
+                                    @if($erroresEditar->has('telefono'))<div class="invalid-feedback">{{ $erroresEditar->first('telefono') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
+                                    <input type="date" class="form-control @if($erroresEditar->has('fecha_nacimiento')) is-invalid @endif" id="editar_fecha_nacimiento" name="fecha_nacimiento" max="{{ date('Y-m-d') }}" value="{{ old('fecha_nacimiento') }}">
+                                    @if($erroresEditar->has('fecha_nacimiento'))<div class="invalid-feedback">{{ $erroresEditar->first('fecha_nacimiento') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_rol_usuario_id" class="form-label">Tipo de usuario</label>
+                                    <select class="form-select @if($erroresEditar->has('rol_usuario_id')) is-invalid @endif" name="rol_usuario_id" id="editar_rol_usuario_id" required>
+                                        @foreach ($rolesUsuario as $rol)
+                                        <option value="{{ $rol->rol_usuario_id }}" @selected(old('rol_usuario_id') == $rol->rol_usuario_id)>{{ $rol->nombre }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if($erroresEditar->has('rol_usuario_id'))<div class="invalid-feedback">{{ $erroresEditar->first('rol_usuario_id') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_institucion_id" class="form-label">Institución</label>
+                                    <select class="form-select @if($erroresEditar->has('institucion_id')) is-invalid @endif" name="institucion_id" id="editar_institucion_id" required>
+                                        @foreach ($instituciones as $institucion)
+                                        <option value="{{ $institucion->institucion_id }}" @selected(old('institucion_id') == $institucion->institucion_id)>{{ $institucion->nombre_institucion }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if($erroresEditar->has('institucion_id'))<div class="invalid-feedback">{{ $erroresEditar->first('institucion_id') }}</div>@endif
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="editar_estado_usuario" class="form-label">Estado</label>
+                                    <select class="form-select" name="estado_usuario" id="editar_estado_usuario" required>
+                                        <option value="1" @selected(old('estado_usuario', '1') === '1')>Activo</option>
+                                        <option value="0" @selected(old('estado_usuario') === '0')>Inactivo</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="modal-acciones">
+                                <button type="button" class="btn-cancelar" data-cerrar-editar>Cancelar</button>
+                                <button type="submit" class="btn-guardar">Guardar cambios</button>
+                            </div>
+                        </form>
+                    </dialog>
                     <div class="contenido-cuentas">
                         <p style="color: #2463A6">
                             {{ $totalUsuarios }} registrados
@@ -371,7 +500,7 @@
                     </div>
                     <div class="panel">
 
-                        @if (request()->hasAny(['buscar', 'rol', 'estado']))
+                        @if (request()->hasAny(['buscar', 'rol', 'estado', 'institucion', 'genero']))
                         <a href="{{ route('usuarios') }}" class="btn-limpiar">
                             <div class="pestanas">
                                 <button type="button">Todos los usuarios</button>
@@ -456,6 +585,26 @@
                                     </select>
                                 </div>
 
+
+                                {{-- Filtro por género --}}
+                                <div class="genero">
+                                    <select
+                                        id="genero"
+                                        name="genero"
+                                        class="combobox-institucion"
+                                        onchange="document.getElementById('formFiltros').requestSubmit()">
+
+                                        <option value="">Género: Todos</option>
+
+                                        @foreach ($generos as $genero)
+                                        <option
+                                            value="{{ $genero->genero_id }}"
+                                            @selected(request('genero')==$genero->genero_id)>
+                                            {{ $genero->nombre_genero }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
                                 {{-- Filtro por estado --}}
                                 <div class="estados">
@@ -543,8 +692,24 @@
 
                                         <td class="col-acciones">
                                             <div class="dato-principal">
-                                                <a href="#">Ver</a>
-                                                <a href="#">Editar</a>
+                                                <button
+                                                    type="button"
+                                                    class="btn-enlace btn-editar-usuario"
+                                                    data-id="{{ $usuario->usuario_id }}"
+                                                    data-nombre="{{ $usuario->nombre }}"
+                                                    data-apellido="{{ $usuario->apellido }}"
+                                                    data-tipo_documento_id="{{ $usuario->tipo_documento_id }}"
+                                                    data-documento="{{ $usuario->documento }}"
+                                                    data-genero_id="{{ $usuario->genero_id }}"
+                                                    data-eps_id="{{ $usuario->eps_id }}"
+                                                    data-correo="{{ $usuario->correo }}"
+                                                    data-telefono="{{ $usuario->telefono }}"
+                                                    data-fecha_nacimiento="{{ $usuario->fecha_nacimiento }}"
+                                                    data-rol_usuario_id="{{ $usuario->rol_usuario_id }}"
+                                                    data-institucion_id="{{ $usuario->institucion_id }}"
+                                                    data-estado_usuario="{{ $usuario->estado_usuario ? 1 : 0 }}">
+                                                    Ver / Editar
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -642,6 +807,58 @@
         });
     </script>
     @endif
+
+    @if ($errors->editar->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('modalEditar');
+
+            if (modal && !modal.open) {
+                modal.showModal();
+            }
+        });
+    </script>
+    @endif
+
+    <script>
+        // HU-29: cargar los datos del usuario seleccionado en el modal de edición.
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('modalEditar');
+            const formulario = document.getElementById('formEditar');
+
+            if (!modal || !formulario) {
+                return;
+            }
+
+            const campos = [
+                'nombre', 'apellido', 'tipo_documento_id', 'documento', 'genero_id', 'eps_id',
+                'correo', 'telefono', 'fecha_nacimiento', 'rol_usuario_id', 'institucion_id', 'estado_usuario'
+            ];
+
+            document.querySelectorAll('.btn-editar-usuario').forEach(function(boton) {
+                boton.addEventListener('click', function() {
+                    formulario.action = formulario.dataset.accionBase + '/' + boton.dataset.id;
+                    document.getElementById('editar_usuario_id').value = boton.dataset.id;
+
+                    campos.forEach(function(campo) {
+                        const elemento = document.getElementById('editar_' + campo);
+
+                        if (elemento) {
+                            elemento.value = boton.dataset[campo] ?? '';
+                            elemento.classList.remove('is-invalid');
+                        }
+                    });
+
+                    formulario.querySelectorAll('.invalid-feedback').forEach((error) => error.remove());
+                    modal.showModal();
+                });
+            });
+
+            document.querySelectorAll('[data-cerrar-editar]').forEach(function(boton) {
+                boton.addEventListener('click', () => modal.close());
+            });
+        });
+    </script>
 </body>
 
 </html>

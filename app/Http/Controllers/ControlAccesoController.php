@@ -186,6 +186,13 @@ class ControlAccesoController extends Controller
         try {
             $resultado = DB::transaction(function () use ($usuario, $suscripcion) {
 
+                // Bloquear la fila del usuario: si llegan dos solicitudes a la vez
+                // (doble clic), la segunda espera y luego ve el ingreso de la primera.
+                DB::table('usuario')
+                    ->where('usuario_id', $usuario->usuario_id)
+                    ->lockForUpdate()
+                    ->first();
+
                 // Volver a comprobar el acceso pendiente para evitar duplicados
                 $accesoPendiente = DB::table('acceso')
                     ->where('usuario_id', $usuario->usuario_id)

@@ -233,13 +233,8 @@
 
                                                     <button type="button"
                                                         class="btn-revision rechazado"
-                                                        data-abrir-revision
-                                                        data-action="{{ route('pago.revisar', $pago->pago_id) }}"
-                                                        data-usuario="{{ $pago->suscripcion->usuario->nombre }} {{ $pago->suscripcion->usuario->apellido }}"
-                                                        data-plan="{{ $pago->suscripcion->plan->nombre_plan }}"
-                                                        data-monto="{{ number_format($pago->monto, 0, ',', '.') }}"
-                                                        data-estado="Rechazado">
-                                                        Revisar
+                                                        disabled>
+                                                        Rechazado
                                                     </button>
 
                                                 @else

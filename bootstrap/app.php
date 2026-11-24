@@ -11,7 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'tipo_cuenta' => \App\Http\Middleware\TipoCuenta::class,
+        ]);
+
+        // Los invitados que intenten entrar a una ruta protegida van al login.
+        $middleware->redirectGuestsTo(fn () => route('login'));
+        $middleware->redirectUsersTo(fn () => route('index'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

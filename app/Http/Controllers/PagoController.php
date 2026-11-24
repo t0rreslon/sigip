@@ -268,11 +268,13 @@ class PagoController extends Controller
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            // Un pago verificado no puede modificarse nuevamente
-            if ($pago->estado_pago === 'Verificado') {
+            // Solo se revisan pagos pendientes. Un pago rechazado no puede
+            // volver a verificarse porque ya no cuenta en el saldo y podría
+            // hacer que el total pagado supere el costo del plan.
+            if ($pago->estado_pago !== 'Pendiente') {
 
                 throw ValidationException::withMessages([
-                    'estado_pago' => 'Este pago ya fue verificado y no puede modificarse.'
+                    'estado_pago' => 'Este pago ya fue ' . mb_strtolower($pago->estado_pago) . ' y no puede modificarse. Registra un pago nuevo si es necesario.'
                 ]);
             }
 
@@ -280,6 +282,13 @@ class PagoController extends Controller
             $pago->fecha_revision = now();
 
             $pago->save();
+
+            // Si con este pago se completa el valor del plan, la suscripción se activa.
+            Suscripcion::with('plan')
+                ->where('suscripcion_id', $pago->suscripcion_id)
+                ->lockForUpdate()
+                ->first()
+                ?->sincronizarEstado();
 
         });
 

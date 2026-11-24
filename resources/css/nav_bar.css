@@ -122,3 +122,18 @@
             color: #64748b;
             font-size: 17px;
         } 
+/* Botón para cerrar sesión */
+.btn-cerrar-sesion {
+    border: 1px solid #d0d5dd;
+    background: #ffffff;
+    color: #344054;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-cerrar-sesion:hover {
+    background: #f2f4f7;
+}

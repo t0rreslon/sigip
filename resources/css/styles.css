@@ -835,8 +835,10 @@ gap: 25px;
     margin-bottom: 14px;
 }
 
-.pestanas button {
+.pestanas button,
+.pestanas a {
     background: none;
+    text-decoration: none;
     border: none;
     border-bottom: 2px solid transparent;
     margin-bottom: -1px;
@@ -848,11 +850,13 @@ gap: 25px;
     cursor: pointer;
 }
 
-.pestanas button:hover {
+.pestanas button:hover,
+.pestanas a:hover {
     color: var(--morado-600);
 }
 
-.pestanas button.activa {
+.pestanas button.activa,
+.pestanas a.activa {
     color: var(--morado-600);
     border-bottom-color: var(--morado-600);
 }
@@ -1807,4 +1811,98 @@ tbody{
         align-items: flex-start;
         flex-direction: column;
     }
+}
+
+/* Detalle de un plan (HU-36) */
+.detalle-plan {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+    margin: 0 0 16px;
+    padding: 12px;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+}
+
+.detalle-plan dt {
+    font-size: 11px;
+    color: var(--texto-suave);
+    font-weight: 600;
+}
+
+.detalle-plan dd {
+    margin: 2px 0 0;
+    font-weight: 600;
+}
+
+.filtros {
+    flex-wrap: wrap;
+}
+
+/* Disponibilidad de espacios (HU-48) */
+.grilla-espacios {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.tarjeta-espacio {
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: #ffffff;
+}
+
+.tarjeta-espacio.libre {
+    border-color: #12b76a;
+}
+
+.tarjeta-espacio.ocupado {
+    border-color: #f04438;
+}
+
+.tarjeta-espacio h3 {
+    font-size: 14px;
+    margin: 0 0 4px;
+}
+
+.tarjeta-espacio ul {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    font-size: 12px;
+}
+
+.tarjeta-espacio li {
+    padding: 3px 0;
+    border-top: 1px dashed var(--borde);
+}
+
+.mensaje-error ul {
+    margin: 0;
+}
+
+@media (max-width: 600px) {
+    .detalle-plan {
+        grid-template-columns: 1fr;
+    }
+}
+
+.mensaje-exito {
+    background: #ecfdf3;
+    color: #027a48;
+    border: 1px solid #abefc6;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+}
+
+.mensaje-error {
+    background: #fef3f2;
+    color: #b42318;
+    border: 1px solid #fecdca;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
 }

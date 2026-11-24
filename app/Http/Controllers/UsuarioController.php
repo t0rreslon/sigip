@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class UsuarioController extends Controller
 {
@@ -29,8 +30,6 @@ class UsuarioController extends Controller
                 'rol_usuario.nombre as nombre_rol',
                 'institucion.nombre_institucion'
             );
-
-        // Buscar por documento, nombre, apellido o correo.
 
         // Buscar por documento, nombre, apellido, correo o nombre completo.
         if ($request->filled('buscar')) {
@@ -137,7 +136,44 @@ class UsuarioController extends Controller
 
     public function store(Request $request)
     {
-        $datos = $request->validate([
+        $datos = $request->validate($this->reglas());
+
+        // Los usuarios nuevos se registran como activos.
+        $datos['estado_usuario'] = true;
+
+        Usuario::create($datos);
+
+        return redirect()
+            ->route('usuarios')
+            ->with('success', 'Usuario registrado correctamente.');
+    }
+
+    // HU-29: Modificar los datos de un usuario.
+    public function update(Request $request, $id)
+    {
+        $usuario = Usuario::findOrFail($id);
+
+        $datos = $request->validateWithBag(
+            'editar',
+            $this->reglas($usuario->usuario_id, $usuario->correo) + [
+                'estado_usuario' => ['required', 'boolean'],
+            ]
+        );
+
+        $usuario->update($datos);
+
+        return redirect()
+            ->route('usuarios', $request->only(['buscar', 'rol', 'estado', 'institucion', 'genero', 'page']))
+            ->with('success', 'Los datos del usuario se actualizaron correctamente.');
+    }
+
+    /**
+     * Reglas de validación compartidas por el registro y la edición.
+     * Al editar se ignora el propio usuario en las validaciones de unicidad.
+     */
+    private function reglas(?int $usuarioId = null, ?string $correoActual = null): array
+    {
+        return [
             'nombre' => ['required', 'string', 'max:50'],
             'apellido' => ['required', 'string', 'max:50'],
 
@@ -150,7 +186,7 @@ class UsuarioController extends Controller
                 'required',
                 'string',
                 'regex:/^[0-9]{8,11}$/',
-                'unique:usuario,documento',
+                Rule::unique('usuario', 'documento')->ignore($usuarioId, 'usuario_id'),
 
                 function ($attribute, $value, $fail) {
                     $existeEnPersonal = DB::table('personal')
@@ -180,13 +216,30 @@ class UsuarioController extends Controller
                 'string',
                 'email',
                 'max:80',
-                'regex:/^[A-Za-z0-9]+(?:[._%+-][A-Za-z0-9]+)*@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/'
+                'regex:/^[A-Za-z0-9]+(?:[.\_%+-][A-Za-z0-9]+)*@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/',
+
+                function ($attribute, $value, $fail) use ($usuarioId, $correoActual) {
+                    // Si al editar no se cambió el correo, no se vuelve a validar
+                    // (hay registros antiguos con correos repetidos).
+                    if ($correoActual !== null && mb_strtolower(trim($value)) === mb_strtolower(trim($correoActual))) {
+                        return;
+                    }
+
+                    $existe = DB::table('usuario')
+                        ->whereRaw('LOWER(BTRIM(correo)) = ?', [mb_strtolower(trim($value))])
+                        ->when($usuarioId, fn ($q) => $q->where('usuario_id', '!=', $usuarioId))
+                        ->exists();
+
+                    if ($existe) {
+                        $fail('Este correo electrónico ya se encuentra registrado.');
+                    }
+                },
             ],
 
             'telefono' => [
                 'nullable',
                 'string',
-                'max:11'
+                'regex:/^[0-9]{7,11}$/'
             ],
 
             'fecha_nacimiento' => [
@@ -206,15 +259,6 @@ class UsuarioController extends Controller
                 'integer',
                 'exists:institucion,institucion_id,estado_convenio,1'
             ],
-        ]);
-
-        // Los usuarios nuevos se registran como activos.
-        $datos['estado_usuario'] = true;
-
-        Usuario::create($datos);
-
-        return redirect()
-            ->route('usuarios')
-            ->with('success', 'Usuario registrado correctamente.');
+        ];
     }
 }

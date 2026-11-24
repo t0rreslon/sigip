@@ -74,72 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ==========================================
-    // 2. FILTRADO DE PESTAÑAS Y COLUMNAS
+    // 2. FILTROS DEL INVENTARIO (HU-41)
+    // Los filtros se aplican en el servidor; los selectores envían el formulario.
     // ==========================================
 
-    const botonesFiltro = document.querySelectorAll('.pestanas button');
-    const tabla = document.querySelector('table.tabla');
-    const buscador = document.getElementById('buscar-inventario');
+    const formFiltros = document.getElementById('form-filtros-inventario');
 
-    const filas = tabla
-        ? tabla.querySelectorAll('tbody tr[data-tipo]')
-        : [];
-
-    let filtroActual = 'todos';
-
-    function actualizarColumnasInventario(tipo) {
-        if (!tabla) return;
-
-        tabla.classList.toggle('solo-maquinas', tipo === 'maquina');
-    }
-
-    function aplicarFiltros() {
-        const busqueda = buscador
-            ? buscador.value.trim().toLowerCase()
-            : '';
-
-        // Actualizar pestaña activa
-        botonesFiltro.forEach((boton) => {
-            boton.classList.toggle(
-                'activa',
-                boton.dataset.filtro === filtroActual
-            );
-        });
-
-        // Filtrar elementos
-        filas.forEach((fila) => {
-            const tipoFila = fila.dataset.tipo;
-
-            const coincideTipo =
-                filtroActual === 'todos' || tipoFila === filtroActual;
-
-            const contenidoFila = fila.textContent.toLowerCase();
-
-            const coincideBusqueda =
-                contenidoFila.includes(busqueda);
-
-            fila.hidden = !(coincideTipo && coincideBusqueda);
-        });
-
-        actualizarColumnasInventario(filtroActual);
-    }
-
-    // Eventos de las pestañas
-    botonesFiltro.forEach((boton) => {
-        boton.addEventListener('click', () => {
-            filtroActual = boton.dataset.filtro;
-            aplicarFiltros();
-        });
+    formFiltros?.querySelectorAll('[data-autoenviar]').forEach((selector) => {
+        selector.addEventListener('change', () => formFiltros.requestSubmit());
     });
-
-    // Evento del buscador
-    buscador?.addEventListener('input', aplicarFiltros);
-
-    // Aplicar filtros iniciales
-    const botonActivo = document.querySelector('.pestanas button.activa');
-
-    filtroActual = botonActivo?.dataset.filtro || 'todos';
-
-    aplicarFiltros();
-    
 });

@@ -1,38 +1,43 @@
+@php
+    $cuenta = auth()->user();
+    $personal = $cuenta?->personal;
+    $nombreCuenta = $personal ? trim($personal->nombre . ' ' . $personal->apellido) : ($cuenta->login ?? 'Invitado');
+    $iniciales = collect(explode(' ', $nombreCuenta))->filter()->take(2)->map(fn ($parte) => mb_strtoupper(mb_substr($parte, 0, 1)))->implode('');
+    $secciones = [
+        'usuarios' => 'Usuarios',
+        'planes' => 'Planes y suscripciones',
+        'pago' => 'Pagos',
+        'control-acceso' => 'Control de acceso',
+        'prestamos' => 'Préstamos y devoluciones',
+        'inventario' => 'Inventario',
+        'espacios' => 'Espacios',
+        'reservas' => 'Reservas de espacios',
+    ];
+    $seccionActual = $secciones[request()->segment(1)] ?? 'Inicio';
+@endphp
 <!-- ABRE NAVBAR -->
-            <nav class="navbar barra-superior">
-                <!-- CODIFICAR RITA DE NAVEGACION CUANDO SE DESARROLLE EL BACK END !!!!!!!!!!!!!!!!!!!! -->
-                <div class="ruta-navegacion">
-                    <span>Gimnasio Universitario</span>
-                    <span>/</span>
-                    <span>Usuarios</span>
-                </div>
-                <!-- CIERRA RUTA DE NAVEGACION -->
-                <div class="acciones-superiores">
-                    <!-- ABRE NOTIFICACIONES -->
-                    <button class="btn-notificaciones" type="button"
-                            aria-label="Notificaciones">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            width="18" height="18" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor"
-                            stroke-width="1.5" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
-                            <path d="M10 21h4"/>
-                        </svg>
-                    </button>
-                    <span class="contador-notificaciones">3</span>
-                    <!-- CIERRA NOTIFICACIONES -->
-                    <!-- ABRE PERFIL DE ADMINISTRACION -->
-                    <button class="perfil-administrador" type="button">
-                        <span class="avatar-administrador">LG</span>
-                        <span class="datos-administrador">
-                            <strong>Laura Gómez</strong>
-                            <small>Administrador</small>
-                        </span>
-                        <span class="flecha-perfil">
-                            v <!--  es recomendable cambiar el simbolo por un svg de flecha  !!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
-                        </span>
-                    </button>
-                    <!-- CIERRA PERFIL DE NOTIFICACION -->
-                </div>
-            </nav>
+<nav class="navbar barra-superior">
+    <div class="ruta-navegacion">
+        <span>Gimnasio Universitario</span>
+        <span>/</span>
+        <span>{{ $seccionActual }}</span>
+    </div>
+
+    <div class="acciones-superiores">
+        <!-- PERFIL DE LA CUENTA -->
+        <div class="perfil-administrador">
+            <span class="avatar-administrador">{{ $iniciales ?: '?' }}</span>
+            <span class="datos-administrador">
+                <strong>{{ $nombreCuenta }}</strong>
+                <small>{{ $cuenta?->nombreTipo() ?? '' }}</small>
+            </span>
+        </div>
+
+        @auth
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="btn-cerrar-sesion" title="Cerrar sesión">Salir</button>
+        </form>
+        @endauth
+    </div>
+</nav>

@@ -12,6 +12,12 @@ class Cuenta extends Authenticatable
 
     public $timestamps = false;
 
+    // Columna de la contraseña (Laravel la usa al volver a cifrar la clave).
+    protected $authPasswordName = 'clave';
+
+    // La tabla "cuenta" no tiene columna remember_token.
+    protected $rememberTokenName = '';
+
     protected $fillable = [
         'personal_id',
         'login',
@@ -46,5 +52,15 @@ class Cuenta extends Authenticatable
     public function tipoCuenta()
     {
         return $this->belongsTo(TipoCuenta::class, 'tipo_cuenta_id', 'tipo_cuenta_id');
+    }
+
+    public function nombreTipo(): ?string
+    {
+        return $this->tipoCuenta?->nombre_cuenta;
+    }
+
+    public function tieneTipo(string ...$tipos): bool
+    {
+        return in_array($this->nombreTipo(), $tipos, true);
     }
 }

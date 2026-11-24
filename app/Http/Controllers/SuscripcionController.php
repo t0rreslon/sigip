@@ -2,164 +2,149 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Suscripcion;
-use App\Models\Usuario;
 use App\Models\Plan;
+use App\Models\Suscripcion;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class SuscripcionController extends Controller
 {
- public function index(Request $request){
-    // Consultar todas las suscripciones
-    $activas = Suscripcion::where('estado', true)->count();
+    // Asignar una suscripción a un usuario.
+    public function store(Request $request)
+    {
+        $datos = $request->validateWithBag('asignar', [
+            'documento' => ['required', 'string', 'regex:/^[0-9]{8,11}$/'],
+            'plan_id' => [
+                'required',
+                Rule::exists('plan', 'plan_id')->where('estado_plan', true),
+            ],
+            'fecha_inicio' => ['required', 'date', 'after_or_equal:today'],
+            'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+        ], [
+            'documento.regex' => 'El documento debe contener entre 8 y 11 números.',
+            'plan_id.exists' => 'El plan seleccionado no existe o está desactivado.',
+            'fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
+        ]);
 
-$vencidas = Suscripcion::where('estado', false)->count();
-    
+        DB::transaction(function () use ($datos) {
+            $usuario = DB::table('usuario')
+                ->where('documento', $datos['documento'])
+                ->lockForUpdate()
+                ->first();
 
-// Desactivar suscripciones vencidas
-Suscripcion::where('estado', true)
-    ->whereNotNull('fecha_fin')
-    ->whereDate('fecha_fin', '<', now()->toDateString())
-    ->update(['estado' => false]);
+            if (!$usuario) {
+                throw ValidationException::withMessages([
+                    'documento' => 'No existe un usuario registrado con ese documento.',
+                ])->errorBag('asignar');
+            }
 
-// Calcular contadores
-$activas = Suscripcion::where('estado', true)->count();
-$vencidas = Suscripcion::where('estado', false)->count();
+            if (!$usuario->estado_usuario) {
+                throw ValidationException::withMessages([
+                    'documento' => 'El usuario se encuentra inactivo.',
+                ])->errorBag('asignar');
+            }
 
-    // Contar usuarios activos sin suscripciones
-    $usuariosSinSuscripcion = DB::table('usuario')
-        ->where('estado_usuario', true)
-        ->whereNotIn('usuario_id', function ($consulta) {
-            $consulta->select('usuario_id')
-                ->from('suscripcion');
-        })
-        ->count();
+            // Un usuario no puede tener dos suscripciones vigentes al mismo tiempo.
+            $tieneVigente = DB::table('suscripcion as s')
+                ->join('plan as pl', 'pl.plan_id', '=', 's.plan_id')
+                ->where('s.usuario_id', $usuario->usuario_id)
+                ->whereRaw('(' . Suscripcion::sqlEstadoCalculado() . ") <> 'vencida'")
+                ->exists();
 
-    // Preparar la consulta para la búsqueda
-    $consulta = Suscripcion::with(['usuario', 'plan']);
+            if ($tieneVigente) {
+                throw ValidationException::withMessages([
+                    'documento' => 'El usuario ya tiene una suscripción vigente o pendiente de activación. Modifícala en lugar de crear otra.',
+                ])->errorBag('asignar');
+            }
 
-    if ($request->filled('buscar')) {
-        $buscar = $request->buscar;
+            $plan = Plan::findOrFail($datos['plan_id']);
+            $fechaInicio = Carbon::parse($datos['fecha_inicio'])->startOfDay();
 
-        $consulta->whereHas('usuario', function ($query) use ($buscar) {
-            $query->where('nombre', 'ILIKE', "%{$buscar}%")
-                ->orWhere('apellido', 'ILIKE', "%{$buscar}%")
-                ->orWhere('documento', 'ILIKE', "%{$buscar}%");
+            $suscripcion = Suscripcion::create([
+                'usuario_id' => $usuario->usuario_id,
+                'plan_id' => $plan->plan_id,
+                'fecha_inicio' => $fechaInicio,
+                'fecha_fin' => $this->calcularFechaFin($plan, $fechaInicio, $datos['fecha_fin'] ?? null),
+                // Tiquetera: entradas disponibles. Suscripción: días de vigencia.
+                'cantidad_dias_restantes' => $plan->cantidad_entradas,
+                // Queda "por activar" hasta que el pago del plan esté verificado.
+                'estado' => false,
+            ]);
+
+            // Un plan gratuito se activa de inmediato.
+            $suscripcion->sincronizarEstado();
         });
+
+        return redirect()
+            ->route('planes.index')
+            ->with('mensaje', 'Suscripción asignada. Se activará cuando el pago del plan esté verificado.');
     }
 
-    if ($request->filled('estado')) {
-    $consulta->where('estado', $request->estado === 'true');
-     }
+    // HU-37 / HU-39: actualizar el plan, la fecha de vencimiento y las entradas.
+    public function update(Request $request, $id)
+    {
+        $suscripcion = Suscripcion::with('plan')->findOrFail($id);
 
-    // Obtener los resultados de la búsqueda
-    $suscripciones = $consulta->get();
+        $datos = $request->validateWithBag('editarSuscripcion', [
+            'plan_id' => [
+                'required',
+                Rule::exists('plan', 'plan_id')->where(function ($q) use ($suscripcion) {
+                    // Se permite conservar el plan actual aunque esté desactivado.
+                    $q->where('estado_plan', true)->orWhere('plan_id', $suscripcion->plan_id);
+                }),
+            ],
+            'fecha_fin' => ['nullable', 'date'],
+            'cantidad_dias_restantes' => ['required', 'integer', 'min:0', 'max:3650'],
+        ], [
+            'plan_id.exists' => 'El plan seleccionado no existe o está desactivado.',
+        ]);
 
-    // Calcular los datos de las suscripciones mostradas
-    foreach ($suscripciones as $suscripcion) {
+        $plan = Plan::findOrFail($datos['plan_id']);
+        $fechaInicio = $suscripcion->fecha_inicio->copy()->startOfDay();
 
-        $suscripcion->estado_pago = $this->obtenerEstadoPago($suscripcion);
+        $fechaFin = $datos['fecha_fin'] ?? null;
 
-        $fechaReferencia = now()->startOfDay();
-
-        if (\Carbon\Carbon::parse($suscripcion->fecha_inicio)->isFuture()) {
-            $fechaReferencia = \Carbon\Carbon::parse($suscripcion->fecha_inicio)->startOfDay();
+        if ($plan->tipo_plan === 'suscripcion' && !$fechaFin) {
+            throw ValidationException::withMessages([
+                'fecha_fin' => 'Los planes de suscripción requieren una fecha de vencimiento.',
+            ])->errorBag('editarSuscripcion');
         }
 
-        $suscripcion->dias_calculados = $suscripcion->fecha_fin
-            ? max(0, (int) $fechaReferencia->diffInDays(
-                \Carbon\Carbon::parse($suscripcion->fecha_fin)->startOfDay(),
-                false
-            ))
-            : 0;
+        if ($fechaFin && Carbon::parse($fechaFin)->lt($fechaInicio)) {
+            throw ValidationException::withMessages([
+                'fecha_fin' => 'La fecha de vencimiento no puede ser anterior a la fecha de inicio (' . $fechaInicio->format('d/m/Y') . ').',
+            ])->errorBag('editarSuscripcion');
+        }
+
+        DB::transaction(function () use ($suscripcion, $plan, $datos, $fechaFin) {
+            $suscripcion->plan_id = $plan->plan_id;
+            $suscripcion->fecha_fin = $fechaFin ? Carbon::parse($fechaFin)->endOfDay() : null;
+            $suscripcion->cantidad_dias_restantes = $datos['cantidad_dias_restantes'];
+            $suscripcion->save();
+
+            // Con el nuevo plan puede cambiar el valor a pagar o la vigencia.
+            $suscripcion->unsetRelation('plan');
+            $suscripcion->sincronizarEstado();
+        });
+
+        return redirect()
+            ->route('planes.index', $request->only(['buscar', 'estado', 'plan', 'page']))
+            ->with('mensaje', 'Suscripción actualizada exitosamente.');
     }
 
-    $planes = Plan::all();
+    /**
+     * Fecha de vencimiento: para los planes de suscripción se calcula con los
+     * días de vigencia; para las tiqueteras es opcional.
+     */
+    private function calcularFechaFin(Plan $plan, Carbon $fechaInicio, ?string $fechaFin): ?Carbon
+    {
+        if ($plan->tipo_plan === 'suscripcion') {
+            return $fechaInicio->copy()->addDays($plan->cantidad_entradas - 1)->endOfDay();
+        }
 
-    return view('planes', compact(
-        'planes',
-        'suscripciones',
-        'activas',
-        'vencidas',
-        'usuariosSinSuscripcion'
-    ));
-}
-
-public function create()
-{
-    $usuarios = Usuario::where('estado_usuario', true)->get();
-
-    $planes = Plan::where('estado_plan', true)->get();
-
-    return view('crear_suscripcion', compact('usuarios', 'planes'));
-}
-
-public function store(Request $request){
-    $datosValidos = $request->validate([
-        'usuario_id' => [
-        'required',
-         Rule::exists('usuario', 'usuario_id')->where('estado_usuario', true),
-     ],
-        'plan_id' => [
-        'required',
-         Rule::exists('plan', 'plan_id')->where('estado_plan', true),
-        ],
-        'fecha_inicio' => 'required|date',
-        'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
-    ]);
-
-    $fechaInicio = \Carbon\Carbon::parse($datosValidos['fecha_inicio']);
-    $fechaFin = \Carbon\Carbon::parse($datosValidos['fecha_fin']);
-
-    $fechaReferencia = $fechaInicio->isFuture()
-        ? $fechaInicio
-        : \Carbon\Carbon::today();
-
-    $diasRestantes = max(
-        0,
-        $fechaReferencia->diffInDays($fechaFin, false)
-    );
-
-    Suscripcion::create([
-        'usuario_id' => $datosValidos['usuario_id'],
-        'plan_id' => $datosValidos['plan_id'],
-        'fecha_inicio' => $datosValidos['fecha_inicio'],
-        'fecha_fin' => $datosValidos['fecha_fin'],
-        'cantidad_dias_restantes' => $diasRestantes,
-       'estado' => false,
-    ]);
-
-    return redirect('/planes');
-}
-
-
-
-private function obtenerEstadoPago(Suscripcion $suscripcion){
-    $pagos = DB::table('pago')
-        ->where('suscripcion_id', $suscripcion->suscripcion_id)
-        ->get();
-
-    if ($pagos->isEmpty()) {
-        return 'Pendiente';
+        return $fechaFin ? Carbon::parse($fechaFin)->endOfDay() : null;
     }
-
-    $todosConfirmados = $pagos->every(function ($pago) {
-        return $pago->esta_confirmado;
-    });
-
-    $totalPagado = $pagos
-        ->where('esta_confirmado', true)
-        ->sum('monto');
-
-    if (
-        $todosConfirmados &&
-        $totalPagado >= $suscripcion->plan->costo
-    ) {
-        return 'Verificado';
-    }
-
-    return 'Pendiente';
-}
 }

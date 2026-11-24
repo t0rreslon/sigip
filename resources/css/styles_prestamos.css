@@ -1198,35 +1198,38 @@ body{
     min-width: 180px;
 }
 
-/* PESTAÑAS DEL PANEL DE PRÉSTAMOS */
-.pestanas {
+.pestanas{
     display: flex;
-    gap: 22px;
-    border-bottom: 1px solid var(--borde);
-    margin-bottom: 14px;
-}
-
-/* ENLACE TODOS LOS PRÉSTAMOS */
-.pestanas a.btn-todos-prestamos {
-    display: inline-flex;
     align-items: center;
-    background: none;
-    border: none;
-    border-bottom: 2px solid var(--morado-600);
-    margin-bottom: -1px;
-    padding: 8px 0 11px;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--morado-600) !important;
-    text-decoration: none !important;
-    cursor: pointer;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    margin-top: 30px;
 }
 
-.pestanas a.btn-todos-prestamos:hover {
-    color: var(--morado-600) !important;
-    background: none;
-    border-bottom-color: var(--morado-600);
+.pestanas button{
+    min-width: 127px;
+    width: auto;
+    min-height: 29px;
+    height: auto;
+    padding: 2px 5px 10px;
+    transition: 0.3s;
+    color: var(--texto-suave, #77647f);
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 14px;
+    font-weight: 600;
+    border-width: 3px;
+    margin-bottom: 0;
+}
+
+.pestanas button:hover,
+.pestanas button:focus{
+    color: var(--morado-600, #692a7f);
+    border-bottom-color: var(--morado-600, #692a7f);
 }
 
 

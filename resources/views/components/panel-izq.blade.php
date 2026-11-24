@@ -2,7 +2,7 @@
     <div class="encabezado">
 
         <div align=center>
-            <img src="imagenes\Logoo.png" alt="logo" style="width: 80px; height: auto;">
+            <img src="{{ asset('imagenes/Logoo.png') }}" alt="logo" style="width: 80px; height: auto;">
             <p>
                 Gimnasio universitario<br>
                 Pascual Bravo, Medellín
@@ -48,10 +48,16 @@
                 <span>Control de acceso</span>
             </a>
 
-            <a href="#" class="button-options">
+            <a href="{{ route('reservas.index') }}" class="button-options">
                 <img src="https://img.icons8.com/material-outlined/24/tear-off-calendar.png"
                     alt="">
                 <span>Reservas de espacios</span>
+            </a>
+
+            <a href="{{ route('espacios.index') }}" class="button-options">
+                <img src="https://img.icons8.com/windows/32/room.png"
+                    alt="">
+                <span>Espacios</span>
             </a>
 
             <a href="{{ route('prestamos') }}" class="button-options">

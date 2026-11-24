@@ -23,3 +23,16 @@ if (formularioFiltros && campoBuscar) {
         }
     });
 }
+
+
+// =====================================================
+// 5. OCULTAR MENSAJE DESPUÉS DE 4 SEGUNDOS
+// =====================================================
+
+const mensaje = document.getElementById('mensaje');
+
+if (mensaje) {
+    setTimeout(() => {
+        mensaje.style.display = 'none';
+    }, 4000);
+}

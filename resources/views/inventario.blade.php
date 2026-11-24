@@ -113,7 +113,7 @@
                   </select>
                   <select name="estado_id" id="estado-implemento" disabled hidden>
                     <option value="">Selecciona un estado</option>
-                    @foreach ($estadosImplemento as $estado)
+                    @foreach ($estadosImplementoRegistro as $estado)
                     <option value="{{ $estado->estado_implemento_id }}">
                       {{ $estado->nombre_estado }}
                     </option>
@@ -164,46 +164,68 @@
         </div>
         <section class="tarjeta">
           <div class="pestanas">
-            <button type="button" class="activa" data-filtro="todos">
+            <a href="{{ route('inventario.index') }}" class="{{ $tipo === 'todos' ? 'activa' : '' }}">
               Todos los elementos ({{ $totalMaquinas + $totalImplementos }})
-            </button>
-            <!--  -->
-            <button type="button" data-filtro="maquina">
+            </a>
+            <a href="{{ route('inventario.index', ['tipo' => 'maquina']) }}" class="{{ $tipo === 'maquina' ? 'activa' : '' }}">
               Máquinas ({{ $totalMaquinas }})
-            </button>
-            <!--  -->
-            <button type="button" data-filtro="implemento">
+            </a>
+            <a href="{{ route('inventario.index', ['tipo' => 'implemento']) }}" class="{{ $tipo === 'implemento' ? 'activa' : '' }}">
               Implementos ({{ $totalImplementos }} unidades)
-            </button>
+            </a>
           </div>
 
-          <div class="filtros">
+          {{-- HU-41: filtros aplicados en el servidor --}}
+          <form class="filtros" method="GET" action="{{ route('inventario.index') }}" id="form-filtros-inventario">
+            @if ($tipo !== 'todos')
+            <input type="hidden" name="tipo" value="{{ $tipo }}">
+            @endif
             <input
-                    type="search"
-                    id="buscar-inventario"
-                    placeholder="Buscar por código, nombre, categoría, estado o ubicación..."
-                    autocomplete="off"
-                >
-            <select>
-              <option>Categoría: todas</option>
-              <option>Máquina</option>
-              <option>Entrenamiento</option>
-              <option>Resistencia</option>
+              type="search"
+              name="buscar"
+              id="buscar-inventario"
+              value="{{ request('buscar') }}"
+              placeholder="Buscar por código, nombre, categoría, estado o ubicación..."
+              autocomplete="off">
+            <select name="categoria" data-autoenviar>
+              <option value="">Categoría: todas</option>
+              <optgroup label="Máquinas">
+                @foreach ($categoriasMaquina as $categoria)
+                <option value="m:{{ $categoria->categoria_maquina_id }}" @selected(request('categoria') === 'm:' . $categoria->categoria_maquina_id)>
+                  {{ $categoria->nombre_categoria }}
+                </option>
+                @endforeach
+              </optgroup>
+              <optgroup label="Implementos">
+                @foreach ($categoriasImplemento as $categoria)
+                <option value="i:{{ $categoria->categoria_implemento_id }}" @selected(request('categoria') === 'i:' . $categoria->categoria_implemento_id)>
+                  {{ $categoria->nombre_categoria }}
+                </option>
+                @endforeach
+              </optgroup>
             </select>
-            <select>
-              <option>Ubicación: todas</option>
-              <option>Musculación</option>
-              <option>Bodega A</option>
+            <select name="espacio" data-autoenviar>
+              <option value="">Ubicación: todas</option>
+              @foreach ($espacios as $espacio)
+              <option value="{{ $espacio->espacio_id }}" @selected((string) request('espacio') === (string) $espacio->espacio_id)>
+                {{ $espacio->nombre_espacio }}
+              </option>
+              @endforeach
             </select>
-            <select>
-              <option>Estado: todos</option>
-              <option>Disponible</option>
-              <option>En mantenimiento</option>
-              <option>Fuera de servicio</option>
+            <select name="estado" data-autoenviar>
+              <option value="">Estado: todos</option>
+              @foreach ($nombresEstado as $nombreEstado)
+              <option value="{{ $nombreEstado }}" @selected(request('estado') === $nombreEstado)>
+                {{ $nombreEstado }}
+              </option>
+              @endforeach
             </select>
-          </div>
+            @if (request()->hasAny(['buscar', 'categoria', 'espacio', 'estado']))
+            <a href="{{ route('inventario.index') }}" class="btn-borde">Limpiar filtros</a>
+            @endif
+          </form>
 
-          <table class="tabla">
+          <table class="tabla {{ $tipo === 'maquina' ? 'solo-maquinas' : '' }}">
             <thead>
               <tr>
                 <th>Código / nombre</th>
@@ -267,9 +289,11 @@
               </tr>
               @endforeach
 
-              @if ($totalMaquinas + $totalImplementos === 0)
+              @if ($paginacion->total() === 0)
               <tr>
-                <td colspan="6">No hay elementos registrados en el inventario.</td>
+                <td colspan="6">
+                  {{ request()->hasAny(['buscar', 'categoria', 'espacio', 'estado']) ? 'No hay elementos que coincidan con los filtros.' : 'No hay elementos registrados en el inventario.' }}
+                </td>
               </tr>
               @endif
             </tbody>
@@ -320,7 +344,6 @@
           </div>
         </section>
 
-        <p class="observacion">Observación seleccionada CM-03: banda de arrastre irregular; uso bloqueado hasta cierre de mantenimiento. Detalle completo disponible en consulta.</p>
       </main>
     </div>
   </div>
