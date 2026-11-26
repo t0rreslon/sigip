@@ -39,10 +39,6 @@
                 </p>
 
             </div>
-            <div class="imagen-gimnasio">
-                <img src="imagenes/Logoo.png"
-                    alt="Gimnasio universitario">
-            </div>
 
             <footer class="footer">
                 Bienestar Universitario · Gestión integral del gimnasio
