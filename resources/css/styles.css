@@ -2000,3 +2000,10 @@ tbody{
 .btn-exportar:hover {
     background: var(--morado-100);
 }
+
+/* ISO 25010 – Protección contra errores: botón mientras se envía el formulario. */
+button.enviando {
+  opacity: .65;
+  cursor: progress;
+  pointer-events: none;
+}

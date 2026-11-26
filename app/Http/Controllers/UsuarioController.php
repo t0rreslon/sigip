@@ -67,7 +67,15 @@ class UsuarioController extends Controller
 
     public function store(Request $request)
     {
-        $datos = $request->validate($this->reglas());
+        $datos = $request->validate($this->reglas() + [
+            // Ley 1581 de 2012: sin autorización no se pueden guardar los datos personales.
+            'autoriza_datos' => ['accepted'],
+        ], [
+            'autoriza_datos.accepted' => 'Para registrar al usuario debe autorizar el tratamiento de sus datos personales.',
+        ]);
+
+        unset($datos['autoriza_datos']);
+        $datos['autoriza_datos_en'] = now();
 
         // Los usuarios nuevos se registran como activos.
         $datos['estado_usuario'] = true;

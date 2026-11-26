@@ -60,7 +60,7 @@
 
                 <span class="etiqueta-login">NUEVA CONTRASEÑA</span>
                 <h1>Crea una nueva contraseña</h1>
-                <p class="subtitulo">Mínimo 8 caracteres con letras y números. El enlace solo se puede usar una vez.</p>
+                <p class="subtitulo">Mínimo 10 caracteres con mayúsculas, minúsculas, números y un símbolo. El enlace solo se puede usar una vez.</p>
 
                 <form action="{{ route('password.store') }}" method="POST">
                     @csrf
@@ -77,12 +77,12 @@
 
                     <div class="campo">
                         <label for="password">Nueva contraseña *</label>
-                        <input type="password" id="password" name="password" minlength="8" autocomplete="new-password" required>
+                        <input type="password" id="password" name="password" minlength="10" autocomplete="new-password" required>
                     </div>
 
                     <div class="campo">
                         <label for="password_confirmation">Confirmar contraseña *</label>
-                        <input type="password" id="password_confirmation" name="password_confirmation" minlength="8" autocomplete="new-password" required>
+                        <input type="password" id="password_confirmation" name="password_confirmation" minlength="10" autocomplete="new-password" required>
                     </div>
 
                     <button type="submit" class="boton-login"><span>➜</span> Guardar contraseña</button>

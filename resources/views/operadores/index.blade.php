@@ -111,10 +111,10 @@
         <label class="campo-plan"><span>Usuario *</span><input type="text" name="login" maxlength="50" value="{{ old('login') }}" autocomplete="off" required></label>
       </div>
       <div class="fila-plan">
-        <label class="campo-plan"><span>Contraseña *</span><input type="password" name="password" minlength="8" autocomplete="new-password" required></label>
-        <label class="campo-plan"><span>Confirmar *</span><input type="password" name="password_confirmation" minlength="8" autocomplete="new-password" required></label>
+        <label class="campo-plan"><span>Contraseña *</span><input type="password" name="password" minlength="10" autocomplete="new-password" required></label>
+        <label class="campo-plan"><span>Confirmar *</span><input type="password" name="password_confirmation" minlength="10" autocomplete="new-password" required></label>
       </div>
-      <p class="nota-plan">Mínimo 8 caracteres con letras y números. El correo se usa para recuperar la contraseña.</p>
+      <p class="nota-plan">Mínimo 10 caracteres con mayúsculas, minúsculas, números y un símbolo. El correo se usa para recuperar la contraseña.</p>
       <div class="modal-plan-acciones">
         <button type="button" class="btn-borde" data-cerrar>Cancelar</button>
         <button type="submit" class="btn-primario">Crear operador</button>

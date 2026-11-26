@@ -83,7 +83,7 @@ class RecuperarClaveController extends Controller
         $datos = $request->validate([
             'cuenta' => ['required', 'integer'],
             'token' => ['required', 'string'],
-            'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
+            'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
         if (!$this->tokenValido((int) $datos['cuenta'], $datos['token'])) {

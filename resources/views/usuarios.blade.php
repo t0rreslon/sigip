@@ -340,6 +340,21 @@
 
                             </div>
 
+                            <!-- Ley 1581 de 2012: autorización para el tratamiento de datos personales -->
+                            <div class="form-check autorizacion-datos">
+                                <input class="form-check-input @error('autoriza_datos') is-invalid @enderror"
+                                    type="checkbox" name="autoriza_datos" id="autoriza_datos" value="1"
+                                    {{ old('autoriza_datos') ? 'checked' : '' }} required>
+                                <label class="form-check-label" for="autoriza_datos">
+                                    El usuario autoriza el tratamiento de sus datos personales según la
+                                    <a href="{{ route('politica-datos') }}" target="_blank" rel="noopener">política de tratamiento de datos</a>
+                                    (Ley 1581 de 2012). *
+                                </label>
+                                @error('autoriza_datos')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <!-- BOTONES -->
                             <div class="modal-acciones">
                                 <button

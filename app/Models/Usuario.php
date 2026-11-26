@@ -25,6 +25,7 @@ class Usuario extends Model
         'rol_usuario_id',
         'institucion_id',
         'estado_usuario',
+        'autoriza_datos_en',
     ];
 
     protected function casts(): array

@@ -2,6 +2,10 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 
 export default defineConfig({
+    // Dirección IPv4 fija: la Content-Security-Policy no acepta direcciones IPv6 como [::1].
+    server: {
+        host: '127.0.0.1',
+    },
     plugins: [
         laravel({
             // Todos los archivos que las vistas cargan con @vite deben estar

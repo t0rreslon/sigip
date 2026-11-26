@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActividadController;
+use App\Http\Controllers\Auth\DobleFactorController;
 use App\Http\Controllers\ControlAccesoController;
 use App\Http\Controllers\EspacioController;
 use App\Http\Controllers\InstructorController;
@@ -16,6 +17,9 @@ use App\Http\Controllers\PrestamoController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\SuscripcionController;
 use App\Http\Controllers\UsuarioController;
+
+// Ley 1581 de 2012: política de tratamiento de datos personales (pública).
+Route::view('/politica-de-datos', 'politica-datos')->name('politica-datos');
 
 Route::get('/', function () {
     return auth()->check()
@@ -49,6 +53,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
     Route::put('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
     Route::put('/perfil/clave', [PerfilController::class, 'cambiarClave'])->name('perfil.clave');
+
+    // ISO 25010 – Autenticidad: doble factor (TOTP) para administradores.
+    Route::post('/perfil/doble-factor/iniciar', [DobleFactorController::class, 'iniciarActivacion'])->name('perfil.2fa.iniciar');
+    Route::post('/perfil/doble-factor/activar', [DobleFactorController::class, 'activar'])->middleware('throttle:10,1')->name('perfil.2fa.activar');
+    Route::post('/perfil/doble-factor/cancelar', [DobleFactorController::class, 'cancelarActivacion'])->name('perfil.2fa.cancelar');
+    Route::delete('/perfil/doble-factor', [DobleFactorController::class, 'desactivar'])->middleware('throttle:10,1')->name('perfil.2fa.desactivar');
 
     // Detalle de una actividad programada y su asistencia (HU-180, 181, 184).
     // El instructor solo puede abrir sus propias actividades.

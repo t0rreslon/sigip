@@ -20,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\RegistrarMovimiento::class,
         ]);
 
+        // ISO 25010 – Resistencia: cabeceras de seguridad en todas las respuestas.
+        $middleware->append(\App\Http\Middleware\CabecerasSeguridad::class);
+
         // Los invitados que intenten entrar a una ruta protegida van al login.
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn () => route('index'));

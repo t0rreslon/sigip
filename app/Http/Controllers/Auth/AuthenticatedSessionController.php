@@ -28,6 +28,21 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Doble factor: la contraseña fue correcta, pero falta el código del celular.
+        $cuenta = $request->user();
+
+        if ($cuenta->doble_factor_activo) {
+            Auth::guard('web')->logout();
+            $request->session()->regenerate();
+            $request->session()->put([
+                DobleFactorController::SESION_PENDIENTE => $cuenta->cuenta_id,
+                'doble_factor.desde' => now()->timestamp,
+                'doble_factor.recordar' => $request->boolean('remember'),
+            ]);
+
+            return redirect()->route('doble-factor');
+        }
+
         \App\Support\Auditoria::movimiento('Iniciar sesión');
 
         return redirect()->intended(route('index', absolute: false));

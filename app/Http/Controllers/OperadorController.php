@@ -48,7 +48,7 @@ class OperadorController extends Controller
     {
         $datos = $request->validate(InstructorController::reglasPersonal() + [
             'login' => ['required', 'string', 'min:4', 'max:50', 'regex:/^[A-Za-z0-9._-]+$/', 'unique:cuenta,login'],
-            'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
+            'password' => ['required', 'confirmed', Password::defaults()],
         ], [
             'login.regex' => 'El usuario solo puede tener letras, números, punto, guion y guion bajo.',
         ]);

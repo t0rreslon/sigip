@@ -40,13 +40,56 @@
     @method('PUT')
     <label class="campo-plan"><span>Contraseña actual *</span><input type="password" name="clave_actual" autocomplete="current-password" required></label>
     <div class="fila-plan">
-      <label class="campo-plan"><span>Nueva contraseña *</span><input type="password" name="password" minlength="8" autocomplete="new-password" required></label>
-      <label class="campo-plan"><span>Confirmar *</span><input type="password" name="password_confirmation" minlength="8" autocomplete="new-password" required></label>
+      <label class="campo-plan"><span>Nueva contraseña *</span><input type="password" name="password" minlength="10" autocomplete="new-password" required></label>
+      <label class="campo-plan"><span>Confirmar *</span><input type="password" name="password_confirmation" minlength="10" autocomplete="new-password" required></label>
     </div>
-    <p class="nota-plan">Mínimo 8 caracteres con letras y números.</p>
+    <p class="nota-plan">Mínimo 10 caracteres con mayúsculas, minúsculas, números y un símbolo.</p>
     <div class="modal-plan-acciones">
       <button type="submit" class="btn-primario">Cambiar contraseña</button>
     </div>
   </form>
 </section>
+
+@if ($cuenta->tieneTipo('Administrador') || $cuenta->doble_factor_activo)
+<section class="tarjeta" id="doble-factor">
+  <h2>Verificación en dos pasos</h2>
+  @if ($cuenta->doble_factor_activo)
+    <p>Estado: <strong>activa</strong>. Al iniciar sesión se pide el código de tu app de autenticación.</p>
+    <form method="POST" action="{{ route('perfil.2fa.desactivar') }}" data-confirmar="¿Desactivar la verificación en dos pasos? Tu cuenta quedará protegida solo con la contraseña.">
+      @csrf
+      @method('DELETE')
+      <label class="campo-plan"><span>Contraseña actual *</span><input type="password" name="clave_actual_2fa" autocomplete="current-password" required></label>
+      <div class="modal-plan-acciones">
+        <button type="submit" class="btn-secundario">Desactivar</button>
+      </div>
+    </form>
+  @elseif ($nuevoSecreto)
+    <ol class="nota-plan">
+      <li>Instala en tu celular Google Authenticator, Microsoft Authenticator o Authy.</li>
+      <li>Elige <em>Ingresar clave de configuración</em> y escribe esta clave (cuenta: <strong>SIGIP:{{ $cuenta->login }}</strong>, basada en tiempo):</li>
+    </ol>
+    <p class="clave-2fa"><code>{{ \App\Support\Totp::formatear($nuevoSecreto) }}</code></p>
+    <form method="POST" action="{{ route('perfil.2fa.activar') }}">
+      @csrf
+      <label class="campo-plan"><span>Código de 6 dígitos que muestra la app *</span>
+        <input type="text" name="codigo_activacion" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" autocomplete="one-time-code" required></label>
+      <div class="modal-plan-acciones">
+        <button type="submit" class="btn-primario">Activar</button>
+      </div>
+    </form>
+    <form method="POST" action="{{ route('perfil.2fa.cancelar') }}">
+      @csrf
+      <button type="submit" class="btn-secundario">Cancelar</button>
+    </form>
+  @else
+    <p>Protege tu cuenta de administrador: además de la contraseña, se pedirá un código que cambia cada 30 segundos en tu celular.</p>
+    <form method="POST" action="{{ route('perfil.2fa.iniciar') }}">
+      @csrf
+      <div class="modal-plan-acciones">
+        <button type="submit" class="btn-primario">Configurar verificación en dos pasos</button>
+      </div>
+    </form>
+  @endif
+</section>
+@endif
 @endsection

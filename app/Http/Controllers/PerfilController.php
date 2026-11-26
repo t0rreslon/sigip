@@ -21,6 +21,7 @@ class PerfilController extends Controller
         return view('perfil', [
             'cuenta' => $cuenta,
             'personal' => DB::table('personal')->where('personal_id', $cuenta->personal_id)->first(),
+            'nuevoSecreto' => $request->session()->get('doble_factor.nuevo_secreto'),
         ]);
     }
 
@@ -48,7 +49,7 @@ class PerfilController extends Controller
 
         $datos = $request->validate([
             'clave_actual' => ['required', 'string'],
-            'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
+            'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
         if (!Hash::check($datos['clave_actual'], $cuenta->clave)) {

@@ -28,11 +28,13 @@ class Cuenta extends Authenticatable
 
     protected $hidden = [
         'clave',
+        'doble_factor_secreto',
     ];
 
     protected function casts(): array
     {
         return [
+            'doble_factor_activo' => 'boolean',
             'clave' => 'hashed',
             'fecha_creacion' => 'datetime',
             'estado_cuenta' => 'boolean',

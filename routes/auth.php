@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Auth\RecuperarClaveController;
+use App\Http\Controllers\Auth\DobleFactorController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -19,6 +20,12 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    // ISO 25010 – Autenticidad: segundo paso del inicio de sesión con doble factor.
+    Route::get('verificar-codigo', [DobleFactorController::class, 'desafio'])->name('doble-factor');
+    Route::post('verificar-codigo', [DobleFactorController::class, 'verificar'])
+        ->middleware('throttle:10,1')
+        ->name('doble-factor.verificar');
 
     // HU-195 / HU-206: recuperación de contraseña por usuario (cuenta) y correo del personal.
     Route::get('forgot-password', [RecuperarClaveController::class, 'solicitar'])

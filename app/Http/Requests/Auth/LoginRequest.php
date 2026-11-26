@@ -49,6 +49,13 @@ class LoginRequest extends FormRequest
         ], $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
+            // ISO 25010 – Responsabilidad: queda registro de los intentos fallidos.
+            \App\Support\Auditoria::movimiento(
+                'Login fallido',
+                ['login' => Str::limit((string) $this->input('login'), 50, '')],
+                \App\Models\Cuenta::where('login', $this->input('login'))->value('cuenta_id')
+            );
+
             throw ValidationException::withMessages([
                 'login' => trans('auth.failed'),
             ]);
@@ -69,6 +76,12 @@ class LoginRequest extends FormRequest
         }
 
         event(new Lockout($this));
+
+        \App\Support\Auditoria::movimiento(
+            'Bloqueo de cuenta',
+            ['login' => Str::limit((string) $this->input('login'), 50, ''), 'motivo' => 'Demasiados intentos de inicio de sesión'],
+            \App\Models\Cuenta::where('login', $this->input('login'))->value('cuenta_id')
+        );
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
