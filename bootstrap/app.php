@@ -8,7 +8,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
-        health: '/up',
+        // La ruta /up (estado del sistema) está en routes/web.php: la de Laravel
+        // carga estilos y scripts de CDN externos sin verificación de integridad.
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
@@ -22,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // ISO 25010 – Resistencia: cabeceras de seguridad en todas las respuestas.
         $middleware->append(\App\Http\Middleware\CabecerasSeguridad::class);
+
+        // CSRF sin la cookie XSRF-TOKEN (no se usa y no puede ser HttpOnly).
+        $middleware->web(replace: [
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class => \App\Http\Middleware\ValidarTokenCsrf::class,
+        ]);
 
         // HU-63: limpia bytes nulos y caracteres de control antes de validar.
         $middleware->prepend(\App\Http\Middleware\LimpiarEntrada::class);

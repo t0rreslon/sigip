@@ -58,7 +58,7 @@
 
   {{-- Si hubo errores de validación, se reabre el modal que envió el formulario. --}}
   @if ($errors->any() && old('_modal'))
-  <script>
+  <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
     document.addEventListener('DOMContentLoaded', () => document.getElementById(@json(old('_modal')))?.showModal());
   </script>
   @endif

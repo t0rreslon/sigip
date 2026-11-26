@@ -18,6 +18,18 @@ use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\SuscripcionController;
 use App\Http\Controllers\UsuarioController;
 
+// Estado del sistema para monitoreo (ISO 25010 – Fiabilidad / Disponibilidad).
+// Responde 200 si la aplicación y la base de datos funcionan; no expone detalles.
+Route::get('/up', function () {
+    try {
+        \Illuminate\Support\Facades\DB::select('select 1');
+
+        return response()->json(['estado' => 'ok']);
+    } catch (\Throwable) {
+        return response()->json(['estado' => 'error'], 503);
+    }
+})->withoutMiddleware([\Illuminate\Session\Middleware\StartSession::class, \Illuminate\View\Middleware\ShareErrorsFromSession::class, \App\Http\Middleware\ValidarTokenCsrf::class])->name('estado');
+
 // Ley 1581 de 2012: política de tratamiento de datos personales (pública).
 Route::view('/politica-de-datos', 'politica-datos')->name('politica-datos');
 

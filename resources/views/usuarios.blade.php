@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- estilos de usuarios y estilos del panel izquierdo y javascrpit del pop-out -->
-    @vite(['resources/css/styles2.css', 'resources/js/app.js', 'resources/js/pop_out.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css'])
+    @vite(['resources/css/styles2.css', 'resources/js/app.js', 'resources/js/pop_out.js', 'resources/js/sigip.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css'])
     <!-- bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
     <!-- fuentes -->
@@ -567,7 +567,7 @@
                                         id="rol"
                                         name="rol"
                                         class="combobox-rol"
-                                        onchange="document.getElementById('formFiltros').requestSubmit()">
+                                        data-autoenviar>
 
                                         <option value="">Rol: Todos</option>
 
@@ -588,7 +588,7 @@
                                         id="institucion"
                                         name="institucion"
                                         class="combobox-institucion"
-                                        onchange="document.getElementById('formFiltros').requestSubmit()">
+                                        data-autoenviar>
 
                                         <option value="">Institución: Todas</option>
 
@@ -609,7 +609,7 @@
                                         id="genero"
                                         name="genero"
                                         class="combobox-institucion"
-                                        onchange="document.getElementById('formFiltros').requestSubmit()">
+                                        data-autoenviar>
 
                                         <option value="">Género: Todos</option>
 
@@ -629,7 +629,7 @@
                                         id="estado"
                                         name="estado"
                                         class="combobox-estado"
-                                        onchange="document.getElementById('formFiltros').requestSubmit()">
+                                        data-autoenviar>
 
                                         <option value="">Estado: Todos</option>
 
@@ -729,7 +729,7 @@
                                                 </button>
                                                 <a href="{{ route('usuarios.historial', $usuario->usuario_id) }}">Historial</a>
                                                 {{-- HU-144: cambiar el estado del usuario --}}
-                                                <form method="POST" action="{{ route('usuarios.estado', $usuario->usuario_id) }}" style="display:inline" onsubmit="return confirm('¿{{ $usuario->estado_usuario ? 'Desactivar' : 'Activar' }} a este usuario?')">
+                                                <form method="POST" action="{{ route('usuarios.estado', $usuario->usuario_id) }}" style="display:inline" data-confirmar="¿{{ $usuario->estado_usuario ? 'Desactivar' : 'Activar' }} a este usuario?">
                                                     @csrf
                                                     @method('PATCH')
                                                     @foreach (['buscar', 'rol', 'estado', 'institucion', 'genero', 'page'] as $filtro)
@@ -826,7 +826,7 @@
         <!-- CIERRA PANEL DERECHO -->
     </div>
     @if ($errors->any())
-    <script>
+    <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('modalRegistro');
 
@@ -838,7 +838,7 @@
     @endif
 
     @if ($errors->editar->any())
-    <script>
+    <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('modalEditar');
 
@@ -849,7 +849,7 @@
     </script>
     @endif
 
-    <script>
+    <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
         // HU-29: cargar los datos del usuario seleccionado en el modal de edición.
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('modalEditar');

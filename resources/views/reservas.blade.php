@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SIGIP | Reservas de espacios</title>
-  @vite(['resources/css/styles.css', 'resources/js/app.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css', 'resources/js/espacios.js'])
+  @vite(['resources/css/styles.css', 'resources/js/app.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css', 'resources/js/espacios.js', 'resources/js/sigip.js'])
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,7 +68,7 @@
                       <input type="hidden" name="accion" value="confirmar">
                       <button type="submit" class="btn-primario">Confirmar</button>
                     </form>
-                    <form method="POST" action="{{ route('reservas.responder', $solicitud->reserva_id) }}" onsubmit="return confirm('¿Rechazar esta solicitud?')">
+                    <form method="POST" action="{{ route('reservas.responder', $solicitud->reserva_id) }}" data-confirmar="¿Rechazar esta solicitud?">
                       @csrf
                       @method('PATCH')
                       <input type="hidden" name="accion" value="rechazar">
@@ -308,7 +308,7 @@
   </dialog>
 
   @if ($errors->reservar->any())
-  <script>
+  <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
     document.addEventListener('DOMContentLoaded', () => document.getElementById('modal-registrar-reserva')?.showModal());
   </script>
   @endif

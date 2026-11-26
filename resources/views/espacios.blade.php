@@ -258,7 +258,7 @@
   </dialog>
 
   @if ($errors->registrar->any())
-  <script>
+  <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
     document.addEventListener('DOMContentLoaded', () => document.getElementById('modal-registrar-espacio')?.showModal());
   </script>
   @endif

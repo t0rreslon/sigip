@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Vite;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -15,8 +16,12 @@ use Symfony\Component\HttpFoundation\Response;
  *  - X-Frame-Options / X-Content-Type-Options / Referrer-Policy / Permissions-Policy.
  *  - Strict-Transport-Security cuando la conexión es HTTPS.
  *
- * Pendiente: las vistas aún tienen scripts y atributos onclick en línea, por eso
- * script-src incluye 'unsafe-inline'. Al moverlos a archivos .js se puede quitar.
+ * script-src NO admite 'unsafe-inline': cada petición genera un nonce y solo se
+ * ejecutan los <script> en línea que lo llevan (Vite::cspNonce()). No se usan
+ * atributos onclick/onchange; esos comportamientos están en resources/js/sigip.js.
+ *
+ * style-src conserva 'unsafe-inline' porque varias vistas usan atributos style=""
+ * y Vite inyecta estilos en desarrollo. Es un riesgo bajo: los estilos no ejecutan código.
  */
 class CabecerasSeguridad
 {
@@ -30,10 +35,13 @@ class CabecerasSeguridad
 
     public function handle(Request $request, Closure $next): Response
     {
+        // El nonce se crea antes de dibujar la vista para que @vite y los <script> lo usen.
+        $nonce = Vite::useCspNonce();
+
         $respuesta = $next($request);
 
         $cabeceras = [
-            'Content-Security-Policy' => $this->politica(),
+            'Content-Security-Policy' => $this->politica($nonce),
             'X-Frame-Options' => 'DENY',
             'X-Content-Type-Options' => 'nosniff',
             'Referrer-Policy' => 'strict-origin-when-cross-origin',
@@ -51,19 +59,22 @@ class CabecerasSeguridad
             }
         }
 
-        // No revelar la versión de PHP.
+        // No revelar la versión de PHP. PHP agrega X-Powered-By por su cuenta (expose_php),
+        // fuera del objeto de respuesta, así que también se quita a nivel de PHP.
         $respuesta->headers->remove('X-Powered-By');
+        header_remove('X-Powered-By');
 
         return $respuesta;
     }
 
-    private function politica(): string
+    private function politica(string $nonce): string
     {
         [$vite, $viteWs] = $this->servidorVite();
 
         $directivas = [
             'default-src' => ["'self'"],
-            'script-src' => ["'self'", "'unsafe-inline'", ...self::CDN_SCRIPTS, ...$vite],
+            'script-src' => ["'self'", "'nonce-{$nonce}'", ...self::CDN_SCRIPTS, ...$vite],
+            'script-src-attr' => ["'none'"],
             'style-src' => ["'self'", "'unsafe-inline'", ...self::CDN_ESTILOS, ...$vite],
             'font-src' => ["'self'", 'data:', ...self::CDN_FUENTES],
             'img-src' => ["'self'", 'data:', 'blob:', ...self::CDN_IMAGENES],

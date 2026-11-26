@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Planes|Suscripciones</title>
-  @vite(['resources/css/styles.css', 'resources/js/app.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css', 'resources/js/planes.js'])
+  @vite(['resources/css/styles.css', 'resources/js/app.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css', 'resources/js/planes.js', 'resources/js/sigip.js'])
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,12 +39,12 @@
         {{-- HU-152: filtrar los planes registrados --}}
         <form class="filtros" method="GET" action="{{ route('planes.index') }}">
           <input type="search" name="p_buscar" value="{{ request('p_buscar') }}" placeholder="Buscar plan por nombre o descripción">
-          <select name="p_tipo" onchange="this.form.requestSubmit()">
+          <select name="p_tipo" data-autoenviar>
             <option value="">Tipo: todos</option>
             <option value="tiquetera" @selected(request('p_tipo') === 'tiquetera')>Tiquetera</option>
             <option value="suscripcion" @selected(request('p_tipo') === 'suscripcion')>Suscripción</option>
           </select>
-          <select name="p_estado" onchange="this.form.requestSubmit()">
+          <select name="p_estado" data-autoenviar>
             <option value="">Estado: todos</option>
             <option value="1" @selected(request('p_estado') === '1')>Activos</option>
             <option value="0" @selected(request('p_estado') === '0')>Inactivos</option>
@@ -593,25 +593,25 @@
   </dialog>
 
   @if ($errors->has('nombre_plan') || $errors->has('cantidad_entradas') || $errors->has('costo') || $errors->has('tipo_plan'))
-  <script>
+  <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
     document.addEventListener('DOMContentLoaded', () => document.getElementById('modal-crear-plan')?.showModal());
   </script>
   @endif
 
   @if ($erroresPlan->any())
-  <script>
+  <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
     document.addEventListener('DOMContentLoaded', () => document.getElementById('modal-editar-plan')?.showModal());
   </script>
   @endif
 
   @if ($erroresAsignar->any())
-  <script>
+  <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
     document.addEventListener('DOMContentLoaded', () => document.getElementById('modal-asignar-suscripcion')?.showModal());
   </script>
   @endif
 
   @if ($erroresSuscripcion->any())
-  <script>
+  <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
     document.addEventListener('DOMContentLoaded', () => document.getElementById('modal-editar-suscripcion')?.showModal());
   </script>
   @endif

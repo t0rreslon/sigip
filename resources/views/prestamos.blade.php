@@ -650,7 +650,7 @@
     </div>
     <!-- CIERRA FLEXBOX -->
     @if ($errors->any())
-    <script>
+    <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('modalRegistro');
 

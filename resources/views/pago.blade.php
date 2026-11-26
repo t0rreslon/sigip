@@ -468,7 +468,7 @@
     {{-- JAVASCRIPT --}}
     {{-- ================================= --}}
 
-    <script>
+    <script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
         document.addEventListener('DOMContentLoaded', () => {
 
             // --------------------------------------
