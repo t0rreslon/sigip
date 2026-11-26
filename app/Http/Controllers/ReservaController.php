@@ -400,11 +400,11 @@ class ReservaController extends Controller
         $buscar = trim($buscar);
 
         $consulta->where(function ($q) use ($buscar) {
-            $q->where('u.documento', 'ILIKE', "%{$buscar}%")
-                ->orWhere('per.documento', 'ILIKE', "%{$buscar}%")
-                ->orWhereRaw("CONCAT_WS(' ', u.nombre, u.apellido) ILIKE ?", ["%{$buscar}%"])
-                ->orWhereRaw("CONCAT_WS(' ', per.nombre, per.apellido) ILIKE ?", ["%{$buscar}%"])
-                ->orWhere('e.nombre_espacio', 'ILIKE', "%{$buscar}%");
+            $q->where('u.documento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                ->orWhere('per.documento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                ->orWhereRaw("CONCAT_WS(' ', u.nombre, u.apellido) ILIKE ?", [\App\Support\Busqueda::contiene($buscar)])
+                ->orWhereRaw("CONCAT_WS(' ', per.nombre, per.apellido) ILIKE ?", [\App\Support\Busqueda::contiene($buscar)])
+                ->orWhere('e.nombre_espacio', 'ILIKE', \App\Support\Busqueda::contiene($buscar));
         });
     }
 

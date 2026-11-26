@@ -22,9 +22,9 @@ class OperadorController extends Controller
             ->where('c.tipo_cuenta_id', $this->tipoOperador())
             ->when($request->filled('buscar'), function ($q) use ($request) {
                 $buscar = trim($request->input('buscar'));
-                $q->where(fn ($w) => $w->where('p.documento', 'ILIKE', "%{$buscar}%")
-                    ->orWhere('c.login', 'ILIKE', "%{$buscar}%")
-                    ->orWhereRaw("CONCAT_WS(' ', p.nombre, p.apellido) ILIKE ?", ["%{$buscar}%"]));
+                $q->where(fn ($w) => $w->where('p.documento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhere('c.login', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhereRaw("CONCAT_WS(' ', p.nombre, p.apellido) ILIKE ?", [\App\Support\Busqueda::contiene($buscar)]));
             })
             ->when(in_array($request->input('estado'), ['1', '0'], true), fn ($q) => $q->where('c.estado_cuenta', $request->input('estado') === '1'))
             ->select('c.cuenta_id', 'c.login', 'c.estado_cuenta', 'c.fecha_creacion', 'p.*')

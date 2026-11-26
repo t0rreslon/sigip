@@ -36,8 +36,8 @@ class EspacioController extends Controller
             $buscar = trim($request->input('buscar'));
 
             $consulta->where(function ($q) use ($buscar) {
-                $q->where('e.nombre_espacio', 'ILIKE', "%{$buscar}%")
-                    ->orWhere('e.descripcion', 'ILIKE', "%{$buscar}%");
+                $q->where('e.nombre_espacio', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhere('e.descripcion', 'ILIKE', \App\Support\Busqueda::contiene($buscar));
             });
         }
 

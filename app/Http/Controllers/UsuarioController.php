@@ -206,17 +206,17 @@ class UsuarioController extends Controller
             $termino = trim($request->input('buscar'));
 
             $consulta->where(function ($query) use ($termino) {
-                $query->where('usuario.documento', 'ILIKE', "%{$termino}%")
-                    ->orWhere('usuario.nombre', 'ILIKE', "%{$termino}%")
-                    ->orWhere('usuario.apellido', 'ILIKE', "%{$termino}%")
-                    ->orWhere('usuario.correo', 'ILIKE', "%{$termino}%")
+                $query->where('usuario.documento', 'ILIKE', \App\Support\Busqueda::contiene($termino))
+                    ->orWhere('usuario.nombre', 'ILIKE', \App\Support\Busqueda::contiene($termino))
+                    ->orWhere('usuario.apellido', 'ILIKE', \App\Support\Busqueda::contiene($termino))
+                    ->orWhere('usuario.correo', 'ILIKE', \App\Support\Busqueda::contiene($termino))
                     ->orWhereRaw(
                         "CONCAT_WS(' ', usuario.nombre, usuario.apellido) ILIKE ?",
-                        ["%{$termino}%"]
+                        [\App\Support\Busqueda::contiene($termino)]
                     )
                     ->orWhereRaw(
                         "CONCAT_WS(' ', usuario.apellido, usuario.nombre) ILIKE ?",
-                        ["%{$termino}%"]
+                        [\App\Support\Busqueda::contiene($termino)]
                     );
             });
         }

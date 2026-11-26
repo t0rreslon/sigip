@@ -94,7 +94,7 @@
       </div>
       <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
     </div>
-    <form method="POST" action="{{ old('_accion', route('portal.reservas.store')) }}">
+    <form method="POST" action="{{ \App\Support\Busqueda::accionSegura(old('_accion'), route('portal.reservas.store')) }}">
       @csrf
       <input type="hidden" name="_method" value="{{ old('_method', 'POST') }}">
       <label class="campo-plan"><span>Espacio *</span>

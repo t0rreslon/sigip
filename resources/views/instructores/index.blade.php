@@ -106,7 +106,7 @@
       </div>
       <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
     </div>
-    <form method="POST" action="{{ old('_accion', route('instructores.store')) }}">
+    <form method="POST" action="{{ \App\Support\Busqueda::accionSegura(old('_accion'), route('instructores.store')) }}">
       @csrf
       <input type="hidden" name="_method" value="{{ old('_method', 'POST') }}">
       <input type="hidden" name="_modal" value="modal-instructor">
@@ -187,7 +187,7 @@
       </div>
       <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
     </div>
-    <form method="POST" action="{{ old('_accion') }}">
+    <form method="POST" action="{{ \App\Support\Busqueda::accionSegura(old('_accion')) }}">
       @csrf
       <input type="hidden" name="_modal" value="modal-cuenta">
       <label class="campo-plan"><span>Usuario *</span><input type="text" name="login" maxlength="50" value="{{ old('login') }}" autocomplete="off" required></label>

@@ -183,7 +183,7 @@ class InventarioController extends Controller
 
             $prefijo = $categoria->nombre_categoria . ' ';
             $nombres = DB::table('implemento')
-                ->where('nombre_implemento', 'like', $prefijo . '%')
+                ->where('nombre_implemento', 'like', \App\Support\Busqueda::empiezaPor($prefijo))
                 ->pluck('nombre_implemento');
             $siguienteNumero = $this->obtenerSiguienteNumero($nombres);
             $nombre = $prefijo . str_pad($siguienteNumero, 2, '0', STR_PAD_LEFT);
@@ -467,18 +467,18 @@ class InventarioController extends Controller
 
         if ($buscar !== '') {
             $consultaMaquinas->where(function ($q) use ($buscar) {
-                $q->where('m.nombre_maquina', 'ILIKE', "%{$buscar}%")
-                    ->orWhere('c.nombre_categoria', 'ILIKE', "%{$buscar}%")
-                    ->orWhere('e.nombre_espacio', 'ILIKE', "%{$buscar}%")
-                    ->orWhere('em.nombre_estado', 'ILIKE', "%{$buscar}%")
-                    ->orWhereRaw("CONCAT('MAQ-', m.maquina_id) ILIKE ?", ["%{$buscar}%"]);
+                $q->where('m.nombre_maquina', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhere('c.nombre_categoria', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhere('e.nombre_espacio', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhere('em.nombre_estado', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhereRaw("CONCAT('MAQ-', m.maquina_id) ILIKE ?", [\App\Support\Busqueda::contiene($buscar)]);
             });
 
             $consultaImplementos->where(function ($q) use ($buscar) {
-                $q->where('i.nombre_implemento', 'ILIKE', "%{$buscar}%")
-                    ->orWhere('c.nombre_categoria', 'ILIKE', "%{$buscar}%")
-                    ->orWhere('ei.nombre_estado', 'ILIKE', "%{$buscar}%")
-                    ->orWhereRaw("CONCAT('IMP-', i.implemento_id) ILIKE ?", ["%{$buscar}%"]);
+                $q->where('i.nombre_implemento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhere('c.nombre_categoria', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhere('ei.nombre_estado', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhereRaw("CONCAT('IMP-', i.implemento_id) ILIKE ?", [\App\Support\Busqueda::contiene($buscar)]);
             });
         }
 

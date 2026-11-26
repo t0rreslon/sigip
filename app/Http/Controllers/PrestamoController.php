@@ -266,25 +266,25 @@ class PrestamoController extends Controller
                 $query->where(function ($q) use ($buscar) {
 
                     // Buscar en los datos de usuarios.
-                    $q->where('u.nombre', 'ILIKE', "%{$buscar}%")
-                        ->orWhere('u.apellido', 'ILIKE', "%{$buscar}%")
+                    $q->where('u.nombre', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                        ->orWhere('u.apellido', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
                         ->orWhereRaw(
                             "CONCAT_WS(' ', u.nombre, u.apellido) ILIKE ?",
-                            ["%{$buscar}%"]
+                            [\App\Support\Busqueda::contiene($buscar)]
                         )
-                        ->orWhere('u.documento', 'ILIKE', "%{$buscar}%")
+                        ->orWhere('u.documento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
 
                         // Buscar en los datos del personal.
-                        ->orWhere('per.nombre', 'ILIKE', "%{$buscar}%")
-                        ->orWhere('per.apellido', 'ILIKE', "%{$buscar}%")
+                        ->orWhere('per.nombre', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                        ->orWhere('per.apellido', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
                         ->orWhereRaw(
                             "CONCAT_WS(' ', per.nombre, per.apellido) ILIKE ?",
-                            ["%{$buscar}%"]
+                            [\App\Support\Busqueda::contiene($buscar)]
                         )
-                        ->orWhere('per.documento', 'ILIKE', "%{$buscar}%")
+                        ->orWhere('per.documento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
 
                         // Buscar por tipo de usuario o rol.
-                        ->orWhere('ru.nombre', 'ILIKE', "%{$buscar}%")
+                        ->orWhere('ru.nombre', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
 
                         // Buscar por nombre del implemento prestado.
                         ->orWhereExists(function ($subquery) use ($buscar) {
@@ -297,7 +297,7 @@ class PrestamoController extends Controller
                                     'pi.implemento_id'
                                 )
                                 ->whereColumn('pi.prestamo_id', 'p.prestamo_id')
-                                ->where('i.nombre_implemento', 'ILIKE', "%{$buscar}%");
+                                ->where('i.nombre_implemento', 'ILIKE', \App\Support\Busqueda::contiene($buscar));
                         });
                 });
             })

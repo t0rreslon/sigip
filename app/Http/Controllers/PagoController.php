@@ -34,17 +34,17 @@ class PagoController extends Controller
 
                 $query->whereHas('usuario', function ($usuario) use ($buscar) {
 
-                    $usuario->where('nombre', 'ILIKE', "%{$buscar}%")
-                        ->orWhere('apellido', 'ILIKE', "%{$buscar}%")
-                        ->orWhere('documento', 'ILIKE', "%{$buscar}%")
+                    $usuario->where('nombre', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                        ->orWhere('apellido', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                        ->orWhere('documento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
                         ->orWhereRaw(
                             "CONCAT(nombre, ' ', apellido) ILIKE ?",
-                            ["%{$buscar}%"]
+                            [\App\Support\Busqueda::contiene($buscar)]
                         );
 
                 })->orWhereHas('plan', function ($plan) use ($buscar) {
 
-                    $plan->where('nombre_plan', 'ILIKE', "%{$buscar}%");
+                    $plan->where('nombre_plan', 'ILIKE', \App\Support\Busqueda::contiene($buscar));
 
                 });
 

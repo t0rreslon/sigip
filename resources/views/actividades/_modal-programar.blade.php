@@ -8,7 +8,7 @@
       </div>
       <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
     </div>
-    <form method="POST" action="{{ old('_accion', $programacion ? route('programaciones.update', $programacion->programacion_actividad_id) : route('programaciones.store')) }}">
+    <form method="POST" action="{{ \App\Support\Busqueda::accionSegura(old('_accion'), $programacion ? route('programaciones.update', $programacion->programacion_actividad_id) : route('programaciones.store')) }}">
       @csrf
       <input type="hidden" name="_method" value="{{ old('_method', $programacion ? 'PUT' : 'POST') }}">
       @php

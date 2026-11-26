@@ -18,7 +18,7 @@ class PlanController extends Controller
         $planes = Plan::query()
             ->when($request->filled('p_buscar'), function ($q) use ($request) {
                 $buscar = trim($request->input('p_buscar'));
-                $q->where(fn ($w) => $w->where('nombre_plan', 'ILIKE', "%{$buscar}%")->orWhere('descripcion', 'ILIKE', "%{$buscar}%"));
+                $q->where(fn ($w) => $w->where('nombre_plan', 'ILIKE', \App\Support\Busqueda::contiene($buscar))->orWhere('descripcion', 'ILIKE', \App\Support\Busqueda::contiene($buscar)));
             })
             ->when(in_array($request->input('p_tipo'), ['tiquetera', 'suscripcion'], true), fn ($q) => $q->where('tipo_plan', $request->input('p_tipo')))
             ->when(in_array($request->input('p_estado'), ['1', '0'], true), fn ($q) => $q->where('estado_plan', $request->input('p_estado') === '1'))
@@ -61,10 +61,10 @@ class PlanController extends Controller
             $buscar = trim($request->input('buscar'));
 
             $consulta->where(function ($q) use ($buscar) {
-                $q->where('u.nombre', 'ILIKE', "%{$buscar}%")
-                    ->orWhere('u.apellido', 'ILIKE', "%{$buscar}%")
-                    ->orWhere('u.documento', 'ILIKE', "%{$buscar}%")
-                    ->orWhereRaw("CONCAT_WS(' ', u.nombre, u.apellido) ILIKE ?", ["%{$buscar}%"]);
+                $q->where('u.nombre', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhere('u.apellido', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhere('u.documento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhereRaw("CONCAT_WS(' ', u.nombre, u.apellido) ILIKE ?", [\App\Support\Busqueda::contiene($buscar)]);
             });
         }
 

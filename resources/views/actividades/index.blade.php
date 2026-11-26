@@ -140,7 +140,7 @@
       </div>
       <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
     </div>
-    <form method="POST" action="{{ old('_accion', route('actividades.store')) }}">
+    <form method="POST" action="{{ \App\Support\Busqueda::accionSegura(old('_accion'), route('actividades.store')) }}">
       @csrf
       <input type="hidden" name="_method" value="{{ old('_method', 'POST') }}">
       <label class="campo-plan"><span>Nombre *</span><input type="text" name="nombre_actividad" maxlength="50" value="{{ old('nombre_actividad') }}" required></label>

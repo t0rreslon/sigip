@@ -265,10 +265,10 @@ class ControlAccesoController extends Controller
         // Buscar usuario por nombre, apellido, documento o correo.
         $usuarios = Usuario::query()
             ->where(function ($query) use ($termino) {
-                $query->where('nombre', 'ILIKE', "%{$termino}%")
-                    ->orWhere('apellido', 'ILIKE', "%{$termino}%")
-                    ->orWhere('documento', 'ILIKE', "%{$termino}%")
-                    ->orWhere('correo', 'ILIKE', "%{$termino}%");
+                $query->where('nombre', 'ILIKE', \App\Support\Busqueda::contiene($termino))
+                    ->orWhere('apellido', 'ILIKE', \App\Support\Busqueda::contiene($termino))
+                    ->orWhere('documento', 'ILIKE', \App\Support\Busqueda::contiene($termino))
+                    ->orWhere('correo', 'ILIKE', \App\Support\Busqueda::contiene($termino));
             })
             ->limit(10)
             ->get([
@@ -440,8 +440,8 @@ class ControlAccesoController extends Controller
             ->when($request->filled('usuario_id'), fn ($q) => $q->where('a.usuario_id', $request->input('usuario_id')))
             ->when($request->filled('buscar'), function ($q) use ($request) {
                 $buscar = trim($request->input('buscar'));
-                $q->where(fn ($w) => $w->where('u.documento', 'ILIKE', "%{$buscar}%")
-                    ->orWhereRaw("CONCAT_WS(' ', u.nombre, u.apellido) ILIKE ?", ["%{$buscar}%"]));
+                $q->where(fn ($w) => $w->where('u.documento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhereRaw("CONCAT_WS(' ', u.nombre, u.apellido) ILIKE ?", [\App\Support\Busqueda::contiene($buscar)]));
             })
             ->when($request->input('estado') === 'sin_salida', fn ($q) => $q->whereNull('a.fecha_salida'))
             ->when($request->input('estado') === 'con_salida', fn ($q) => $q->whereNotNull('a.fecha_salida'))

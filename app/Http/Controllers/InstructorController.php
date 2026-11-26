@@ -305,9 +305,9 @@ class InstructorController extends Controller
             ->where(fn ($q) => $q->whereNull('c.cuenta_id')->orWhereNotIn('c.tipo_cuenta_id', $tiposPersonal))
             ->when($request->filled('buscar'), function ($q) use ($request) {
                 $buscar = trim($request->input('buscar'));
-                $q->where(fn ($w) => $w->where('p.documento', 'ILIKE', "%{$buscar}%")
-                    ->orWhere('p.correo', 'ILIKE', "%{$buscar}%")
-                    ->orWhereRaw("CONCAT_WS(' ', p.nombre, p.apellido) ILIKE ?", ["%{$buscar}%"]));
+                $q->where(fn ($w) => $w->where('p.documento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhere('p.correo', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
+                    ->orWhereRaw("CONCAT_WS(' ', p.nombre, p.apellido) ILIKE ?", [\App\Support\Busqueda::contiene($buscar)]));
             })
             ->when($request->filled('estado'), fn ($q) => $q->where('p.estado_personal_id', $request->input('estado')))
             ->when($request->input('cuenta') === 'con', fn ($q) => $q->whereNotNull('c.cuenta_id'))
