@@ -76,7 +76,7 @@
 </section>
 
 {{-- Gráficas: los datos viajan en data-grafica y se dibujan con resources/js/inicio.js --}}
-<section class="inicio-graficas">
+<section class="inicio-graficas {{ count($graficas) === 3 ? 'inicio-graficas-tres' : '' }}">
   @foreach ($graficas as $grafica)
   <article class="tarjeta inicio-grafica {{ !empty($grafica['ancho']) ? 'inicio-grafica-ancha' : '' }}">
     <h2>{{ $grafica['titulo'] }}</h2>

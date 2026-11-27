@@ -95,8 +95,34 @@ class Suscripcion extends Model
         $estado = $pagada && !$this->estaVencida();
 
         if ($this->estado !== $estado) {
+            // Al activarse (pago completo) empieza la vigencia: ese día es la fecha de inicio.
+            if ($estado) {
+                $this->iniciarVigencia();
+            }
+
             $this->estado = $estado;
             $this->save();
+        }
+    }
+
+    /**
+     * Fechas automáticas al activarse:
+     * - Suscripción: inicia hoy y vence al cumplirse los días de vigencia del plan.
+     * - Tiquetera: inicia hoy; la fecha de fin se registra cuando se usa la última entrada.
+     */
+    public function iniciarVigencia(): void
+    {
+        $this->loadMissing('plan');
+        $inicio = now();
+
+        $this->fecha_inicio = $inicio;
+
+        if ($this->plan->tipo_plan === 'suscripcion') {
+            $dias = max(1, (int) $this->plan->cantidad_entradas);
+            $this->fecha_fin = $inicio->copy()->addDays($dias - 1)->endOfDay();
+            $this->cantidad_dias_restantes = $dias;
+        } else {
+            $this->fecha_fin = null;
         }
     }
 }

@@ -22,12 +22,9 @@ class SuscripcionController extends Controller
                 'required',
                 Rule::exists('plan', 'plan_id')->where('estado_plan', true),
             ],
-            'fecha_inicio' => ['required', 'date', 'after_or_equal:today'],
-            'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
         ], [
             'documento.regex' => 'El documento debe contener entre 8 y 11 números.',
             'plan_id.exists' => 'El plan seleccionado no existe o está desactivado.',
-            'fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
         ]);
 
         DB::transaction(function () use ($datos) {
@@ -62,20 +59,20 @@ class SuscripcionController extends Controller
             }
 
             $plan = Plan::findOrFail($datos['plan_id']);
-            $fechaInicio = Carbon::parse($datos['fecha_inicio'])->startOfDay();
 
+            // Las fechas se calculan solas: queda "por activar" (fecha de registro, sin vencimiento)
+            // y al completarse el pago empieza la vigencia (ver Suscripcion::iniciarVigencia).
             $suscripcion = Suscripcion::create([
                 'usuario_id' => $usuario->usuario_id,
                 'plan_id' => $plan->plan_id,
-                'fecha_inicio' => $fechaInicio,
-                'fecha_fin' => $this->calcularFechaFin($plan, $fechaInicio, $datos['fecha_fin'] ?? null),
+                'fecha_inicio' => now(),
+                'fecha_fin' => null,
                 // Tiquetera: entradas disponibles. Suscripción: días de vigencia.
                 'cantidad_dias_restantes' => $plan->cantidad_entradas,
-                // Queda "por activar" hasta que el pago del plan esté verificado.
                 'estado' => false,
             ]);
 
-            // Un plan gratuito se activa de inmediato.
+            // Un plan gratuito se activa de inmediato (y empieza su vigencia hoy).
             $suscripcion->sincronizarEstado();
 
             Auditoria::cambio('suscripcion', 'INSERT', $suscripcion->suscripcion_id, null, [
@@ -85,7 +82,7 @@ class SuscripcionController extends Controller
 
         return redirect()
             ->route('planes.index')
-            ->with('mensaje', 'Suscripción asignada. Se activará cuando el pago del plan esté verificado.');
+            ->with('mensaje', 'Plan asignado. Se activará y empezará su vigencia cuando el pago esté completo y verificado.');
     }
 
     // HU-37 / HU-39: actualizar el plan, la fecha de vencimiento y las entradas.
@@ -112,7 +109,7 @@ class SuscripcionController extends Controller
 
         $fechaFin = $datos['fecha_fin'] ?? null;
 
-        if ($plan->tipo_plan === 'suscripcion' && !$fechaFin) {
+        if ($plan->tipo_plan === 'suscripcion' && !$fechaFin && $suscripcion->estado) {
             throw ValidationException::withMessages([
                 'fecha_fin' => 'Los planes de suscripción requieren una fecha de vencimiento.',
             ])->errorBag('editarSuscripcion');
@@ -156,18 +153,5 @@ class SuscripcionController extends Controller
             'entradas_o_dias_restantes' => (int) $suscripcion->cantidad_dias_restantes,
             'estado' => $suscripcion->estado ? 'Activa' : 'Por activar',
         ];
-    }
-
-    /**
-     * Fecha de vencimiento: para los planes de suscripción se calcula con los
-     * días de vigencia; para las tiqueteras es opcional.
-     */
-    private function calcularFechaFin(Plan $plan, Carbon $fechaInicio, ?string $fechaFin): ?Carbon
-    {
-        if ($plan->tipo_plan === 'suscripcion') {
-            return $fechaInicio->copy()->addDays($plan->cantidad_entradas - 1)->endOfDay();
-        }
-
-        return $fechaFin ? Carbon::parse($fechaFin)->endOfDay() : null;
     }
 }

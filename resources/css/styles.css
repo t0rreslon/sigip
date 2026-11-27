@@ -2406,3 +2406,89 @@ body :is(h1, h2, h3, h4, h5, h6) {
 .ficha-espacio-acciones:not(:has(> form, > .btn-deshabilitar-espacio)) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
+/* Planes: acciones del encabezado y nota de fechas automáticas. */
+.pagina-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.nota-fechas-automaticas ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+}
+
+.nota-fechas-automaticas li {
+    margin-bottom: 4px;
+}
+
+.texto-suave {
+    color: var(--texto-suave);
+    font-size: 11px;
+}
+
+.nota-usuarios-sin-plan {
+    margin: -6px 0 16px;
+    text-align: right;
+}
+
+.modal-registros .filtros {
+    margin-bottom: 12px;
+}
+
+/* Perfil: foto de la cuenta. */
+.perfil-foto {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+}
+
+.perfil-foto-vista {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--morado-100);
+    color: var(--morado-600);
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.perfil-foto-vista img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.perfil-foto-acciones {
+    flex: 1 1 280px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.perfil-foto-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+    margin: 0;
+}
+
+.perfil-foto-acciones form {
+    margin: 0;
+}
+
+.mensaje-error-campo {
+    width: 100%;
+    margin: 0;
+    font-size: 12px;
+    color: #b42318;
+}

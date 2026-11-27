@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Support\Auditoria;
+use App\Support\Imagenes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -41,6 +42,27 @@ class PerfilController extends Controller
         Auditoria::cambio('personal', 'UPDATE', $cuenta->personal_id, (array) $antes, $datos);
 
         return back()->with('success', 'Tus datos se actualizaron.');
+    }
+
+    // Foto de perfil de la cuenta: subir una nueva o quitar la actual.
+    public function cambiarFoto(Request $request)
+    {
+        $cuenta = $request->user();
+        $personal = DB::table('personal')->where('personal_id', $cuenta->personal_id)->first();
+        abort_unless($personal, 404);
+
+        $request->validate([
+            'imagen' => array_merge(['required_without:quitar_imagen'], array_slice(Imagenes::REGLAS, 1)),
+            'quitar_imagen' => ['nullable', 'boolean'],
+        ], ['imagen.required_without' => 'Elige una imagen para tu foto de perfil.']);
+
+        Imagenes::borrar($personal->imagen, 'personal');
+        $nueva = $request->hasFile('imagen') ? Imagenes::guardar($request->file('imagen'), 'personal') : null;
+
+        DB::table('personal')->where('personal_id', $cuenta->personal_id)->update(['imagen' => $nueva]);
+        Auditoria::cambio('personal', 'UPDATE', $cuenta->personal_id, ['foto' => $personal->imagen ? 'Sí' : 'No'], ['foto' => $nueva ? 'Actualizada' : 'Quitada']);
+
+        return back()->with('success', $nueva ? 'Tu foto de perfil se actualizó.' : 'Se quitó tu foto de perfil.');
     }
 
     public function cambiarClave(Request $request)

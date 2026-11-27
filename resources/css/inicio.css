@@ -351,3 +351,10 @@
 .asistente-entrada input::placeholder {
     color: #8a8590;
 }
+
+/* Tres gráficas en una misma fila (inicio del administrador). */
+@media (min-width: 1100px) {
+    .inicio-graficas.inicio-graficas-tres {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}

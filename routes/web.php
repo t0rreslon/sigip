@@ -80,6 +80,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
     Route::put('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
     Route::put('/perfil/clave', [PerfilController::class, 'cambiarClave'])->name('perfil.clave');
+    Route::post('/perfil/foto', [PerfilController::class, 'cambiarFoto'])->middleware('throttle:10,1')->name('perfil.foto');
+
+    // Fotos (disco privado). Usuarios y espacios: solo personal; foto de perfil: personal o la propia cuenta.
+    Route::get('/imagenes/{carpeta}/{archivo}', [ImagenController::class, 'ver'])->whereIn('carpeta', ['usuarios', 'espacios', 'personal'])->where('archivo', '[0-9a-f\-]{36}\.(jpg|jpeg|png|webp)')->name('imagenes.ver');
 
     // ISO 25010 – Autenticidad: doble factor (TOTP) opcional para todas las cuentas.
     Route::post('/perfil/doble-factor/iniciar', [DobleFactorController::class, 'iniciarActivacion'])->name('perfil.2fa.iniciar');
@@ -119,9 +123,6 @@ Route::middleware('auth')->group(function () {
     |----------------------------------------------------------------------
     */
     Route::middleware('tipo_cuenta:Administrador,Operador')->group(function () {
-
-        // Fotos de usuarios y espacios (disco privado, solo personal autenticado).
-        Route::get('/imagenes/{carpeta}/{archivo}', [ImagenController::class, 'ver'])->whereIn('carpeta', ['usuarios', 'espacios'])->where('archivo', '[0-9a-f\-]{36}\.(jpg|jpeg|png|webp)')->name('imagenes.ver');
 
         // HU-199 / HU-204: notificaciones de solicitudes.
         Route::get('/notificaciones', [NotificacionController::class, 'index'])->name('notificaciones');

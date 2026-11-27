@@ -20,7 +20,7 @@ class UsuarioController extends Controller
         $usuarios = $consulta
             ->orderBy('usuario.apellido')
             ->orderBy('usuario.nombre')
-            ->paginate(15)
+            ->paginate(12)
             ->withQueryString();
 
         // Contadores generales, independientes de los filtros.

@@ -34,60 +34,28 @@ class PlanController extends Controller
 
         $estadoCalculado = Suscripcion::sqlEstadoCalculado();
 
-        // Total pagado (verificado) por suscripción.
-        $pagosVerificados = DB::table('pago')
-            ->select('suscripcion_id', DB::raw('SUM(monto) AS total_pagado'))
-            ->where('estado_pago', 'Verificado')
-            ->groupBy('suscripcion_id');
-
-        $consulta = DB::table('suscripcion as s')
-            ->join('usuario as u', 'u.usuario_id', '=', 's.usuario_id')
-            ->join('plan as pl', 'pl.plan_id', '=', 's.plan_id')
-            ->leftJoinSub($pagosVerificados, 'pv', 'pv.suscripcion_id', '=', 's.suscripcion_id')
-            ->select(
-                's.*',
-                'u.nombre',
-                'u.apellido',
-                'u.documento',
-                'pl.nombre_plan',
-                'pl.tipo_plan',
-                'pl.costo',
-                'pl.cantidad_entradas',
-                DB::raw('COALESCE(pv.total_pagado, 0) AS total_pagado'),
-                DB::raw("({$estadoCalculado}) AS estado_calculado")
-            );
-
-        if ($request->filled('buscar')) {
-            $buscar = trim($request->input('buscar'));
-
-            $consulta->where(function ($q) use ($buscar) {
-                $q->where('u.nombre', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
-                    ->orWhere('u.apellido', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
-                    ->orWhere('u.documento', 'ILIKE', \App\Support\Busqueda::contiene($buscar))
-                    ->orWhereRaw("CONCAT_WS(' ', u.nombre, u.apellido) ILIKE ?", [\App\Support\Busqueda::contiene($buscar)]);
-            });
-        }
-
-        if (in_array($request->input('estado'), ['activa', 'por_activar', 'vencida'], true)) {
-            $consulta->whereRaw("({$estadoCalculado}) = ?", [$request->input('estado')]);
-        }
-
-        if ($request->filled('plan')) {
-            $consulta->where('s.plan_id', $request->input('plan'));
-        }
-
-        $suscripciones = $consulta
-            ->orderByRaw("CASE ({$estadoCalculado}) WHEN 'activa' THEN 0 WHEN 'por_activar' THEN 1 ELSE 2 END")
-            ->orderByDesc('s.fecha_inicio')
-            ->paginate(10)
-            ->withQueryString();
+        // Asignaciones separadas por tipo de plan, cada una con sus filtros y su paginación
+        // (prefijo "t_" para tiqueteras y "s_" para suscripciones).
+        $tiqueteras = $this->asignaciones($request, 'tiquetera', 't_');
+        $suscripciones = $this->asignaciones($request, 'suscripcion', 's_');
 
         // Contadores generales.
         $conteos = DB::table('suscripcion as s')
             ->join('plan as pl', 'pl.plan_id', '=', 's.plan_id')
-            ->select(DB::raw("({$estadoCalculado}) AS estado_calculado"), DB::raw('COUNT(*) AS total'))
-            ->groupBy('estado_calculado')
-            ->pluck('total', 'estado_calculado');
+            ->select('pl.tipo_plan', DB::raw("({$estadoCalculado}) AS estado_calculado"), DB::raw('COUNT(*) AS total'))
+            ->groupBy('pl.tipo_plan', 'estado_calculado')
+            ->get();
+
+        $contar = fn (?string $tipo, string $estado) => (int) $conteos
+            ->where('estado_calculado', $estado)
+            ->when($tipo, fn ($c) => $c->where('tipo_plan', $tipo))
+            ->sum('total');
+
+        $resumenTipo = fn (string $tipo) => [
+            'activa' => $contar($tipo, 'activa'),
+            'por_activar' => $contar($tipo, 'por_activar'),
+            'vencida' => $contar($tipo, 'vencida'),
+        ];
 
         $usuariosSinSuscripcion = DB::table('usuario')
             ->where('estado_usuario', true)
@@ -106,11 +74,74 @@ class PlanController extends Controller
             'planesActivos' => $planesActivos,
             'todosLosPlanes' => $todosLosPlanes,
             'suscripciones' => $suscripciones,
-            'activas' => (int) ($conteos['activa'] ?? 0),
-            'porActivar' => (int) ($conteos['por_activar'] ?? 0),
-            'vencidas' => (int) ($conteos['vencida'] ?? 0),
+            'tiqueteras' => $tiqueteras,
+            'resumenTiqueteras' => $resumenTipo('tiquetera'),
+            'resumenSuscripciones' => $resumenTipo('suscripcion'),
+            'activas' => $contar(null, 'activa'),
+            'porActivar' => $contar(null, 'por_activar'),
+            'vencidas' => $contar(null, 'vencida'),
             'usuariosSinSuscripcion' => $usuariosSinSuscripcion,
         ]);
+    }
+
+    /**
+     * Asignaciones de un tipo de plan (tiquetera o suscripción) con búsqueda, filtro por
+     * estado y por plan, y paginación propia. Los parámetros llevan el prefijo indicado.
+     */
+    private function asignaciones(Request $request, string $tipo, string $prefijo)
+    {
+        $estadoCalculado = Suscripcion::sqlEstadoCalculado();
+
+        // Total pagado (verificado) por asignación.
+        $pagosVerificados = DB::table('pago')
+            ->select('suscripcion_id', DB::raw('SUM(monto) AS total_pagado'))
+            ->where('estado_pago', 'Verificado')
+            ->groupBy('suscripcion_id');
+
+        $consulta = DB::table('suscripcion as s')
+            ->join('usuario as u', 'u.usuario_id', '=', 's.usuario_id')
+            ->join('plan as pl', 'pl.plan_id', '=', 's.plan_id')
+            ->leftJoinSub($pagosVerificados, 'pv', 'pv.suscripcion_id', '=', 's.suscripcion_id')
+            ->where('pl.tipo_plan', $tipo)
+            ->select(
+                's.*',
+                'u.nombre',
+                'u.apellido',
+                'u.documento',
+                'pl.nombre_plan',
+                'pl.tipo_plan',
+                'pl.costo',
+                'pl.cantidad_entradas',
+                DB::raw('COALESCE(pv.total_pagado, 0) AS total_pagado'),
+                DB::raw("({$estadoCalculado}) AS estado_calculado")
+            );
+
+        if ($request->filled($prefijo . 'buscar')) {
+            $buscar = \App\Support\Busqueda::contiene(trim($request->input($prefijo . 'buscar')));
+
+            $consulta->where(function ($q) use ($buscar) {
+                $q->where('u.nombre', 'ILIKE', $buscar)
+                    ->orWhere('u.apellido', 'ILIKE', $buscar)
+                    ->orWhere('u.documento', 'ILIKE', $buscar)
+                    ->orWhere('pl.nombre_plan', 'ILIKE', $buscar)
+                    ->orWhereRaw("CONCAT_WS(' ', u.nombre, u.apellido) ILIKE ?", [$buscar]);
+            });
+        }
+
+        if (in_array($request->input($prefijo . 'estado'), ['activa', 'por_activar', 'vencida'], true)) {
+            $consulta->whereRaw("({$estadoCalculado}) = ?", [$request->input($prefijo . 'estado')]);
+        }
+
+        if ($request->filled($prefijo . 'plan')) {
+            $consulta->where('s.plan_id', (int) $request->input($prefijo . 'plan'));
+        }
+
+        return $consulta
+            ->orderByRaw("CASE ({$estadoCalculado}) WHEN 'activa' THEN 0 WHEN 'por_activar' THEN 1 ELSE 2 END")
+            ->orderByDesc('s.fecha_inicio')
+            ->orderByDesc('s.suscripcion_id')
+            ->paginate(10, ['*'], $prefijo . 'pagina')
+            ->withQueryString();
     }
 
     // HU-16: registrar un nuevo plan.

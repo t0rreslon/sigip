@@ -228,6 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const campoEntradas = document.getElementById('editar-suscripcion-entradas');
     const etiquetaEntradas = document.getElementById('etiqueta-entradas-suscripcion');
     const campoInicio = document.getElementById('editar-suscripcion-inicio');
+    // Una suscripción por activar aún no tiene vencimiento: se calcula al completarse el pago.
+    let suscripcionActiva = true;
 
     function actualizarEtiquetaEntradas() {
         const opcion = selectorPlanSuscripcion?.selectedOptions[0];
@@ -238,7 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ? 'Entradas restantes *'
             : 'Días de vigencia del plan *';
 
-        campoFin.required = opcion.dataset.tipo === 'suscripcion';
+        campoFin.required = opcion.dataset.tipo === 'suscripcion' && suscripcionActiva;
+        campoFin.placeholder = suscripcionActiva ? '' : 'Se calcula al activarse';
         campoFin.min = campoInicio?.value || '';
     }
 
@@ -250,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         campoEntradas.value = opcion.dataset.cantidad;
 
-        if (opcion.dataset.tipo === 'suscripcion' && campoInicio?.value) {
+        if (opcion.dataset.tipo === 'suscripcion' && campoInicio?.value && suscripcionActiva) {
             const fin = new Date(`${campoInicio.value}T12:00:00`);
             fin.setDate(fin.getDate() + Number(opcion.dataset.cantidad) - 1);
             campoFin.value = fin.toISOString().slice(0, 10);
@@ -270,6 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('editar-suscripcion-texto').value = datos.usuario;
             document.getElementById('editar-suscripcion-usuario').textContent = datos.usuario;
             campoInicio.value = datos.inicio;
+            suscripcionActiva = datos.activa !== '0';
 
             // El plan actual se puede conservar aunque esté inactivo.
             Array.from(selectorPlanSuscripcion.options).forEach((opcion) => {

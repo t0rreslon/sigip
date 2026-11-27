@@ -14,6 +14,40 @@
   </dl>
 </section>
 
+<section class="tarjeta perfil-foto-tarjeta">
+  <h2>Foto de perfil</h2>
+  @php
+    $fotoPerfil = \App\Support\Imagenes::url($personal->imagen ?? null, 'personal');
+    $inicialesPerfil = mb_strtoupper(mb_substr($personal->nombre ?? $cuenta->login, 0, 1) . mb_substr($personal->apellido ?? '', 0, 1));
+  @endphp
+  <div class="perfil-foto">
+    <div class="perfil-foto-vista" id="perfil-foto-vista">
+      @if ($fotoPerfil)
+      <img src="{{ $fotoPerfil }}" alt="Tu foto de perfil">
+      @else
+      <span>{{ $inicialesPerfil }}</span>
+      @endif
+    </div>
+    <div class="perfil-foto-acciones">
+      <form method="POST" action="{{ route('perfil.foto') }}" enctype="multipart/form-data" class="perfil-foto-form">
+        @csrf
+        <label class="campo-plan"><span>{{ $fotoPerfil ? 'Cambiar foto' : 'Agregar foto' }} (JPG, PNG o WEBP, máx. 2 MB)</span>
+          <input type="file" name="imagen" accept="image/jpeg,image/png,image/webp" id="perfil-foto-archivo" required>
+        </label>
+        @error('imagen')<p class="mensaje-error-campo">{{ $message }}</p>@enderror
+        <button type="submit" class="btn-primario">Guardar foto</button>
+      </form>
+      @if ($fotoPerfil)
+      <form method="POST" action="{{ route('perfil.foto') }}" data-confirmar="¿Quitar tu foto de perfil?">
+        @csrf
+        <input type="hidden" name="quitar_imagen" value="1">
+        <button type="submit" class="btn-borde">Quitar foto</button>
+      </form>
+      @endif
+    </div>
+  </div>
+</section>
+
 <section class="tarjeta">
   <h2>Datos personales</h2>
   <form method="POST" action="{{ route('perfil.update') }}">

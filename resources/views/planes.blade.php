@@ -33,7 +33,10 @@
             <h1>Planes y suscripciones</h1>
             <p>Administración interna de planes. No se realizan compras de autoservicio.</p>
           </div>
-          <button class="btn-primario" id="abrir-crear-plan">+ Crear plan</button>
+          <div class="pagina-acciones">
+            <button type="button" class="btn-borde" id="abrir-asignar-suscripcion">+ Asignar plan</button>
+            <button class="btn-primario" id="abrir-crear-plan">+ Crear plan</button>
+          </div>
         </div>
 
         {{-- HU-152: filtrar los planes registrados --}}
@@ -155,229 +158,41 @@
 
         </section>
 
-        {{-- Registros de planes y de suscripciones en dos cajas; cada una abre sus registros en un pop-up. --}}
+        {{-- Planes asignados en dos cajas: tiqueteras y suscripciones; cada una abre sus registros en un pop-up. --}}
         <section class="cajas-registros">
+          @foreach ([
+            ['vista' => 'tiqueteras', 'titulo' => 'Tiquetera', 'texto' => 'Planes por número de entradas', 'resumen' => $resumenTiqueteras, 'total' => $tiqueteras->total(), 'icono' => '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M9 6v12" stroke-dasharray="2 2"/><path d="M13 10h4M13 14h3"/>'],
+            ['vista' => 'suscripciones', 'titulo' => 'Suscripción', 'texto' => 'Planes por días de vigencia', 'resumen' => $resumenSuscripciones, 'total' => $suscripciones->total(), 'icono' => '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m9 15 2 2 4-4"/>'],
+          ] as $caja)
           <article class="caja-registros">
             <div class="caja-registros-icono" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{!! $caja['icono'] !!}</svg>
             </div>
             <div class="caja-registros-texto">
-              <h2>Planes</h2>
-              <p>{{ $todosLosPlanes->count() }} registrados · {{ $planesActivos->count() }} activos · {{ $todosLosPlanes->count() - $planesActivos->count() }} inactivos</p>
+              <h2>{{ $caja['titulo'] }}</h2>
+              <p>{{ $caja['texto'] }} · {{ $caja['resumen']['activa'] }} activas · {{ $caja['resumen']['por_activar'] }} por activar · {{ $caja['resumen']['vencida'] }} vencidas</p>
             </div>
             <div class="caja-registros-acciones">
-              <button type="button" class="btn-borde" data-abrir-registros="modal-registros-planes">Ver registros de planes</button>
+              <button type="button" class="btn-borde" data-abrir-registros="modal-registros-{{ $caja['vista'] }}">Ver {{ $caja['vista'] === 'tiqueteras' ? 'tiqueteras' : 'suscripciones' }} asignadas</button>
             </div>
           </article>
-
-          <article class="caja-registros">
-            <div class="caja-registros-icono" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 11l2 2 3.5-4"/></svg>
-            </div>
-            <div class="caja-registros-texto">
-              <h2>Suscripciones</h2>
-              <p>
-                {{ $activas }} activas · {{ $vencidas }} vencidas · {{ $porActivar }} por activar ·
-                {{ $usuariosSinSuscripcion }} usuarios sin suscripción
-              </p>
-            </div>
-            <div class="caja-registros-acciones">
-              <button type="button" class="btn-borde" data-abrir-registros="modal-registros-suscripciones">Ver registros de suscripciones</button>
-              <button type="button" class="btn-primario" id="abrir-asignar-suscripcion">+ Asignar suscripción</button>
-            </div>
-          </article>
+          @endforeach
         </section>
+        <p class="texto-suave nota-usuarios-sin-plan">{{ $usuariosSinSuscripcion }} usuarios activos sin ningún plan asignado.</p>
       </main>
     </div>
   </div>
 
 
-  <!-- ===== VENTANA: REGISTROS DE PLANES ===== -->
-  <dialog class="modal-plan modal-registros" id="modal-registros-planes" aria-labelledby="titulo-registros-planes">
-    <div class="modal-plan-cuerpo">
-      <div class="modal-plan-cab">
-        <div>
-          <h2 id="titulo-registros-planes">Registros de planes</h2>
-          <p>{{ $planes->count() }} plan(es){{ request()->hasAny(['p_buscar', 'p_tipo', 'p_estado']) ? ' con los filtros aplicados' : '' }}</p>
-        </div>
-        <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
-      </div>
-
-      <div class="tabla-desplazable">
-        <table class="tabla">
-          <thead>
-            <tr>
-              <th>Plan</th>
-              <th>Tipo</th>
-              <th>Precio</th>
-              <th>Entradas / días</th>
-              <th>Suscripciones</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @forelse ($planes as $plan)
-            <tr>
-              <td>{{ $plan->nombre_plan }}</td>
-              <td>{{ $plan->tipo_plan === 'tiquetera' ? 'Tiquetera' : 'Suscripción' }}</td>
-              <td>${{ number_format($plan->costo, 0, ',', '.') }}</td>
-              <td>{{ $plan->cantidad_entradas }} {{ $plan->tipo_plan === 'tiquetera' ? 'entradas' : 'días' }}</td>
-              <td>{{ $plan->suscripciones_activas_count }} activas de {{ $plan->suscripciones_count }}</td>
-              <td>
-                @if ($plan->estado_plan)
-                <span class="badge verde">Activo</span>
-                @else
-                <span class="badge gris">Inactivo</span>
-                @endif
-              </td>
-              <td class="acciones-registro">
-                <button type="button" class="btn-borde" data-editar-plan-id="{{ $plan->plan_id }}">Editar</button>
-                <a href="{{ route('planes.historial', $plan->plan_id) }}" class="enlace-historial">Ver historial</a>
-              </td>
-            </tr>
-            @empty
-            <tr><td colspan="7">No hay planes registrados.</td></tr>
-            @endforelse
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- ===== VENTANA: REGISTROS DE SUSCRIPCIONES ===== -->
-  <dialog class="modal-plan modal-registros" id="modal-registros-suscripciones" aria-labelledby="titulo-registros-suscripciones">
-    <div class="modal-plan-cuerpo">
-      <div class="modal-plan-cab">
-        <div>
-          <h2 id="titulo-registros-suscripciones">Registros de suscripciones</h2>
-          <p>{{ $activas }} activas · {{ $vencidas }} vencidas · {{ $porActivar }} por activar</p>
-        </div>
-        <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
-      </div>
-          <form class="filtros" method="GET" action="{{ route('planes.index') }}" id="form-filtros-suscripciones">
-            <input type="hidden" name="ver" value="suscripciones">
-            <input type="search" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar usuario o identificación">
-            <select name="estado" data-autoenviar>
-              <option value="">Estado: todos</option>
-              <option value="activa" @selected(request('estado') === 'activa')>Activa</option>
-              <option value="por_activar" @selected(request('estado') === 'por_activar')>Por activar</option>
-              <option value="vencida" @selected(request('estado') === 'vencida')>Vencida</option>
-            </select>
-            <select name="plan" data-autoenviar>
-              <option value="">Plan: todos</option>
-              @foreach ($todosLosPlanes as $plan)
-              <option value="{{ $plan->plan_id }}" @selected((string) request('plan') === (string) $plan->plan_id)>
-                {{ $plan->nombre_plan }}
-              </option>
-              @endforeach
-            </select>
-            @if (request()->hasAny(['buscar', 'estado', 'plan']))
-            <a href="{{ route('planes.index', ['ver' => 'suscripciones']) }}" class="btn-borde">Limpiar</a>
-            @endif
-          </form>
-
-          <table class="tabla">
-            <thead>
-              <tr>
-                <th>Usuario</th>
-                <th>Plan</th>
-                <th>Inicio</th>
-                <th>Vencimiento</th>
-                <th>Entradas / días</th>
-                <th>Pago</th>
-                <th>Suscripción</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              @forelse ($suscripciones as $suscripcion)
-              @php
-                $inicio = \Illuminate\Support\Carbon::parse($suscripcion->fecha_inicio);
-                $fin = $suscripcion->fecha_fin ? \Illuminate\Support\Carbon::parse($suscripcion->fecha_fin) : null;
-                $pagado = (float) $suscripcion->total_pagado;
-                $costo = (float) $suscripcion->costo;
-              @endphp
-              <tr>
-                <td>
-                  {{ $suscripcion->nombre }} {{ $suscripcion->apellido }}
-                  <br><small>{{ $suscripcion->documento }}</small>
-                </td>
-                <td>{{ $suscripcion->nombre_plan }}</td>
-                <td>{{ $inicio->format('d/m/Y') }}</td>
-                <td>{{ $fin ? $fin->format('d/m/Y') : 'Sin vencimiento' }}</td>
-                <td>
-                  @if ($suscripcion->tipo_plan === 'tiquetera')
-                  {{ $suscripcion->cantidad_dias_restantes }} entradas
-                  @elseif ($fin)
-                  {{ max(0, (int) now()->startOfDay()->diffInDays($fin->copy()->startOfDay(), false)) }} días
-                  @endif
-                </td>
-                <td>
-                  @if ($pagado >= $costo)
-                  <span class="badge verde">Verificado</span>
-                  @elseif ($pagado > 0)
-                  <span class="badge amarillo">Parcial · ${{ number_format($pagado, 0, ',', '.') }}</span>
-                  @else
-                  <span class="badge amarillo">Pendiente</span>
-                  @endif
-                </td>
-                <td>
-                  @if ($suscripcion->estado_calculado === 'activa')
-                  <span class="badge verde">Activa</span>
-                  @elseif ($suscripcion->estado_calculado === 'por_activar')
-                  <span class="badge amarillo">Por activar</span>
-                  @else
-                  <span class="badge rojo">Vencida</span>
-                  @endif
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    class="btn-borde btn-editar-suscripcion"
-                    data-id="{{ $suscripcion->suscripcion_id }}"
-                    data-usuario="{{ $suscripcion->nombre }} {{ $suscripcion->apellido }} · {{ $suscripcion->documento }}"
-                    data-plan="{{ $suscripcion->plan_id }}"
-                    data-inicio="{{ $inicio->format('Y-m-d') }}"
-                    data-fin="{{ $fin?->format('Y-m-d') }}"
-                    data-entradas="{{ $suscripcion->cantidad_dias_restantes }}">
-                    Modificar
-                  </button>
-                  <a href="{{ route('historial.registro', ['suscripcion', $suscripcion->suscripcion_id]) }}" class="enlace-historial">Ver historial</a>
-                </td>
-              </tr>
-              @empty
-              <tr>
-                <td colspan="8">
-                  {{ request()->hasAny(['buscar', 'estado', 'plan']) ? 'No hay suscripciones que coincidan con los filtros.' : 'No hay suscripciones registradas.' }}
-                </td>
-              </tr>
-              @endforelse
-            </tbody>
-          </table>
-
-          <div class="paginacion">
-            <small>Mostrando {{ $suscripciones->firstItem() ?? 0 }}–{{ $suscripciones->lastItem() ?? 0 }} de {{ $suscripciones->total() }} registros</small>
-            <div>
-              @if ($suscripciones->onFirstPage())
-              <button class="btn-pag" disabled>Anterior</button>
-              @else
-              <a href="{{ $suscripciones->previousPageUrl() }}" class="btn-pag">Anterior</a>
-              @endif
-
-              @foreach ($suscripciones->getUrlRange(max(1, $suscripciones->currentPage() - 2), min($suscripciones->lastPage(), $suscripciones->currentPage() + 2)) as $pagina => $url)
-              <a href="{{ $url }}" class="btn-pag {{ $pagina == $suscripciones->currentPage() ? 'actual' : '' }}">{{ $pagina }}</a>
-              @endforeach
-
-              @if ($suscripciones->hasMorePages())
-              <a href="{{ $suscripciones->nextPageUrl() }}" class="btn-pag">Siguiente</a>
-              @else
-              <button class="btn-pag" disabled>Siguiente</button>
-              @endif
-            </div>
-          </div>
-    </div>
-  </dialog>
+  <!-- ===== VENTANAS: TIQUETERAS Y SUSCRIPCIONES ASIGNADAS ===== -->
+  @include('partials.asignaciones-plan', [
+    'id' => 'modal-registros-tiqueteras', 'titulo' => 'Tiqueteras asignadas', 'vista' => 'tiqueteras', 'prefijo' => 't_',
+    'registros' => $tiqueteras, 'planesTipo' => $todosLosPlanes->where('tipo_plan', 'tiquetera'), 'resumen' => $resumenTiqueteras, 'unidad' => 'entradas',
+  ])
+  @include('partials.asignaciones-plan', [
+    'id' => 'modal-registros-suscripciones', 'titulo' => 'Suscripciones asignadas', 'vista' => 'suscripciones', 'prefijo' => 's_',
+    'registros' => $suscripciones, 'planesTipo' => $todosLosPlanes->where('tipo_plan', 'suscripcion'), 'resumen' => $resumenSuscripciones, 'unidad' => 'dias',
+  ])
 
   <!-- ===== VENTANA: CREAR PLAN ===== -->
   <dialog class="modal-plan" id="modal-crear-plan" aria-labelledby="titulo-crear-plan">
@@ -558,8 +373,8 @@
     <div class="modal-plan-cuerpo">
       <div class="modal-plan-cab">
         <div>
-          <h2 id="titulo-asignar-suscripcion">Asignar suscripción</h2>
-          <p>La suscripción se activa cuando el pago del plan esté verificado.</p>
+          <h2 id="titulo-asignar-suscripcion">Asignar plan</h2>
+          <p>Asigna una tiquetera o una suscripción. Queda por activar hasta que el pago esté completo.</p>
         </div>
         <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
       </div>
@@ -585,16 +400,13 @@
           </label>
         </div>
 
-        <div class="fila-plan">
-          <label class="campo-plan"><span>Fecha de inicio *</span>
-            <input type="date" name="fecha_inicio" min="{{ date('Y-m-d') }}" value="{{ old('fecha_inicio', date('Y-m-d')) }}" required>
-          </label>
-          <label class="campo-plan" id="campo-asignar-fin"><span>Vencimiento (opcional, tiqueteras)</span>
-            <input type="date" name="fecha_fin" value="{{ old('fecha_fin') }}">
-          </label>
+        <div class="nota-plan nota-fechas-automaticas">
+          <strong>Las fechas se calculan solas:</strong>
+          <ul>
+            <li><strong>Suscripción:</strong> inicia el día en que se completa el pago y vence al cumplirse los días de vigencia del plan.</li>
+            <li><strong>Tiquetera:</strong> queda inactiva hasta que se complete el pago; ese día inicia, y su fecha de fin se registra cuando se usa la última entrada.</li>
+          </ul>
         </div>
-
-        <p class="nota-plan">En los planes de suscripción el vencimiento se calcula con los días de vigencia del plan.</p>
 
         @if ($erroresAsignar->any())
         <div class="invalid-feedback d-block">
@@ -606,7 +418,7 @@
 
         <div class="modal-plan-acciones">
           <button type="button" class="btn-borde" data-cerrar>Cancelar</button>
-          <button type="submit" class="btn-primario">Asignar</button>
+          <button type="submit" class="btn-primario">Asignar plan</button>
         </div>
       </form>
     </div>

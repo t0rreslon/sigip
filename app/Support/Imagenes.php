@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
  */
 class Imagenes
 {
-    public const CARPETAS = ['usuarios', 'espacios'];
+    public const CARPETAS = ['usuarios', 'espacios', 'personal'];
 
     // Reglas de validación del campo de foto (máx. 2 MB, solo imágenes comunes).
     public const REGLAS = ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:max_width=4000,max_height=4000'];

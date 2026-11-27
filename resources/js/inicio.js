@@ -25,7 +25,8 @@ const numero = new Intl.NumberFormat('es-CO');
 export function crear(lienzo) {
     const g = JSON.parse(lienzo.dataset.grafica);
     const horizontal = g.tipo.startsWith('barh');
-    const apilada = g.tipo === 'barh-apilada';
+    // Barras apiladas horizontales (barh-apilada) o verticales (bar-apilada).
+    const apilada = g.tipo.endsWith('-apilada');
     const formato = (v) => (g.moneda ? pesos.format(v) : numero.format(v));
 
     const series = g.datos.series ?? [{ nombre: g.serie, valores: g.datos.valores }];
@@ -35,7 +36,7 @@ export function crear(lienzo) {
         backgroundColor: g.tipo === 'line' ? SERIES[i] + '22' : SERIES[i],
         borderColor: SERIES[i],
         // Barras apiladas: borde del color de la tarjeta para separar los segmentos.
-        borderWidth: g.tipo === 'line' ? 2 : (apilada ? { right: 2 } : 0),
+        borderWidth: g.tipo === 'line' ? 2 : (apilada ? (horizontal ? { right: 2 } : { top: 2 }) : 0),
         ...(apilada ? { borderColor: '#ffffff' } : {}),
         borderRadius: 4,
         borderSkipped: 'start',
@@ -56,6 +57,18 @@ export function crear(lienzo) {
         ticks: { precision: 0, callback: (v) => (g.moneda ? pesos.format(v) : numero.format(v)) },
     };
     const ejeCategoria = { stacked: apilada, grid: { display: false }, border: { color: CUADRICULA } };
+
+    // En barras verticales los nombres largos (planes) se recortan en el eje; el nombre completo sale al pasar el cursor.
+    if (!horizontal && g.tipo !== 'line') {
+        ejeCategoria.ticks = {
+            autoSkip: false,
+            maxRotation: 45,
+            callback(valor) {
+                const etiqueta = String(this.getLabelForValue(valor));
+                return etiqueta.length > 12 ? `${etiqueta.slice(0, 11)}…` : etiqueta;
+            },
+        };
+    }
 
     new Chart(lienzo, {
         type: g.tipo === 'line' ? 'line' : 'bar',

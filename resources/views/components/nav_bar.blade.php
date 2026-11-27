@@ -2,6 +2,7 @@
     $cuenta = auth()->user();
     $personal = $cuenta?->personal;
     $nombreCuenta = $personal ? trim($personal->nombre . ' ' . $personal->apellido) : ($cuenta->login ?? 'Invitado');
+    $fotoCuenta = \App\Support\Imagenes::url($personal?->imagen, 'personal');
     $iniciales = collect(explode(' ', $nombreCuenta))->filter()->take(2)->map(fn ($parte) => mb_strtoupper(mb_substr($parte, 0, 1)))->implode('');
     $secciones = [
         'usuarios' => 'Usuarios',
@@ -50,7 +51,13 @@
 
         <!-- PERFIL DE LA CUENTA (HU-189) -->
         <a class="perfil-administrador" href="{{ route('perfil') }}" title="Mi perfil">
-            <span class="avatar-administrador">{{ $iniciales ?: '?' }}</span>
+            <span class="avatar-administrador">
+                @if ($fotoCuenta)
+                <img src="{{ $fotoCuenta }}" alt="">
+                @else
+                {{ $iniciales ?: '?' }}
+                @endif
+            </span>
             <span class="datos-administrador">
                 <strong>{{ $nombreCuenta }}</strong>
                 <small>{{ $cuenta?->nombreTipo() ?? '' }}</small>

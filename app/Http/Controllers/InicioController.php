@@ -46,7 +46,7 @@ class InicioController extends Controller
             'graficas' => [
                 ['id' => 'accesos-14', 'titulo' => 'Accesos por día', 'subtitulo' => 'Últimos 14 días', 'tipo' => 'line', 'serie' => 'Accesos', 'datos' => Indicadores::accesosPorDia(14)],
                 ['id' => 'ingresos-mes', 'titulo' => 'Ingresos verificados por mes', 'subtitulo' => 'Últimos 6 meses, en pesos', 'tipo' => 'bar', 'serie' => 'Ingresos', 'moneda' => true, 'datos' => Indicadores::ingresosPorMes(6)],
-                ['id' => 'planes-asignados', 'titulo' => 'Planes y suscripciones más asignados', 'subtitulo' => 'Suscripciones asignadas por plan: activas y vencidas o por activar', 'tipo' => 'barh-apilada', 'ancho' => true, 'datos' => Indicadores::planesMasAsignados(8)],
+                ['id' => 'planes-asignados', 'titulo' => 'Planes y suscripciones más asignados', 'subtitulo' => 'Asignaciones por plan: activas y vencidas o por activar', 'tipo' => 'bar-apilada', 'datos' => Indicadores::planesMasAsignados(8)],
             ],
             'listas' => [],
         ];

@@ -218,6 +218,13 @@ class ControlAccesoController extends Controller
                             'No hay entradas disponibles para descontar.'
                         );
                     }
+
+                    // Con la última entrada la tiquetera termina: se registra su fecha de fin.
+                    DB::table('suscripcion')
+                        ->where('suscripcion_id', $suscripcion->suscripcion_id)
+                        ->where('cantidad_dias_restantes', 0)
+                        ->whereNull('fecha_fin')
+                        ->update(['fecha_fin' => DB::raw('GREATEST(NOW(), fecha_inicio)')]);
                 }
 
                 // Crear registro de acceso
