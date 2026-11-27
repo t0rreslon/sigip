@@ -52,7 +52,7 @@ class EspacioController extends Controller
 
         $espacios = $consulta
             ->orderBy('e.nombre_espacio')
-            ->paginate(10)
+            ->paginate(8)
             ->withQueryString();
 
         $estados = DB::table('estado_espacio')->orderBy('estado_espacio_id')->get();
