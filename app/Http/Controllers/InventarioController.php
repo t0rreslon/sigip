@@ -41,6 +41,18 @@ class InventarioController extends Controller
         $hayFiltros = $request->hasAny(['buscar', 'categoria', 'espacio', 'estado']);
         $tarjetas = $this->tarjetasPorCategoria($tipo, $maquinasFiltradas, $implementosFiltrados, $hayFiltros);
 
+        // Filtros sobre las tarjetas: cantidad de unidades (todas las pestañas) y stock mínimo (implementos).
+        $cantidadMin = filter_var($request->input('cantidad_min'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+        $cantidadMax = filter_var($request->input('cantidad_max'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+        $stock = $tipo === 'implemento' ? $request->input('stock') : null;
+
+        $tarjetas = $tarjetas
+            ->when($cantidadMin !== false, fn ($c) => $c->filter(fn ($t) => $t->total >= $cantidadMin))
+            ->when($cantidadMax !== false, fn ($c) => $c->filter(fn ($t) => $t->total <= $cantidadMax))
+            ->when($stock === 'bajo', fn ($c) => $c->filter(fn ($t) => $t->bajo_stock))
+            ->when($stock === 'suficiente', fn ($c) => $c->filter(fn ($t) => !$t->bajo_stock))
+            ->values();
+
         $porPagina = 8;
         $paginaActual = LengthAwarePaginator::resolveCurrentPage();
 

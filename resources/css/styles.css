@@ -2774,3 +2774,47 @@ body :is(h1, h2, h3, h4, h5, h6) {
         flex-wrap: wrap;
     }
 }
+
+/* Inventario: filtros por pestaña en una fila. */
+.filtros-inventario {
+    flex-wrap: wrap;
+}
+
+.filtros-inventario input[type=search] {
+    flex: 2 1 240px;
+}
+
+.filtros-inventario select {
+    flex: 1 1 140px;
+    width: auto;
+    min-width: 130px;
+}
+
+.filtro-cantidad {
+    font-size: 11px;
+    color: var(--texto-suave);
+}
+
+.filtros-inventario .filtro-cantidad input {
+    flex: 0 0 auto;
+    width: 96px;
+}
+
+/* Filtros de inventario más compactos para que quepan en una sola línea. */
+.filtros-inventario input[type=search] {
+    flex: 2 1 170px;
+    min-width: 150px;
+}
+
+.filtros-inventario select {
+    flex: 1 1 115px;
+    min-width: 105px;
+}
+
+.filtros-inventario .filtro-cantidad input {
+    width: 78px;
+}
+
+.filtros-inventario .btn-borde {
+    flex: 0 0 auto;
+}

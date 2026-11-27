@@ -190,8 +190,11 @@
             </a>
           </div>
 
-          {{-- HU-41: filtros aplicados en el servidor --}}
-          <form class="filtros" method="GET" action="{{ route('inventario.index') }}" id="form-filtros-inventario">
+          {{-- HU-41: filtros según la pestaña.
+               Todos: búsqueda, categoría y cantidad (aplican a máquinas e implementos).
+               Máquinas: búsqueda, categoría, ubicación, estado de máquina y cantidad.
+               Implementos: búsqueda, categoría, estado de implemento, stock mínimo y cantidad. --}}
+          <form class="filtros filtros-inventario" method="GET" action="{{ route('inventario.index') }}" id="form-filtros-inventario">
             @if ($tipo !== 'todos')
             <input type="hidden" name="tipo" value="{{ $tipo }}">
             @endif
@@ -200,43 +203,63 @@
               name="buscar"
               id="buscar-inventario"
               value="{{ request('buscar') }}"
-              placeholder="Buscar por código, nombre, categoría, estado o ubicación..."
+              placeholder="{{ $tipo === 'maquina' ? 'Buscar máquina por código, nombre, categoría o ubicación...' : ($tipo === 'implemento' ? 'Buscar implemento por código, nombre o categoría...' : 'Buscar por código, nombre o categoría...') }}"
               autocomplete="off">
-            <select name="categoria" data-autoenviar>
+
+            <select name="categoria" data-autoenviar aria-label="Categoría">
               <option value="">Categoría: todas</option>
+              @if ($tipo !== 'implemento')
               <optgroup label="Máquinas">
                 @foreach ($categoriasMaquina as $categoria)
-                <option value="m:{{ $categoria->categoria_maquina_id }}" @selected(request('categoria') === 'm:' . $categoria->categoria_maquina_id)>
-                  {{ $categoria->nombre_categoria }}
-                </option>
+                <option value="m:{{ $categoria->categoria_maquina_id }}" @selected(request('categoria') === 'm:' . $categoria->categoria_maquina_id)>{{ $categoria->nombre_categoria }}</option>
                 @endforeach
               </optgroup>
+              @endif
+              @if ($tipo !== 'maquina')
               <optgroup label="Implementos">
                 @foreach ($categoriasImplemento as $categoria)
-                <option value="i:{{ $categoria->categoria_implemento_id }}" @selected(request('categoria') === 'i:' . $categoria->categoria_implemento_id)>
-                  {{ $categoria->nombre_categoria }}
-                </option>
+                <option value="i:{{ $categoria->categoria_implemento_id }}" @selected(request('categoria') === 'i:' . $categoria->categoria_implemento_id)>{{ $categoria->nombre_categoria }}</option>
                 @endforeach
               </optgroup>
+              @endif
             </select>
-            <select name="espacio" data-autoenviar>
+
+            @if ($tipo === 'maquina')
+            <select name="espacio" data-autoenviar aria-label="Ubicación">
               <option value="">Ubicación: todas</option>
               @foreach ($espacios as $espacio)
-              <option value="{{ $espacio->espacio_id }}" @selected((string) request('espacio') === (string) $espacio->espacio_id)>
-                {{ $espacio->nombre_espacio }}
-              </option>
+              <option value="{{ $espacio->espacio_id }}" @selected((string) request('espacio') === (string) $espacio->espacio_id)>{{ $espacio->nombre_espacio }}</option>
               @endforeach
             </select>
-            <select name="estado" data-autoenviar>
+            @endif
+
+            @if ($tipo !== 'todos')
+            <select name="estado" data-autoenviar aria-label="Estado">
               <option value="">Estado: todos</option>
-              @foreach ($nombresEstado as $nombreEstado)
-              <option value="{{ $nombreEstado }}" @selected(request('estado') === $nombreEstado)>
-                {{ $nombreEstado }}
-              </option>
+              @foreach ($tipo === 'maquina' ? $estadosMaquina : $estadosImplemento as $estadoOpcion)
+              <option value="{{ $estadoOpcion->nombre_estado }}" @selected(request('estado') === $estadoOpcion->nombre_estado)>{{ $estadoOpcion->nombre_estado }}</option>
               @endforeach
             </select>
-            @if (request()->hasAny(['buscar', 'categoria', 'espacio', 'estado']))
-            <a href="{{ route('inventario.index') }}" class="btn-borde">Limpiar filtros</a>
+            @endif
+
+            @if ($tipo === 'implemento')
+            <select name="stock" data-autoenviar aria-label="Stock">
+              <option value="">Stock: todos</option>
+              <option value="bajo" @selected(request('stock') === 'bajo')>Bajo el mínimo</option>
+              <option value="suficiente" @selected(request('stock') === 'suficiente')>Stock suficiente</option>
+            </select>
+            @endif
+
+            <label class="filtro-cantidad">Cantidad mín.
+              <input type="number" name="cantidad_min" min="0" step="1" value="{{ request('cantidad_min') }}" placeholder="0">
+            </label>
+            <label class="filtro-cantidad">Cantidad máx.
+              <input type="number" name="cantidad_max" min="0" step="1" value="{{ request('cantidad_max') }}" placeholder="—">
+            </label>
+
+            <button type="submit" class="btn-borde">Filtrar</button>
+            @if (request()->hasAny(['buscar', 'categoria', 'espacio', 'estado', 'stock', 'cantidad_min', 'cantidad_max']))
+            <a href="{{ route('inventario.index', $tipo !== 'todos' ? ['tipo' => $tipo] : []) }}" class="btn-borde">Limpiar</a>
             @endif
           </form>
 
@@ -306,7 +329,7 @@
             </article>
             @empty
             <p class="sin-registros-espacios">
-              {{ request()->hasAny(['buscar', 'categoria', 'espacio', 'estado']) ? 'No hay elementos que coincidan con los filtros.' : 'No hay categorías registradas en el inventario.' }}
+              {{ request()->hasAny(['buscar', 'categoria', 'espacio', 'estado', 'stock', 'cantidad_min', 'cantidad_max']) ? 'No hay elementos que coincidan con los filtros.' : 'No hay categorías registradas en el inventario.' }}
             </p>
             @endforelse
           </div>
