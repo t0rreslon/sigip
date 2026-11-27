@@ -926,3 +926,17 @@ body{
 .btn-exportar:hover {
     background: #eef4fb;
 }
+
+/* Los títulos heredan el color de su contenedor. Bootstrap 6 los pinta casi
+   blancos cuando el dispositivo está en modo oscuro, y SIGIP usa fondos claros. */
+:root {
+  color-scheme: light;
+}
+
+html body {
+  color: #1f1f1f;
+}
+
+body :is(h1, h2, h3, h4, h5, h6) {
+  color: inherit;
+}

@@ -1,0 +1,120 @@
+/* Página de inicio del personal (bienvenida, indicadores y gráficas). */
+:root {
+    --grafica-serie-1: #2a78d6;
+    --grafica-serie-2: #eb6834;
+    --grafica-texto: #52514e;
+    --grafica-cuadricula: #ecebe8;
+}
+
+.inicio-bienvenida {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    background: linear-gradient(120deg, #692a7f, #8e44ad);
+    color: #fff;
+}
+
+.inicio-saludo {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.inicio-fecha {
+    font-size: 12px;
+    opacity: .85;
+}
+
+.inicio-mensaje {
+    font-size: 13px;
+    max-width: 460px;
+}
+
+.inicio-indicadores {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 900px) {
+    .inicio-indicadores {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.inicio-indicador {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px 16px;
+    border: 1px solid var(--borde, #e5e5e5);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.inicio-indicador-titulo {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--texto-suave, #52514e);
+}
+
+.inicio-indicador-valor {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1f1f1f;
+    font-variant-numeric: tabular-nums;
+}
+
+.inicio-indicador-detalle {
+    font-size: 11px;
+    color: var(--texto-suave, #6b6b6b);
+}
+
+.inicio-graficas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.inicio-graficas > .tarjeta {
+    margin: 0;
+}
+
+.inicio-lienzo {
+    position: relative;
+    height: 240px;
+}
+
+.inicio-tabla {
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.inicio-tabla summary {
+    cursor: pointer;
+    color: var(--texto-suave, #52514e);
+}
+
+.inicio-tabla .tabla {
+    margin-top: 6px;
+}
+
+.inicio-lista td {
+    font-size: 12px;
+}
+
+.inicio-vacio {
+    color: var(--texto-suave, #6b6b6b);
+}
+
+@media (max-width: 600px) {
+    .inicio-graficas {
+        grid-template-columns: 1fr;
+    }
+}

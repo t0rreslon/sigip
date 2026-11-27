@@ -5,6 +5,7 @@ use App\Http\Controllers\ActividadController;
 use App\Http\Controllers\Auth\DobleFactorController;
 use App\Http\Controllers\ControlAccesoController;
 use App\Http\Controllers\EspacioController;
+use App\Http\Controllers\InicioController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\NotificacionController;
@@ -56,8 +57,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/index', function () {
         return auth()->user()->tieneTipo('Instructor')
             ? redirect()->route('portal.horario')
-            : redirect()->route('usuarios');
+            : redirect()->route('inicio');
     })->name('index');
+
+    // Inicio del personal: bienvenida, indicadores y gráficas según el rol.
+    Route::get('/inicio', [InicioController::class, 'index'])
+        ->middleware('tipo_cuenta:Administrador,Operador')
+        ->name('inicio');
 
     Route::get('/dashboard', fn () => redirect()->route('index'))->name('dashboard');
 

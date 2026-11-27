@@ -12,6 +12,8 @@ export default defineConfig({
             // aquí para que "npm run build" los incluya en el manifiesto.
             input: [
                 'resources/css/app.css',
+                'resources/css/inicio.css',
+                'resources/js/inicio.js',
                 'resources/css/nav_bar.css',
                 'resources/css/panel_izq.css',
                 'resources/css/styles.css',

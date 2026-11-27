@@ -6,6 +6,7 @@
 
     // Opciones del menú según el tipo de cuenta: [ruta, ícono, texto, visible].
     $opciones = [
+        ['inicio', 'https://img.icons8.com/material-outlined/24/home--v2.png', 'Inicio', $esPersonal],
         ['usuarios', 'https://img.icons8.com/pastel-glyph/64/conference-call.png', 'Usuarios', $esPersonal],
         ['planes.index', 'https://img.icons8.com/windows/32/verified-account.png', 'Planes y suscripciones', $esPersonal],
         ['pago.index', 'https://img.icons8.com/external-anggara-glyph-anggara-putra/32/external-scan-user-interface-anggara-basic-outline-anggara-putra-2.png', 'Pagos', $esPersonal],
