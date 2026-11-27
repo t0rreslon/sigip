@@ -120,6 +120,8 @@ class Auditoria
         'prestamo' => 'Préstamos',
         'implemento' => 'Inventario · implementos',
         'maquina' => 'Inventario · máquinas',
+        'categoria_implemento' => 'Inventario · categorías de implementos',
+        'categoria_maquina' => 'Inventario · categorías de máquinas',
         'espacio' => 'Espacios',
         'reserva' => 'Reservas',
         'actividad' => 'Actividades · catálogo',

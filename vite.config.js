@@ -33,6 +33,7 @@ export default defineConfig({
                 'resources/js/usuarios-tarjetas.js',
                 'resources/js/planes-registros.js',
                 'resources/js/asistente.js',
+                'resources/js/inventario-tarjetas.js',
             ],
             refresh: true,
         }),

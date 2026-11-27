@@ -4,8 +4,7 @@
 @section('descripcion', 'Catálogo de actividades, programación con instructores y espacios, y solicitudes de los instructores.')
 
 @section('acciones')
-<a href="{{ route('actividades.reporte') }}" class="btn-borde">Reporte de participación y asistencia</a>
-<a href="{{ route('actividades.participante') }}" class="btn-borde">Historial de un participante</a>
+<a href="{{ route('actividades.reporte') }}" class="btn-borde">Participación y asistencia</a>
 @if (auth()->user()->tieneTipo('Administrador'))
 <button type="button" class="btn-borde" data-abrir="modal-actividad" data-accion="{{ route('actividades.store') }}"
   data-campos='{"_method":"POST","nombre_actividad":"","descripcion":"","maximo_participantes":"","registro_obligatorio":false,"estado":"1"}'

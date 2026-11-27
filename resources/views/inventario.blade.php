@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SIGIP | Inventario</title>
-  @vite(['resources/css/styles.css', 'resources/js/app.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css', 'resources/js/registrar-inventario.js'])
+  @vite(['resources/css/styles.css', 'resources/js/app.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css', 'resources/js/registrar-inventario.js', 'resources/js/inventario-tarjetas.js', 'resources/js/sigip.js'])
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -240,79 +240,76 @@
             @endif
           </form>
 
-          <table class="tabla {{ $tipo === 'maquina' ? 'solo-maquinas' : '' }}">
-            <thead>
-              <tr>
-                <th>Código / nombre</th>
-                <th>Categoría</th>
-                <th class="col-ubicacion">Ubicación</th>
-                <th>Estado operativo</th>
-                <th class="col-mantenimiento">Últ. mantenimiento</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{-- Máquinas --}}
-              @foreach ($maquinas as $maquina)
-              <tr data-tipo="maquina">
-                <td>
-                  MAQ-{{ $maquina->maquina_id }} ·
-                  {{ $maquina->nombre_maquina }}
-                </td>
-
-                <td>{{ $maquina->nombre_categoria }}</td>
-
-                <td class="col-ubicacion">
-                  {{ $maquina->nombre_espacio ?? 'Sin ubicación' }}
-                </td>
-
-                <td>{{ $maquina->nombre_estado }}</td>
-
-                <td class="col-mantenimiento">
-                  @if ($maquina->ultima_fecha)
-                  {{ \Carbon\Carbon::parse($maquina->ultima_fecha)->format('d/m/Y') }}
+          {{-- Una tarjeta por categoría: foto, cantidad de unidades y barra por estado. --}}
+          <div class="inventario-grid">
+            @forelse ($paginacion as $categoria)
+            @php
+              $unidad = $categoria->tipo === 'maquina' ? ($categoria->total === 1 ? 'máquina' : 'máquinas') : ($categoria->total === 1 ? 'implemento' : 'implementos');
+            @endphp
+            <article class="tarjeta-categoria {{ $categoria->bajo_stock ? 'bajo-stock' : '' }}">
+              <div class="tarjeta-categoria-foto">
+                @if ($categoria->imagen)
+                <img src="{{ $categoria->imagen }}" alt="Foto de {{ $categoria->nombre }}" loading="lazy">
+                @else
+                <div class="tarjeta-categoria-sin-foto" aria-hidden="true">
+                  @if ($categoria->tipo === 'maquina')
+                  <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="14" width="18" height="5" rx="1.5"/><path d="M6 14V8a2 2 0 0 1 2-2h3l3 8"/><path d="M17 14V9"/></svg>
                   @else
-                  Sin mantenimiento
+                  <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11M6.5 17.5h11"/><rect x="2" y="8" width="4" height="8" rx="1"/><rect x="18" y="8" width="4" height="8" rx="1"/><path d="M12 6.5v11"/></svg>
                   @endif
-                </td>
+                </div>
+                @endif
+                <span class="badge tarjeta-categoria-tipo {{ $categoria->tipo === 'maquina' ? 'morado' : 'gris' }}">{{ $categoria->tipo === 'maquina' ? 'Máquinas' : 'Implementos' }}</span>
+              </div>
 
-                <td>
-                  <a class="btn-borde" href="{{ route('inventario.show', ['maquina', $maquina->maquina_id]) }}">Ver / editar</a>
-                </td>
-              </tr>
-              @endforeach
+              <div class="tarjeta-categoria-cuerpo">
+                <div class="tarjeta-categoria-titulo">
+                  <h3 title="{{ $categoria->nombre }}">{{ $categoria->nombre }}</h3>
+                  <span class="tarjeta-categoria-total"><strong>{{ $categoria->total }}</strong> {{ $unidad }}</span>
+                </div>
 
-              {{-- Implementos --}}
-              @foreach ($implementos as $implemento)
-              <tr data-tipo="implemento">
-                <td>
-                  IMP-{{ $implemento->implemento_id }} ·
-                  {{ $implemento->nombre_implemento }}
-                </td>
+                @if ($categoria->total > 0)
+                {{-- Barra apilada: cuántas unidades hay en cada estado. --}}
+                <div class="barra-estados" role="img" aria-label="{{ collect($categoria->estados)->where('total', '>', 0)->map(fn ($e) => $e['total'] . ' ' . mb_strtolower($e['nombre']))->implode(', ') }}">
+                  @foreach ($categoria->estados as $estado)
+                  @if ($estado['total'] > 0)
+                  <span class="segmento estado-{{ $estado['clase'] }}" style="flex-grow: {{ $estado['total'] }}" title="{{ $estado['nombre'] }}: {{ $estado['total'] }}"></span>
+                  @endif
+                  @endforeach
+                </div>
+                <ul class="leyenda-estados">
+                  @foreach ($categoria->estados as $estado)
+                  @if ($estado['total'] > 0)
+                  <li><span class="punto estado-{{ $estado['clase'] }}"></span>{{ $estado['nombre'] }} <strong>{{ $estado['total'] }}</strong></li>
+                  @endif
+                  @endforeach
+                </ul>
+                @else
+                <p class="tarjeta-categoria-vacia">Sin unidades registradas.</p>
+                @endif
 
-                <td>{{ $implemento->nombre_categoria }}</td>
+                @if ($categoria->bajo_stock)
+                <p class="tarjeta-categoria-alerta">Stock por debajo del mínimo ({{ $categoria->stock_minimo }})</p>
+                @endif
+              </div>
 
-                <td class="col-ubicacion">Sin ubicación</td>
-
-                <td>{{ $implemento->nombre_estado }}</td>
-
-                <td class="col-mantenimiento">No aplica</td>
-
-                <td>
-                  <a class="btn-borde" href="{{ route('inventario.show', ['implemento', $implemento->implemento_id]) }}">Ver / editar</a>
-                </td>
-              </tr>
-              @endforeach
-
-              @if ($paginacion->total() === 0)
-              <tr>
-                <td colspan="6">
-                  {{ request()->hasAny(['buscar', 'categoria', 'espacio', 'estado']) ? 'No hay elementos que coincidan con los filtros.' : 'No hay elementos registrados en el inventario.' }}
-                </td>
-              </tr>
-              @endif
-            </tbody>
-          </table>
+              <div class="tarjeta-categoria-acciones">
+                <button type="button" class="btn-icono" data-ver-categoria="{{ json_encode(['nombre' => $categoria->nombre, 'tipo' => $categoria->tipo, 'unidades' => $categoria->unidades], JSON_UNESCAPED_UNICODE) }}" title="Ver unidades" aria-label="Ver las unidades de {{ $categoria->nombre }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+                @if (auth()->user()->tieneTipo('Administrador'))
+                <button type="button" class="btn-icono" data-editar-categoria="{{ json_encode(['accion' => route('inventario.categoria.update', [$categoria->tipo, $categoria->id]), 'tipo' => $categoria->tipo, 'nombre' => $categoria->nombre, 'descripcion' => $categoria->descripcion, 'stock_minimo' => $categoria->stock_minimo, 'imagen' => $categoria->imagen], JSON_UNESCAPED_UNICODE) }}" title="Editar categoría" aria-label="Editar la categoría {{ $categoria->nombre }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+                </button>
+                @endif
+              </div>
+            </article>
+            @empty
+            <p class="sin-registros-espacios">
+              {{ request()->hasAny(['buscar', 'categoria', 'espacio', 'estado']) ? 'No hay elementos que coincidan con los filtros.' : 'No hay categorías registradas en el inventario.' }}
+            </p>
+            @endforelse
+          </div>
 
           <div class="paginacion">
             <small>
@@ -358,6 +355,88 @@
             </div>
           </div>
         </section>
+
+        {{-- Pop-up "Ver": unidades de la categoría, cada una con su detalle (ver y editar). --}}
+        <dialog class="modal-plan modal-registros" id="modal-unidades-categoria" aria-labelledby="titulo-unidades-categoria">
+          <div class="modal-plan-cuerpo">
+            <div class="modal-plan-cab">
+              <div>
+                <h2 id="titulo-unidades-categoria">Unidades</h2>
+                <p id="subtitulo-unidades-categoria"></p>
+              </div>
+              <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
+            </div>
+            <div class="tabla-desplazable">
+              <table class="tabla">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th class="solo-maquina">Ubicación</th>
+                    <th class="solo-maquina">Últ. mantenimiento</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="cuerpo-unidades-categoria"></tbody>
+              </table>
+            </div>
+          </div>
+        </dialog>
+
+        @if (auth()->user()->tieneTipo('Administrador'))
+        {{-- Pop-up "Editar": nombre, descripción, stock mínimo y foto de la categoría. --}}
+        <dialog class="modal-plan" id="modal-editar-categoria" aria-labelledby="titulo-editar-categoria">
+          <div class="modal-plan-cuerpo">
+            <div class="modal-plan-cab">
+              <div>
+                <h2 id="titulo-editar-categoria">Editar categoría</h2>
+                <p>La foto se muestra en la tarjeta de la categoría.</p>
+              </div>
+              <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
+            </div>
+            <form method="POST" id="form-editar-categoria" action="{{ old('_accion_categoria') }}" enctype="multipart/form-data">
+              @csrf
+              <input type="hidden" name="_accion_categoria" id="editar-categoria-accion" value="{{ old('_accion_categoria') }}">
+              <div class="campo-foto">
+                <div class="campo-foto-vista" id="editar-categoria-vista"><span class="avatar-iniciales">+</span></div>
+                <div class="campo-foto-entrada">
+                  <label class="campo-plan"><span>Foto (JPG, PNG o WEBP, máx. 2 MB)</span>
+                    <input type="file" name="imagen" id="editar-categoria-imagen" accept="image/jpeg,image/png,image/webp">
+                  </label>
+                  <label class="quitar-foto-categoria" id="editar-categoria-quitar" hidden><input type="checkbox" name="quitar_imagen" value="1"> Quitar la foto actual</label>
+                </div>
+              </div>
+              <div class="fila-plan una">
+                <label class="campo-plan"><span>Nombre de la categoría *</span>
+                  <input type="text" name="nombre_categoria" id="editar-categoria-nombre" maxlength="45" value="{{ old('nombre_categoria') }}" required>
+                </label>
+              </div>
+              <div class="fila-plan una">
+                <label class="campo-plan"><span>Descripción</span>
+                  <input type="text" name="descripcion" id="editar-categoria-descripcion" maxlength="500" value="{{ old('descripcion') }}">
+                </label>
+              </div>
+              <div class="fila-plan una" id="editar-categoria-fila-stock">
+                <label class="campo-plan"><span>Stock mínimo (implementos disponibles o prestados) *</span>
+                  <input type="number" name="stock_minimo" id="editar-categoria-stock" min="0" step="1" value="{{ old('stock_minimo') }}">
+                </label>
+              </div>
+              @if ($errors->categoria->any())
+              <div class="invalid-feedback d-block">
+                @foreach ($errors->categoria->all() as $error)
+                <div>{{ $error }}</div>
+                @endforeach
+              </div>
+              @endif
+              <div class="modal-plan-acciones">
+                <button type="button" class="btn-borde" data-cerrar>Cancelar</button>
+                <button type="submit" class="btn-primario">Guardar cambios</button>
+              </div>
+            </form>
+          </div>
+        </dialog>
+        @endif
 
       </main>
     </div>

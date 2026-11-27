@@ -2492,3 +2492,285 @@ body :is(h1, h2, h3, h4, h5, h6) {
     font-size: 12px;
     color: #b42318;
 }
+
+/* Inventario en tarjetas por categoría. */
+.inventario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    margin: 4px 0 12px;
+}
+
+.tarjeta-categoria {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.tarjeta-categoria:hover {
+    border-color: #d6c1df;
+    box-shadow: 0 4px 14px rgba(68, 27, 84, 0.08);
+}
+
+.tarjeta-categoria.bajo-stock {
+    border-color: #f3c27a;
+}
+
+.tarjeta-categoria-foto {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--morado-100);
+}
+
+.tarjeta-categoria-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.tarjeta-categoria-sin-foto {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--morado-500);
+}
+
+.tarjeta-categoria-tipo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.tarjeta-categoria-cuerpo {
+    flex: 1 1 auto;
+    padding: 14px 16px 8px;
+}
+
+.tarjeta-categoria-titulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.tarjeta-categoria-titulo h3 {
+    margin: 0;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tarjeta-categoria-total {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--texto-suave);
+}
+
+.tarjeta-categoria-total strong {
+    font-size: 18px;
+    color: var(--morado-800, #441b54);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Barra apilada por estado: 2px de separación entre segmentos. */
+.barra-estados {
+    display: flex;
+    gap: 2px;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #f1ecf3;
+}
+
+.barra-estados .segmento {
+    flex-basis: 0;
+    min-width: 6px;
+}
+
+.leyenda-estados {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 11px;
+    color: var(--texto-suave);
+}
+
+.leyenda-estados li {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.leyenda-estados strong {
+    color: #1f1f1f;
+    font-variant-numeric: tabular-nums;
+}
+
+.leyenda-estados .punto {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+}
+
+.estado-disponible { background: #1f9d55; }
+.estado-ocupado { background: #2a78d6; }
+.estado-averiado { background: #e8a317; }
+.estado-perdido { background: #d64545; }
+.estado-mantenimiento { background: #8e44ad; }
+.estado-retirada { background: #9aa0a6; }
+.estado-otro { background: #b8b3bd; }
+
+.etiqueta-estado {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.tarjeta-categoria-vacia {
+    margin: 0;
+    font-size: 12px;
+    color: var(--texto-suave);
+}
+
+.tarjeta-categoria-alerta {
+    margin: 8px 0 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: #946200;
+}
+
+.tarjeta-categoria-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 10px 16px 14px;
+    border-top: 1px solid #f1eaf4;
+}
+
+/* Botones de solo icono (ver y editar), como en Usuarios. */
+.tarjeta-categoria .btn-icono {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #e4d6ea;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--morado-600);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tarjeta-categoria .btn-icono:hover,
+.tarjeta-categoria .btn-icono:focus-visible {
+    background: var(--morado-600);
+    border-color: var(--morado-600);
+    color: #fff;
+    outline: none;
+}
+
+#modal-unidades-categoria:not(.con-maquinas) .solo-maquina {
+    display: none;
+}
+
+/* Foto en el formulario de categoría (mismo diseño que en Usuarios). */
+#modal-editar-categoria .campo-foto {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+#modal-editar-categoria .campo-foto-vista {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--morado-100);
+    border: 1px dashed #d6c1df;
+}
+
+#modal-editar-categoria .campo-foto-vista img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#modal-editar-categoria .campo-foto-entrada {
+    flex: 1 1 auto;
+}
+
+#modal-editar-categoria .avatar-iniciales {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--morado-600);
+}
+
+.quitar-foto-categoria {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #a12d2d;
+}
+
+/* Acciones del encabezado en una sola fila, en la esquina superior derecha
+   (el botón principal, como "+ Programar", queda siempre a la derecha). */
+.pagina-titulo {
+    gap: 16px;
+}
+
+.pagina-titulo > div:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.acciones-titulo {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.acciones-titulo > a,
+.acciones-titulo > button {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+@media (max-width: 860px) {
+    .pagina-titulo {
+        flex-wrap: wrap;
+    }
+
+    .acciones-titulo {
+        flex-wrap: wrap;
+    }
+}

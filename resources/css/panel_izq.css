@@ -183,3 +183,25 @@
     white-space: nowrap;
     text-decoration: none;
 }
+
+/* Controles de consulta alineados por abajo: los campos con etiqueta encima ("Desde", "Hasta")
+   y los que no la tienen quedan sobre la misma línea base, sin que unos se vean más elevados. */
+.filtros,
+.busquedas,
+#formFiltros,
+.filtros-pagos-secundarios,
+.acciones-filtros-pagos {
+    align-items: flex-end !important;
+}
+
+.filtros > label {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 4px;
+    margin: 0;
+}
+
+.filtros > label > :is(input, select) {
+    flex: 0 0 auto;
+}

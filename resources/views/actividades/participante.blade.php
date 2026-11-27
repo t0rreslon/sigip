@@ -1,6 +1,6 @@
 @extends('layouts.sigip')
 
-@section('titulo', 'Historial de asistencia')
+@section('titulo', 'Participación y asistencia')
 @section('descripcion', 'Actividades en las que un participante se inscribió y a cuáles asistió.')
 
 @section('acciones')
@@ -8,6 +8,11 @@
 @endsection
 
 @section('contenido')
+<nav class="pestanas" aria-label="Participación y asistencia">
+  <a href="{{ route('actividades.reporte') }}" class="">Por actividad</a>
+  <a href="{{ route('actividades.participante') }}" class="activa">Por participante</a>
+</nav>
+
 <section class="tarjeta">
   <form class="filtros" method="GET" action="{{ route('actividades.participante') }}">
     <input type="text" name="documento" inputmode="numeric" maxlength="12" value="{{ request('documento') }}" placeholder="Documento del participante" required>

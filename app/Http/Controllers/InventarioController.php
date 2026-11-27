@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use App\Support\Auditoria;
+use App\Support\Imagenes;
 use App\Support\PdfReporte;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
@@ -36,27 +37,16 @@ class InventarioController extends Controller
         $totalAveriados = $contar('Averiado');
         $totalPerdidos = $contar('Perdido');
 
-        // Unificar máquinas e implementos para paginarlos en una sola tabla.
-        $elementos = $maquinasFiltradas->map(function ($maquina) {
-            $maquina->tipo_elemento = 'maquina';
-            return $maquina;
-        })->concat(
-            $implementosFiltrados->map(function ($implemento) {
-                $implemento->tipo_elemento = 'implemento';
-                return $implemento;
-            })
-        )->values();
+        // Tarjetas por categoría (máquinas e implementos), con la cantidad y los estados de sus unidades.
+        $hayFiltros = $request->hasAny(['buscar', 'categoria', 'espacio', 'estado']);
+        $tarjetas = $this->tarjetasPorCategoria($tipo, $maquinasFiltradas, $implementosFiltrados, $hayFiltros);
 
-        $porPagina = 10;
+        $porPagina = 12;
         $paginaActual = LengthAwarePaginator::resolveCurrentPage();
 
-        $elementosPagina = $elementos
-            ->slice(($paginaActual - 1) * $porPagina, $porPagina)
-            ->values();
-
         $paginacion = new LengthAwarePaginator(
-            $elementosPagina,
-            $elementos->count(),
+            $tarjetas->slice(($paginaActual - 1) * $porPagina, $porPagina)->values(),
+            $tarjetas->count(),
             $porPagina,
             $paginaActual,
             [
@@ -64,10 +54,6 @@ class InventarioController extends Controller
                 'query' => $request->query(),
             ]
         );
-
-        $maquinas = $elementosPagina->where('tipo_elemento', 'maquina')->values();
-        $implementos = $elementosPagina->where('tipo_elemento', 'implemento')->values();
-
         // Datos para los selectores.
         $categoriasMaquina = DB::table('categoria_maquina')->orderBy('nombre_categoria')->get();
         $categoriasImplemento = DB::table('categoria_implemento')->orderBy('nombre_categoria')->get();
@@ -90,8 +76,6 @@ class InventarioController extends Controller
 
         return view('inventario', compact(
             'stockBajo',
-            'maquinas',
-            'implementos',
             'paginacion',
             'tipo',
             'totalMaquinas',
@@ -414,6 +398,139 @@ class InventarioController extends Controller
      * HU-159: categorías de implementos cuya cantidad activa (disponibles + prestados)
      * está por debajo del stock mínimo.
      */
+    /** Clase de color de cada estado para la barra de la tarjeta. */
+    private const COLORES_ESTADO = [
+        'Disponible' => 'disponible',
+        'Ocupado' => 'ocupado',
+        'Averiado' => 'averiado',
+        'Perdido' => 'perdido',
+        'Mantenimiento' => 'mantenimiento',
+        'Retirada' => 'retirada',
+    ];
+
+    /**
+     * Agrupa las unidades filtradas por categoría. Cada tarjeta trae la cantidad, el
+     * conteo por estado (para la barra) y la lista de unidades (para el pop-up "Ver").
+     * Sin filtros también aparecen las categorías sin unidades.
+     */
+    private function tarjetasPorCategoria(string $tipo, Collection $maquinas, Collection $implementos, bool $hayFiltros): Collection
+    {
+        $tarjetas = collect();
+
+        $grupos = [
+            'maquina' => [
+                'categorias' => DB::table('categoria_maquina')->orderBy('nombre_categoria')->get(),
+                'estados' => DB::table('estado_maquina')->orderBy('estado_maquina_id')->pluck('nombre_estado'),
+                'unidades' => $maquinas->groupBy('categoria_maquina_id'),
+                'llave' => 'categoria_maquina_id',
+                'descripcion' => 'descripcion_maquina',
+            ],
+            'implemento' => [
+                'categorias' => DB::table('categoria_implemento')->orderBy('nombre_categoria')->get(),
+                'estados' => DB::table('estado_implemento')->orderBy('estado_implemento_id')->pluck('nombre_estado'),
+                'unidades' => $implementos->groupBy('categoria_implemento_id'),
+                'llave' => 'categoria_implemento_id',
+                'descripcion' => 'descripcion_implemento',
+            ],
+        ];
+
+        foreach ($grupos as $tipoGrupo => $grupo) {
+            if ($tipo !== 'todos' && $tipo !== $tipoGrupo) {
+                continue;
+            }
+
+            foreach ($grupo['categorias'] as $categoria) {
+                $id = $categoria->{$grupo['llave']};
+                $unidades = $grupo['unidades']->get($id, collect());
+
+                if ($hayFiltros && $unidades->isEmpty()) {
+                    continue;
+                }
+
+                $porEstado = $unidades->countBy('nombre_estado');
+                $activos = ($porEstado['Disponible'] ?? 0) + ($porEstado['Ocupado'] ?? 0);
+
+                $tarjetas->push((object) [
+                    'clave' => ($tipoGrupo === 'maquina' ? 'm:' : 'i:') . $id,
+                    'tipo' => $tipoGrupo,
+                    'id' => $id,
+                    'nombre' => $categoria->nombre_categoria,
+                    'descripcion' => $categoria->{$grupo['descripcion']},
+                    'stock_minimo' => $categoria->stock_minimo ?? null,
+                    'bajo_stock' => $tipoGrupo === 'implemento' && $activos < (int) ($categoria->stock_minimo ?? 0),
+                    'imagen' => Imagenes::url($categoria->imagen ?? null, 'categorias'),
+                    'total' => $unidades->count(),
+                    'estados' => $grupo['estados']->map(fn ($nombre) => [
+                        'nombre' => $nombre,
+                        'total' => (int) ($porEstado[$nombre] ?? 0),
+                        'clase' => self::COLORES_ESTADO[$nombre] ?? 'otro',
+                    ])->values()->all(),
+                    'unidades' => $unidades->sortBy($tipoGrupo === 'maquina' ? 'nombre_maquina' : 'nombre_implemento')->map(fn ($u) => [
+                        'codigo' => $tipoGrupo === 'maquina' ? "MAQ-{$u->maquina_id}" : "IMP-{$u->implemento_id}",
+                        'nombre' => $tipoGrupo === 'maquina' ? $u->nombre_maquina : $u->nombre_implemento,
+                        'estado' => $u->nombre_estado,
+                        'clase' => self::COLORES_ESTADO[$u->nombre_estado] ?? 'otro',
+                        'ubicacion' => $tipoGrupo === 'maquina' ? ($u->nombre_espacio ?? 'Sin ubicación') : null,
+                        'mantenimiento' => $tipoGrupo === 'maquina' && $u->ultima_fecha ? Carbon::parse($u->ultima_fecha)->format('d/m/Y') : null,
+                        'url' => route('inventario.show', [$tipoGrupo, $tipoGrupo === 'maquina' ? $u->maquina_id : $u->implemento_id]),
+                    ])->values()->all(),
+                ]);
+            }
+        }
+
+        return $tarjetas;
+    }
+
+    // Editar una categoría del inventario: nombre, descripción, stock mínimo y foto.
+    public function actualizarCategoria(Request $request, string $tipo, $id)
+    {
+        $tabla = $tipo === 'maquina' ? 'categoria_maquina' : 'categoria_implemento';
+        $llave = $tabla . '_id';
+        $columnaDescripcion = $tipo === 'maquina' ? 'descripcion_maquina' : 'descripcion_implemento';
+
+        $categoria = DB::table($tabla)->where($llave, $id)->first();
+        abort_unless($categoria, 404);
+
+        $request->merge(['nombre_categoria' => trim((string) $request->input('nombre_categoria'))]);
+
+        $datos = $request->validateWithBag('categoria', [
+            'nombre_categoria' => ['required', 'string', 'max:45', Rule::unique($tabla, 'nombre_categoria')->ignore($id, $llave)],
+            'descripcion' => ['nullable', 'string', 'max:500'],
+            'stock_minimo' => $tipo === 'implemento' ? ['required', 'integer', 'min:0', 'max:10000'] : ['nullable'],
+            'imagen' => Imagenes::REGLAS,
+            'quitar_imagen' => ['nullable', 'boolean'],
+        ], [
+            'nombre_categoria.unique' => 'Ya existe una categoría con ese nombre.',
+        ]);
+
+        $cambios = [
+            'nombre_categoria' => $datos['nombre_categoria'],
+            $columnaDescripcion => $datos['descripcion'] ?? null,
+        ];
+
+        if ($tipo === 'implemento') {
+            $cambios['stock_minimo'] = (int) $datos['stock_minimo'];
+        }
+
+        if ($request->hasFile('imagen') || !empty($datos['quitar_imagen'])) {
+            Imagenes::borrar($categoria->imagen, 'categorias');
+            $cambios['imagen'] = $request->hasFile('imagen') ? Imagenes::guardar($request->file('imagen'), 'categorias') : null;
+        }
+
+        DB::table($tabla)->where($llave, $id)->update($cambios);
+
+        $antes = (array) $categoria;
+        $despues = $cambios;
+        if (array_key_exists('imagen', $cambios)) {
+            $antes['foto'] = $categoria->imagen ? 'Sí' : 'No';
+            $despues['foto'] = $cambios['imagen'] ? 'Actualizada' : 'Quitada';
+            unset($despues['imagen']);
+        }
+        Auditoria::cambio($tabla, 'UPDATE', $id, $antes, $despues);
+
+        return back()->with('success', "La categoría {$datos['nombre_categoria']} se actualizó.");
+    }
+
     private function categoriasBajoStock()
     {
         return DB::table('categoria_implemento as c')

@@ -1,7 +1,7 @@
 @extends('layouts.sigip')
 
 @section('titulo', 'Participación y asistencia')
-@section('descripcion', 'Sesiones, inscripciones y asistencias por actividad en el periodo seleccionado.')
+@section('descripcion', 'Sesiones, inscripciones y asistencias por actividad, o el historial de un participante.')
 
 @section('acciones')
 <a href="{{ route('actividades.index') }}" class="btn-borde">← Actividades</a>
@@ -9,6 +9,11 @@
 @endsection
 
 @section('contenido')
+<nav class="pestanas" aria-label="Participación y asistencia">
+  <a href="{{ route('actividades.reporte') }}" class="activa">Por actividad</a>
+  <a href="{{ route('actividades.participante') }}" class="">Por participante</a>
+</nav>
+
 <div class="resumen">
   <span class="chip morado">{{ $filas->sum('sesiones') }} sesiones</span>
   <span class="chip verde">{{ $filas->sum('asistencias') }} asistencias</span>
