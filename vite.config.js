@@ -34,6 +34,7 @@ export default defineConfig({
                 'resources/js/planes-registros.js',
                 'resources/js/asistente.js',
                 'resources/js/inventario-tarjetas.js',
+                'resources/js/catalogo-actividades.js',
             ],
             refresh: true,
         }),

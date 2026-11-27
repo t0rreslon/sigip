@@ -6,6 +6,7 @@
 @section('acciones')
 <a href="{{ route('actividades.reporte') }}" class="btn-borde">Participación y asistencia</a>
 @if (auth()->user()->tieneTipo('Administrador'))
+<button type="button" class="btn-borde" data-abrir-catalogo>Gestionar catálogo</button>
 <button type="button" class="btn-borde" data-abrir="modal-actividad" data-accion="{{ route('actividades.store') }}"
   data-campos='{"_method":"POST","nombre_actividad":"","descripcion":"","maximo_participantes":"","registro_obligatorio":false,"estado":"1"}'
   data-textos='{"titulo-modal-actividad":"Registrar actividad"}'>+ Registrar actividad</button>
@@ -15,6 +16,51 @@
 @endsection
 
 @section('contenido')
+@vite(['resources/js/catalogo-actividades.js'])
+{{-- HU-53: catálogo de actividades en una franja compacta de chips (la programación es lo principal). --}}
+@php
+  $esAdminCatalogo = auth()->user()->tieneTipo('Administrador');
+  $camposActividad = fn ($a) => json_encode([
+      '_method' => 'PUT',
+      'nombre_actividad' => $a->nombre_actividad,
+      'descripcion' => $a->descripcion,
+      'maximo_participantes' => $a->maximo_participantes,
+      'registro_obligatorio' => (bool) $a->registro_obligatorio,
+      'estado' => $a->estado ? '1' : '0',
+  ]);
+  $detalleActividad = fn ($a) => collect([
+      $a->maximo_participantes ? 'cupo ' . $a->maximo_participantes : 'sin límite',
+      $a->registro_obligatorio ? 'inscripción previa' : null,
+  ])->filter()->implode(' · ');
+@endphp
+<section class="tarjeta catalogo-actividades" aria-labelledby="titulo-catalogo">
+  <div class="catalogo-cabecera">
+    <h2 id="titulo-catalogo">Catálogo de actividades</h2>
+    <span class="catalogo-resumen">{{ $actividades->where('estado', true)->count() }} activas · {{ $actividades->where('estado', false)->count() }} inactivas</span>
+  </div>
+  <ul class="catalogo-chips">
+    @foreach ($actividades->sortByDesc('estado') as $actividad)
+    <li>
+      @if ($esAdminCatalogo)
+      <button type="button" class="chip-actividad {{ $actividad->estado ? '' : 'inactiva' }}"
+        data-abrir="modal-actividad" data-accion="{{ route('actividades.update', $actividad->actividad_id) }}"
+        data-campos="{{ $camposActividad($actividad) }}"
+        data-textos='{"titulo-modal-actividad":"Editar actividad"}'
+        title="{{ $actividad->descripcion ? $actividad->descripcion . ' · ' : '' }}Clic para editar">
+        <strong>{{ $actividad->nombre_actividad }}</strong>
+        <span>{{ $detalleActividad($actividad) }}</span>
+      </button>
+      @else
+      <span class="chip-actividad {{ $actividad->estado ? '' : 'inactiva' }}" title="{{ $actividad->descripcion }}">
+        <strong>{{ $actividad->nombre_actividad }}</strong>
+        <span>{{ $detalleActividad($actividad) }}</span>
+      </span>
+      @endif
+    </li>
+    @endforeach
+  </ul>
+</section>
+
 <section class="tarjeta">
   <div class="pestanas">
     <a href="{{ route('actividades.index', ['vista' => 'proximas']) }}" class="{{ $vista === 'proximas' ? 'activa' : '' }}">Programadas (próximas)</a>
@@ -91,42 +137,59 @@
   <x-paginacion :p="$programaciones" etiqueta="actividades" />
 </section>
 
-{{-- HU-53: catálogo de actividades --}}
-<section class="tarjeta">
-  <h2>Catálogo de actividades ({{ $actividades->count() }})</h2>
-  <table class="tabla">
-    <thead>
-      <tr><th>Actividad</th><th>Cupo máximo</th><th>Inscripción previa</th><th>Estado</th>@if (auth()->user()->tieneTipo('Administrador'))<th>Acciones</th>@endif</tr>
-    </thead>
-    <tbody>
-      @foreach ($actividades as $actividad)
-      <tr>
-        <td>{{ $actividad->nombre_actividad }}@if ($actividad->descripcion)<br><small>{{ $actividad->descripcion }}</small>@endif</td>
-        <td>{{ $actividad->maximo_participantes ?? 'Sin límite' }}</td>
-        <td>{{ $actividad->registro_obligatorio ? 'Obligatoria' : 'No' }}</td>
-        <td><span class="badge {{ $actividad->estado ? 'verde' : 'gris' }}">{{ $actividad->estado ? 'Activa' : 'Inactiva' }}</span></td>
-        @if (auth()->user()->tieneTipo('Administrador'))
-        <td>
-          <button type="button" class="btn-borde" data-abrir="modal-actividad" data-accion="{{ route('actividades.update', $actividad->actividad_id) }}"
-            data-campos='{{ json_encode([
-              "_method" => "PUT",
-              "nombre_actividad" => $actividad->nombre_actividad,
-              "descripcion" => $actividad->descripcion,
-              "maximo_participantes" => $actividad->maximo_participantes,
-              "registro_obligatorio" => (bool) $actividad->registro_obligatorio,
-              "estado" => $actividad->estado ? "1" : "0",
-            ]) }}'
-            data-textos='{"titulo-modal-actividad":"Editar actividad"}'>Editar</button>
-        </td>
-        @endif
-      </tr>
-      @endforeach
-    </tbody>
-  </table>
-</section>
 @endsection
 
 @push('modales')
+@if (auth()->user()->tieneTipo('Administrador'))
+{{-- Pop-up "Gestionar catálogo": todas las actividades con búsqueda, estado y edición. --}}
+<dialog class="modal-plan modal-registros" id="modal-catalogo" aria-labelledby="titulo-modal-catalogo">
+  <div class="modal-plan-cuerpo">
+    <div class="modal-plan-cab">
+      <div>
+        <h2 id="titulo-modal-catalogo">Gestionar catálogo</h2>
+        <p>{{ $actividades->count() }} actividades · {{ $actividades->where('estado', true)->count() }} activas</p>
+      </div>
+      <button type="button" class="modal-plan-cerrar" data-cerrar-catalogo aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="filtros filtros-catalogo">
+      <input type="search" id="buscar-catalogo" placeholder="Buscar actividad" aria-label="Buscar actividad" autocomplete="off">
+      <select id="estado-catalogo" aria-label="Estado">
+        <option value="">Estado: todas</option>
+        <option value="1">Activas</option>
+        <option value="0">Inactivas</option>
+      </select>
+      <button type="button" class="btn-primario" data-abrir="modal-actividad" data-accion="{{ route('actividades.store') }}"
+        data-campos='{"_method":"POST","nombre_actividad":"","descripcion":"","maximo_participantes":"","registro_obligatorio":false,"estado":"1"}'
+        data-textos='{"titulo-modal-actividad":"Registrar actividad"}'>+ Registrar actividad</button>
+    </div>
+
+    <div class="tabla-desplazable">
+      <table class="tabla">
+        <thead>
+          <tr><th>Actividad</th><th>Cupo máximo</th><th>Inscripción previa</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @foreach ($actividades as $actividad)
+          <tr data-catalogo-nombre="{{ mb_strtolower($actividad->nombre_actividad . ' ' . $actividad->descripcion) }}" data-catalogo-estado="{{ $actividad->estado ? '1' : '0' }}">
+            <td>{{ $actividad->nombre_actividad }}@if ($actividad->descripcion)<br><small>{{ $actividad->descripcion }}</small>@endif</td>
+            <td>{{ $actividad->maximo_participantes ?? 'Sin límite' }}</td>
+            <td>{{ $actividad->registro_obligatorio ? 'Obligatoria' : 'No' }}</td>
+            <td><span class="badge {{ $actividad->estado ? 'verde' : 'gris' }}">{{ $actividad->estado ? 'Activa' : 'Inactiva' }}</span></td>
+            <td>
+              <button type="button" class="btn-borde" data-abrir="modal-actividad" data-accion="{{ route('actividades.update', $actividad->actividad_id) }}"
+                data-campos="{{ $camposActividad($actividad) }}"
+                data-textos='{"titulo-modal-actividad":"Editar actividad"}'>Editar</button>
+            </td>
+          </tr>
+          @endforeach
+          <tr id="catalogo-sin-resultados" hidden><td colspan="5">No hay actividades que coincidan con la búsqueda.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</dialog>
+@endif
 @include('actividades._modal-programar', ['programacion' => null])
 
 {{-- HU-51: registrar / editar actividad del catálogo --}}
