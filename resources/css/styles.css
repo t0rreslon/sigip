@@ -2087,3 +2087,55 @@ body :is(h1, h2, h3, h4, h5, h6) {
     font-size: 15px;
     letter-spacing: 1px;
 }
+
+/* Tarjetas del carrusel de planes: los botones quedan dentro de la tarjeta.
+   Fila 1: Consultar / editar e Historial. Fila 2: Activar o Desactivar a todo el ancho. */
+.planes-track .tarjeta-plan {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.planes-track .tarjeta-plan p {
+    flex: 1 1 auto;
+    overflow-wrap: anywhere;
+}
+
+.planes-track .plan-acciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    align-items: stretch;
+    margin-top: auto;
+}
+
+.planes-track .plan-acciones > * {
+    min-width: 0;
+}
+
+.planes-track .plan-acciones .btn-borde {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 9px 8px;
+    font-size: 12px;
+    text-align: center;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.planes-track .plan-acciones a.btn-borde:hover {
+    text-decoration: none;
+}
+
+.planes-track .plan-acciones form {
+    grid-column: 1 / -1;
+    margin: 0;
+}
+
+.planes-track .plan-acciones .btn-plan-activo {
+    width: 100%;
+    padding: 9px 12px;
+}

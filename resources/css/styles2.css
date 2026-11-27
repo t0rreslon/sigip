@@ -940,3 +940,76 @@ html body {
 body :is(h1, h2, h3, h4, h5, h6) {
   color: inherit;
 }
+
+/* =====================================================
+   AJUSTES DE DISEÑO (encabezado, filtros y tabla de usuarios)
+   ===================================================== */
+
+/* Encabezado: título a la izquierda y acciones en la esquina superior derecha. */
+.encabezado-seccion {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.encabezado-texto {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.encabezado-acciones {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+}
+
+.encabezado-acciones .btn-exportar {
+    margin-left: 0;
+    padding: 9px 14px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* Filtros de usuarios: en una sola línea mientras quepan (pantallas normales);
+   si la pantalla es muy angosta pasan a otra línea en vez de salirse de la tarjeta. */
+.busquedas {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.busquedas .buscar {
+    flex: 3 1 220px;
+    min-width: 180px;
+}
+
+.busquedas .rol,
+.busquedas .institucion,
+.busquedas .genero,
+.busquedas .estados {
+    flex: 1 1 130px;
+    min-width: 120px;
+    margin: 0;
+}
+
+.busquedas .combobox-rol,
+.busquedas .combobox-institucion,
+.busquedas .combobox-estado {
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    min-height: 42px;
+    text-overflow: ellipsis;
+}
+
+/* En pantallas angostas el encabezado pasa a dos líneas para no salirse. */
+@media (max-width: 760px) {
+    .encabezado-seccion {
+        flex-wrap: wrap;
+    }
+}
+
+/* Tabla de usuarios: barra de desplazamiento horizontal solo cuando no cabe. */
+.tabla {
+    overflow-x: auto;
+}

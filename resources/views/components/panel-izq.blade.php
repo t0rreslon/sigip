@@ -25,6 +25,7 @@
         ['perfil', 'https://img.icons8.com/pastel-glyph/64/conference-call.png', 'Mi perfil', (bool) $cuenta],
     ];
 @endphp
+@vite(['resources/js/tablas.js'])
 <aside class="panel-izq">
     <div class="encabezado">
         <div align=center>

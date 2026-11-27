@@ -29,6 +29,7 @@ export default defineConfig({
                 'resources/js/prestamo-categorias.js',
                 'resources/js/registrar-inventario.js',
                 'resources/js/sigip.js',
+                'resources/js/tablas.js',
             ],
             refresh: true,
         }),

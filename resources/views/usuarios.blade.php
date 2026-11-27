@@ -39,14 +39,19 @@
                     </div>
                     @endif
                     <div class="encabezado-seccion">
-                        <h1>Usuarios</h1>
-                        <p>Consulta y administra cuentas, roles y condiciones de la comunidad.</p>
-                        <button type="button" id="abrir-dialogo">
-                            <img width="24" height="24" src="https://img.icons8.com/external-thin-kawalan-studio/24/external-user-plus-users-thin-kawalan-studio.png" alt="external-user-plus-users-thin-kawalan-studio" />
-                            Registrar usuario
-                        </button>
-                        {{-- HU-192: exporta los usuarios con los filtros aplicados --}}
-                        <a href="{{ route('usuarios.exportar', request()->query()) }}" class="btn-exportar">Exportar PDF</a>
+                        <div class="encabezado-texto">
+                            <h1>Usuarios</h1>
+                            <p>Consulta y administra cuentas, roles y condiciones de la comunidad.</p>
+                        </div>
+                        {{-- Acciones en la esquina superior derecha, igual que en los demás módulos. --}}
+                        <div class="encabezado-acciones">
+                            {{-- HU-192: exporta los usuarios con los filtros aplicados --}}
+                            <a href="{{ route('usuarios.exportar', request()->query()) }}" class="btn-exportar">Exportar PDF</a>
+                            <button type="button" id="abrir-dialogo">
+                                <img width="24" height="24" src="https://img.icons8.com/external-thin-kawalan-studio/24/external-user-plus-users-thin-kawalan-studio.png" alt="" />
+                                Registrar usuario
+                            </button>
+                        </div>
                     </div>
 
                     <!-- MODAL DE REGISTRO DE USUARIOS -->
