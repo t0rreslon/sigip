@@ -11,8 +11,14 @@
         background-color: var(--morado-600, #692a7f);
         width: 236px;
         min-width: 236px;
-        min-height: 100vh;
-        height: 720px;
+        /* Alto de la pantalla con desplazamiento propio: si las opciones no caben
+           (Reportes, Mi perfil...), el menú se desplaza en vez de cortarlas. */
+        height: 100vh;
+        height: 100dvh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, .35) transparent;
         position: fixed;
         top: 0;
         left: 0;
