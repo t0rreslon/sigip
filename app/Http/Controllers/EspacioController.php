@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use App\Support\Auditoria;
+use App\Support\Imagenes;
 use Illuminate\Support\Carbon;
 
 class EspacioController extends Controller
@@ -92,9 +93,16 @@ class EspacioController extends Controller
             'descripcion' => ['nullable', 'string', 'max:500'],
             'capacidad' => ['nullable', 'integer', 'min:1', 'max:10000'],
             'estado_espacio_id' => ['required', 'integer', Rule::in($estadosPermitidos)],
+            'imagen' => Imagenes::REGLAS,
         ], [
             'estado_espacio_id.in' => 'El estado "Reservado" se asigna automáticamente con las reservas.',
         ]);
+
+        unset($datos['imagen']);
+
+        if ($request->hasFile('imagen')) {
+            $datos['imagen'] = Imagenes::guardar($request->file('imagen'), 'espacios');
+        }
 
         $espacio = Espacio::create($datos);
         Auditoria::cambio('espacio', 'INSERT', $espacio->espacio_id, null, $datos);
@@ -105,6 +113,25 @@ class EspacioController extends Controller
     }
 
     // HU-47: habilitar o deshabilitar un espacio.
+    // Foto del espacio (se muestra en su tarjeta).
+    public function cambiarImagen(Request $request, $id)
+    {
+        $espacio = Espacio::findOrFail($id);
+
+        $request->validateWithBag('imagen', [
+            'imagen' => array_merge(['required'], array_slice(Imagenes::REGLAS, 1)),
+        ]);
+
+        Imagenes::borrar($espacio->imagen, 'espacios');
+        $antes = ['foto' => $espacio->imagen ? 'Sí' : 'No'];
+        $espacio->imagen = Imagenes::guardar($request->file('imagen'), 'espacios');
+        $espacio->save();
+
+        Auditoria::cambio('espacio', 'UPDATE', $espacio->espacio_id, $antes, ['foto' => 'Actualizada']);
+
+        return back()->with('success', "La foto de {$espacio->nombre_espacio} se actualizó.");
+    }
+
     public function cambiarEstado(Request $request, $id)
     {
         $datos = $request->validate([

@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Planes|Suscripciones</title>
-  @vite(['resources/css/styles.css', 'resources/js/app.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css', 'resources/js/planes.js', 'resources/js/sigip.js'])
+  @vite(['resources/css/styles.css', 'resources/js/app.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css', 'resources/js/planes.js', 'resources/js/sigip.js', 'resources/js/planes-registros.js'])
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -155,19 +155,108 @@
 
         </section>
 
-        <section class="suscripciones">
-          <div class="susc-cabecera">
-            <div>
+        {{-- Registros de planes y de suscripciones en dos cajas; cada una abre sus registros en un pop-up. --}}
+        <section class="cajas-registros">
+          <article class="caja-registros">
+            <div class="caja-registros-icono" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg>
+            </div>
+            <div class="caja-registros-texto">
+              <h2>Planes</h2>
+              <p>{{ $todosLosPlanes->count() }} registrados · {{ $planesActivos->count() }} activos · {{ $todosLosPlanes->count() - $planesActivos->count() }} inactivos</p>
+            </div>
+            <div class="caja-registros-acciones">
+              <button type="button" class="btn-borde" data-abrir-registros="modal-registros-planes">Ver registros de planes</button>
+            </div>
+          </article>
+
+          <article class="caja-registros">
+            <div class="caja-registros-icono" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 3-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><path d="M16 11l2 2 3.5-4"/></svg>
+            </div>
+            <div class="caja-registros-texto">
               <h2>Suscripciones</h2>
-              <small>
+              <p>
                 {{ $activas }} activas · {{ $vencidas }} vencidas · {{ $porActivar }} por activar ·
                 {{ $usuariosSinSuscripcion }} usuarios sin suscripción
-              </small>
+              </p>
             </div>
-            <button type="button" class="enlace" id="abrir-asignar-suscripcion">Asignar suscripción →</button>
-          </div>
+            <div class="caja-registros-acciones">
+              <button type="button" class="btn-borde" data-abrir-registros="modal-registros-suscripciones">Ver registros de suscripciones</button>
+              <button type="button" class="btn-primario" id="abrir-asignar-suscripcion">+ Asignar suscripción</button>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
 
+
+  <!-- ===== VENTANA: REGISTROS DE PLANES ===== -->
+  <dialog class="modal-plan modal-registros" id="modal-registros-planes" aria-labelledby="titulo-registros-planes">
+    <div class="modal-plan-cuerpo">
+      <div class="modal-plan-cab">
+        <div>
+          <h2 id="titulo-registros-planes">Registros de planes</h2>
+          <p>{{ $planes->count() }} plan(es){{ request()->hasAny(['p_buscar', 'p_tipo', 'p_estado']) ? ' con los filtros aplicados' : '' }}</p>
+        </div>
+        <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="tabla-desplazable">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Tipo</th>
+              <th>Precio</th>
+              <th>Entradas / días</th>
+              <th>Suscripciones</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse ($planes as $plan)
+            <tr>
+              <td>{{ $plan->nombre_plan }}</td>
+              <td>{{ $plan->tipo_plan === 'tiquetera' ? 'Tiquetera' : 'Suscripción' }}</td>
+              <td>${{ number_format($plan->costo, 0, ',', '.') }}</td>
+              <td>{{ $plan->cantidad_entradas }} {{ $plan->tipo_plan === 'tiquetera' ? 'entradas' : 'días' }}</td>
+              <td>{{ $plan->suscripciones_activas_count }} activas de {{ $plan->suscripciones_count }}</td>
+              <td>
+                @if ($plan->estado_plan)
+                <span class="badge verde">Activo</span>
+                @else
+                <span class="badge gris">Inactivo</span>
+                @endif
+              </td>
+              <td class="acciones-registro">
+                <button type="button" class="btn-borde" data-editar-plan-id="{{ $plan->plan_id }}">Editar</button>
+                <a href="{{ route('planes.historial', $plan->plan_id) }}" class="enlace-historial">Ver historial</a>
+              </td>
+            </tr>
+            @empty
+            <tr><td colspan="7">No hay planes registrados.</td></tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ===== VENTANA: REGISTROS DE SUSCRIPCIONES ===== -->
+  <dialog class="modal-plan modal-registros" id="modal-registros-suscripciones" aria-labelledby="titulo-registros-suscripciones">
+    <div class="modal-plan-cuerpo">
+      <div class="modal-plan-cab">
+        <div>
+          <h2 id="titulo-registros-suscripciones">Registros de suscripciones</h2>
+          <p>{{ $activas }} activas · {{ $vencidas }} vencidas · {{ $porActivar }} por activar</p>
+        </div>
+        <button type="button" class="modal-plan-cerrar" data-cerrar aria-label="Cerrar">✕</button>
+      </div>
           <form class="filtros" method="GET" action="{{ route('planes.index') }}" id="form-filtros-suscripciones">
+            <input type="hidden" name="ver" value="suscripciones">
             <input type="search" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar usuario o identificación">
             <select name="estado" data-autoenviar>
               <option value="">Estado: todos</option>
@@ -184,7 +273,7 @@
               @endforeach
             </select>
             @if (request()->hasAny(['buscar', 'estado', 'plan']))
-            <a href="{{ route('planes.index') }}" class="btn-borde">Limpiar</a>
+            <a href="{{ route('planes.index', ['ver' => 'suscripciones']) }}" class="btn-borde">Limpiar</a>
             @endif
           </form>
 
@@ -287,11 +376,8 @@
               @endif
             </div>
           </div>
-        </section>
-      </main>
     </div>
-  </div>
-
+  </dialog>
 
   <!-- ===== VENTANA: CREAR PLAN ===== -->
   <dialog class="modal-plan" id="modal-crear-plan" aria-labelledby="titulo-crear-plan">
@@ -384,7 +470,7 @@
     </div>
   </dialog>
   <!-- ===== VENTANA: CONSULTAR / EDITAR PLAN (HU-34, HU-36) ===== -->
-  @php($erroresPlan = $errors->editarPlan)
+  @php $erroresPlan = $errors->editarPlan; @endphp
   <dialog class="modal-plan" id="modal-editar-plan" aria-labelledby="titulo-editar-plan">
     <div class="modal-plan-cuerpo">
       <div class="modal-plan-cab">
@@ -467,7 +553,7 @@
   </dialog>
 
   <!-- ===== VENTANA: ASIGNAR SUSCRIPCIÓN ===== -->
-  @php($erroresAsignar = $errors->asignar)
+  @php $erroresAsignar = $errors->asignar; @endphp
   <dialog class="modal-plan" id="modal-asignar-suscripcion" aria-labelledby="titulo-asignar-suscripcion">
     <div class="modal-plan-cuerpo">
       <div class="modal-plan-cab">
@@ -527,7 +613,7 @@
   </dialog>
 
   <!-- ===== VENTANA: MODIFICAR SUSCRIPCIÓN (HU-37, HU-39) ===== -->
-  @php($erroresSuscripcion = $errors->editarSuscripcion)
+  @php $erroresSuscripcion = $errors->editarSuscripcion; @endphp
   <dialog class="modal-plan" id="modal-editar-suscripcion" aria-labelledby="titulo-editar-suscripcion">
     <div class="modal-plan-cuerpo">
       <div class="modal-plan-cab">

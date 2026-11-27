@@ -2139,3 +2139,270 @@ body :is(h1, h2, h3, h4, h5, h6) {
     width: 100%;
     padding: 9px 12px;
 }
+
+/* Planes y suscripciones: dos cajas paralelas que abren sus registros en un pop-up. */
+.cajas-registros {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 16px 0;
+}
+
+@media (max-width: 900px) {
+    .cajas-registros {
+        grid-template-columns: 1fr;
+    }
+}
+
+.caja-registros {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px 14px;
+    align-items: center;
+    padding: 18px;
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+}
+
+.caja-registros-icono {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--morado-100);
+    color: var(--morado-600);
+}
+
+.caja-registros-texto h2 {
+    margin: 0 0 2px;
+    font-size: 16px;
+}
+
+.caja-registros-texto p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--texto-suave);
+}
+
+.caja-registros-acciones {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--borde);
+}
+
+.modal-plan.modal-registros {
+    width: min(1100px, calc(100vw - 32px));
+    max-width: none;
+}
+
+.modal-registros .acciones-registro {
+    white-space: nowrap;
+}
+
+.modal-registros .acciones-registro .enlace-historial {
+    display: inline-block;
+    margin: 0 0 0 8px;
+}
+
+/* Espacios en tarjetas con foto. */
+.espacios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    margin: 4px 0 12px;
+}
+
+.ficha-espacio {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.ficha-espacio:hover {
+    border-color: #d6c1df;
+    box-shadow: 0 4px 14px rgba(68, 27, 84, 0.08);
+}
+
+.ficha-espacio-foto {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--morado-100);
+}
+
+.ficha-espacio-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.ficha-espacio.deshabilitado .ficha-espacio-foto img,
+.ficha-espacio.deshabilitado .ficha-espacio-sin-foto {
+    filter: grayscale(1);
+    opacity: 0.7;
+}
+
+.ficha-espacio-sin-foto {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--morado-500);
+}
+
+.ficha-espacio-estado {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.form-foto-espacio {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    margin: 0;
+}
+
+.btn-cambiar-foto {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--morado-600);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.btn-cambiar-foto:hover,
+.btn-cambiar-foto:focus-within {
+    background: var(--morado-600);
+    color: #fff;
+}
+
+.btn-cambiar-foto input[type=file] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.visualmente-oculto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.ficha-espacio-cuerpo {
+    flex: 1 1 auto;
+    padding: 14px 16px 6px;
+}
+
+.ficha-espacio-cuerpo h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+}
+
+.ficha-espacio-datos {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+}
+
+.ficha-espacio-datos div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.ficha-espacio-datos dt {
+    color: var(--texto-suave);
+    font-weight: 500;
+}
+
+.ficha-espacio-datos dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 600;
+}
+
+.ficha-espacio-descripcion {
+    margin: 8px 0 0;
+    font-size: 11px;
+    color: var(--texto-suave);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.ficha-espacio-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 16px 16px;
+}
+
+.ficha-espacio-acciones form {
+    margin: 0;
+}
+
+.ficha-espacio-acciones .btn-borde,
+.ficha-espacio-acciones .btn-primario {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 0 12px;
+    text-decoration: none;
+}
+
+.ficha-espacio-acciones a.btn-primario {
+    color: #fff;
+}
+
+.sin-registros-espacios {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--texto-suave);
+    padding: 24px;
+}
+
+/* Botones de la tarjeta de espacio en una sola fila. */
+.ficha-espacio-acciones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ficha-espacio-acciones > *,
+.ficha-espacio-acciones form .btn-borde {
+    width: 100%;
+    padding: 0 6px !important;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* Un operador no ve "Deshabilitar": los dos botones se reparten la fila. */
+.ficha-espacio-acciones:not(:has(> form, > .btn-deshabilitar-espacio)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}

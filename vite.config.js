@@ -30,6 +30,8 @@ export default defineConfig({
                 'resources/js/registrar-inventario.js',
                 'resources/js/sigip.js',
                 'resources/js/tablas.js',
+                'resources/js/usuarios-tarjetas.js',
+                'resources/js/planes-registros.js',
             ],
             refresh: true,
         }),

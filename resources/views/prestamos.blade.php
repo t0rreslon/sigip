@@ -52,14 +52,19 @@
                     @endif
                     <!-- ABRE ENCABEZADO SECCION -->
                     <div class="encabezado-seccion">
-                        <h1>Prestamos y devoluciones</h1>
-                        <p>Controla unidades disponibles, responsables y devoluciones.</p>
-                        <button type="button" id="abrir-dialogo">
-                            <img width="24" height="24" src="https://img.icons8.com/android/24/plus.png" alt="plus" />
-                            Registrar prestamo
-                        </button>
-                        {{-- HU-166 --}}
-                        <a href="{{ route('prestamos.exportar', request()->query()) }}" class="btn-exportar">Exportar PDF</a>
+                        <div class="encabezado-texto">
+                            <h1>Préstamos y devoluciones</h1>
+                            <p>Controla unidades disponibles, responsables y devoluciones.</p>
+                        </div>
+                        {{-- Acciones en la esquina superior derecha, igual que en los demás módulos. --}}
+                        <div class="encabezado-acciones">
+                            {{-- HU-166 --}}
+                            <a href="{{ route('prestamos.exportar', request()->query()) }}" class="btn-exportar">Exportar PDF</a>
+                            <button type="button" id="abrir-dialogo">
+                                <img width="24" height="24" src="https://img.icons8.com/android/24/plus.png" alt="" />
+                                Registrar préstamo
+                            </button>
+                        </div>
                     </div>
                     <!-- CIERRA ENCABEZADO SECCION -->
                     <!-- ABRE VENTANA MODAL PARA REGISTRAR PRESTAMO -->

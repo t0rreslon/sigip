@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use App\Support\Auditoria;
 use App\Support\PdfReporte;
+use App\Support\Imagenes;
 
 class UsuarioController extends Controller
 {
@@ -70,11 +71,16 @@ class UsuarioController extends Controller
         $datos = $request->validate($this->reglas() + [
             // Ley 1581 de 2012: sin autorización no se pueden guardar los datos personales.
             'autoriza_datos' => ['accepted'],
+            'imagen' => Imagenes::REGLAS,
         ], [
             'autoriza_datos.accepted' => 'Para registrar al usuario debe autorizar el tratamiento de sus datos personales.',
         ]);
 
-        unset($datos['autoriza_datos']);
+        unset($datos['autoriza_datos'], $datos['imagen']);
+
+        if ($request->hasFile('imagen')) {
+            $datos['imagen'] = Imagenes::guardar($request->file('imagen'), 'usuarios');
+        }
         $datos['autoriza_datos_en'] = now();
 
         // Los usuarios nuevos se registran como activos.
@@ -98,10 +104,21 @@ class UsuarioController extends Controller
             'editar',
             $this->reglas($usuario->usuario_id, $usuario->correo) + [
                 'estado_usuario' => ['required', 'boolean'],
+                'imagen' => Imagenes::REGLAS,
+                'quitar_imagen' => ['nullable', 'boolean'],
             ]
         );
 
         $antes = $usuario->getAttributes();
+        $quitar = !empty($datos['quitar_imagen']);
+        unset($datos['imagen'], $datos['quitar_imagen']);
+
+        // Foto nueva o quitar la actual: el archivo anterior se borra.
+        if ($request->hasFile('imagen') || $quitar) {
+            Imagenes::borrar($usuario->imagen, 'usuarios');
+            $datos['imagen'] = $request->hasFile('imagen') ? Imagenes::guardar($request->file('imagen'), 'usuarios') : null;
+        }
+
         $usuario->update($datos);
 
         Auditoria::cambio('usuario', 'UPDATE', $usuario->usuario_id, $antes, $usuario->fresh()->getAttributes());

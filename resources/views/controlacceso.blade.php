@@ -40,7 +40,6 @@
                     <div class="encabezado-seccion">
                         <h1>Control de acceso</h1>
                         <p>Valida las condiciones del usuario antes de registrar el ingreso.</p>
-                        <a href="{{ route('control-acceso.historial') }}" style="color:#2463A6;font-weight:600">Ver historial de accesos →</a>
                     </div>
                     <!-- CIERRA ENCABEZADO -->
                     <!-- ABRE CONSULTA DE IDENTIFICACION -->
@@ -184,10 +183,13 @@
                     <div class="historial-accesos">
                         <!-- ENCABEZADO DEL PANEL -->
                         <div class="historial-header">
-                            <h2>Historial reciente de accesos</h2>
-                            <p id="total-ingresos">
-                                Jornada de hoy · {{ $historial->count() }} registros
-                            </p>
+                            <div>
+                                <h2>Historial reciente de accesos</h2>
+                                <p id="total-ingresos">
+                                    Jornada de hoy · {{ $historial->count() }} registros
+                                </p>
+                            </div>
+                            <a href="{{ route('control-acceso.historial') }}" class="btn-historial-accesos">Ver historial de accesos</a>
                         </div>
 
                         <!-- TABLA DE REGISTROS -->

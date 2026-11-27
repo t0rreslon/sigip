@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- estilos de usuarios y estilos del panel izquierdo y javascrpit del pop-out -->
-    @vite(['resources/css/styles2.css', 'resources/js/app.js', 'resources/js/pop_out.js', 'resources/js/sigip.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css'])
+    @vite(['resources/css/styles2.css', 'resources/js/app.js', 'resources/js/pop_out.js', 'resources/js/sigip.js', 'resources/js/usuarios-tarjetas.js', 'resources/css/panel_izq.css', 'resources/css/nav_bar.css'])
     <!-- bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous">
     <!-- fuentes -->
@@ -70,9 +70,21 @@
                             </button>
                         </div>
 
-                        <form id="formRegistro" method="POST" action="{{ route('usuarios.store') }}">
+                        <form id="formRegistro" method="POST" action="{{ route('usuarios.store') }}" enctype="multipart/form-data">
                             @csrf
 
+                            <!-- FOTO (opcional) -->
+                            <div class="campo-foto">
+                                <div class="campo-foto-vista" data-vista-foto="registro_imagen"><span class="avatar-iniciales">+</span></div>
+                                <div class="campo-foto-entrada">
+                                    <label for="registro_imagen" class="form-label">Foto (opcional)</label>
+                                    <input type="file" class="form-control @error('imagen') is-invalid @enderror" id="registro_imagen" name="imagen" accept="image/jpeg,image/png,image/webp" data-foto>
+                                    <small class="texto-ayuda">JPG, PNG o WEBP, máximo 2 MB.</small>
+                                    @error('imagen')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                             <div class="row g-3">
 
                                 <!-- NOMBRE -->
@@ -380,7 +392,7 @@
                     <!-- CIERRA POP-UP DEL FORMULARIO DE REGISTRO -->
 
                     <!-- HU-29: MODAL DE CONSULTA Y EDICIÓN DE USUARIOS -->
-                    @php($erroresEditar = $errors->editar)
+                    @php $erroresEditar = $errors->editar; @endphp
                     <dialog id="modalEditar" class="modal-registro">
                         <div class="modal-encabezado">
                             <div>
@@ -393,6 +405,7 @@
                         <form
                             id="formEditar"
                             method="POST"
+                            enctype="multipart/form-data"
                             action="{{ old('usuario_id') ? route('usuarios.update', old('usuario_id')) : '' }}"
                             data-accion-base="{{ url('/usuarios') }}">
                             @csrf
@@ -404,6 +417,16 @@
                             @endif
                             @endforeach
 
+                            <div class="campo-foto">
+                                <div class="campo-foto-vista" id="editar_vista_foto" data-vista-foto="editar_imagen"><span class="avatar-iniciales">+</span></div>
+                                <div class="campo-foto-entrada">
+                                    <label for="editar_imagen" class="form-label">Foto</label>
+                                    <input type="file" class="form-control @if($erroresEditar->has('imagen')) is-invalid @endif" id="editar_imagen" name="imagen" accept="image/jpeg,image/png,image/webp" data-foto>
+                                    <small class="texto-ayuda">Elige una imagen para cambiarla (JPG, PNG o WEBP, máximo 2 MB).</small>
+                                    @if($erroresEditar->has('imagen'))<div class="invalid-feedback">{{ $erroresEditar->first('imagen') }}</div>@endif
+                                    <label class="quitar-foto" id="editar_quitar_foto_contenedor" hidden><input type="checkbox" name="quitar_imagen" value="1" id="editar_quitar_imagen"> Quitar la foto actual</label>
+                                </div>
+                            </div>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label for="editar_nombre" class="form-label">Nombre</label>
@@ -506,6 +529,50 @@
                                 <button type="submit" class="btn-guardar">Guardar cambios</button>
                             </div>
                         </form>
+                    </dialog>
+
+                    <!-- POP-UP "VER USUARIO": información completa e historial sin salir del pop-up -->
+                    <dialog id="modalVerUsuario" class="modal-registro modal-ver-usuario" aria-labelledby="verUsuarioNombre">
+                        <div class="modal-encabezado">
+                            <div class="ver-usuario-cabecera">
+                                <div class="ver-usuario-foto" id="verUsuarioFoto"></div>
+                                <div>
+                                    <h2 id="verUsuarioNombre">Usuario</h2>
+                                    <p id="verUsuarioEstado"></p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-cerrar" data-cerrar-ver aria-label="Cerrar">&times;</button>
+                        </div>
+
+                        <div class="pestanas ver-usuario-pestanas" role="tablist">
+                            <button type="button" class="activa" role="tab" data-pestana-ver="info" aria-selected="true">Información</button>
+                            <button type="button" role="tab" data-pestana-ver="historial" aria-selected="false">Historial de cambios</button>
+                        </div>
+
+                        <div data-panel-ver="info">
+                            <table class="tabla-ficha">
+                                <tbody id="verUsuarioDatos"></tbody>
+                            </table>
+                        </div>
+
+                        <div data-panel-ver="historial" hidden>
+                            <div id="verUsuarioHistorial" class="ver-usuario-historial">Cargando historial…</div>
+                        </div>
+
+                        <div class="modal-acciones">
+                            {{-- HU-144: activar o desactivar al usuario desde su ficha --}}
+                            <form method="POST" id="verUsuarioFormEstado" data-confirmar="¿Cambiar el estado de este usuario?">
+                                @csrf
+                                @method('PATCH')
+                                @foreach (['buscar', 'rol', 'estado', 'institucion', 'genero', 'page'] as $filtro)
+                                @if (request()->filled($filtro))
+                                <input type="hidden" name="{{ $filtro }}" value="{{ request($filtro) }}">
+                                @endif
+                                @endforeach
+                                <button type="submit" class="btn-cancelar" id="verUsuarioBtnEstado">Desactivar</button>
+                            </form>
+                            <button type="button" class="btn-guardar" id="verUsuarioEditar">Editar</button>
+                        </div>
                     </dialog>
                     <div class="contenido-cuentas">
                         <p style="color: #2463A6">
@@ -653,112 +720,98 @@
                         </div>
                         <!-- CIERRA BUSQUEDAS -->
 
-                        <!-- ABRE TABLA -->
-                        <div class="tabla">
-                            <table class="tabla-users">
-                                <thead>
-                                    <tr>
-                                        <th class="col-identificacion">Identificación</th>
-                                        <th class="col-usuario">Nombre/Correo</th>
-                                        <th class="col-telefono">Teléfono</th>
-                                        <th class="col-rol">Rol</th>
-                                        <th class="col-tipo">Institucion</th>
-                                        <th class="col-estado">Estado</th>
-                                        <th class="col-acciones">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($usuarios as $usuario)
-                                    <tr>
-                                        <td class="col-identificacion">
-                                            <div class="dato-principal">
-                                                {{ $usuario->documento }}
-                                            </div>
-                                        </td>
+                        <!-- ABRE TARJETAS DE USUARIOS -->
+                        @php
+                            $nombresTipoDoc = $tiposDocumento->pluck('nombre_tipo_documento', 'tipo_documento_id');
+                            $nombresGenero = $generos->pluck('nombre_genero', 'genero_id');
+                            $nombresEps = $eps->pluck('nombre_eps', 'eps_id');
+                        @endphp
+                        <div class="usuarios-grid">
+                            @forelse ($usuarios as $usuario)
+                            @php
+                                $foto = \App\Support\Imagenes::url($usuario->imagen, 'usuarios');
+                                $iniciales = mb_strtoupper(mb_substr($usuario->nombre, 0, 1) . mb_substr($usuario->apellido, 0, 1));
+                                $ficha = [
+                                    'id' => $usuario->usuario_id,
+                                    'nombre' => "{$usuario->nombre} {$usuario->apellido}",
+                                    'iniciales' => $iniciales,
+                                    'foto' => $foto,
+                                    'activo' => (bool) $usuario->estado_usuario,
+                                    'historial' => route('usuarios.historial', $usuario->usuario_id),
+                                    'estadoAccion' => route('usuarios.estado', $usuario->usuario_id),
+                                    'datos' => [
+                                        'Tipo de documento' => $nombresTipoDoc[$usuario->tipo_documento_id] ?? '—',
+                                        'Identificación' => $usuario->documento,
+                                        'Nombre' => $usuario->nombre,
+                                        'Apellido' => $usuario->apellido,
+                                        'Correo' => $usuario->correo ?: '—',
+                                        'Teléfono' => $usuario->telefono ?: 'Sin teléfono registrado',
+                                        'Fecha de nacimiento' => $usuario->fecha_nacimiento ? \Illuminate\Support\Carbon::parse($usuario->fecha_nacimiento)->format('d/m/Y') : '—',
+                                        'Género' => $nombresGenero[$usuario->genero_id] ?? '—',
+                                        'EPS' => $nombresEps[$usuario->eps_id] ?? 'Sin EPS',
+                                        'Rol' => $usuario->nombre_rol ?? 'Sin rol',
+                                        'Institución' => $usuario->nombre_institucion ?? 'Sin institución',
+                                        'Estado' => $usuario->estado_usuario ? 'Activo' : 'Inactivo',
+                                        'Autorización de datos' => $usuario->autoriza_datos_en ? \Illuminate\Support\Carbon::parse($usuario->autoriza_datos_en)->format('d/m/Y h:i a') : 'Sin registro',
+                                    ],
+                                ];
+                            @endphp
+                            <article class="tarjeta-usuario {{ $usuario->estado_usuario ? '' : 'inactiva' }}">
+                                <div class="tarjeta-usuario-foto">
+                                    @if ($foto)
+                                    <img src="{{ $foto }}" alt="Foto de {{ $usuario->nombre }} {{ $usuario->apellido }}" loading="lazy">
+                                    @else
+                                    <span class="avatar-iniciales" aria-hidden="true">{{ $iniciales }}</span>
+                                    @endif
+                                </div>
 
-                                        <td class="col-usuario">
-                                            <div class="dato-principal">
-                                                {{ $usuario->nombre }} {{ $usuario->apellido }}
-                                            </div>
+                                <div class="tarjeta-usuario-datos">
+                                    <h3 title="{{ $usuario->nombre }} {{ $usuario->apellido }}">{{ $usuario->nombre }} {{ $usuario->apellido }}</h3>
+                                    <p class="tarjeta-usuario-doc">ID {{ $usuario->documento }}</p>
+                                    <p class="tarjeta-usuario-correo" title="{{ $usuario->correo }}">{{ $usuario->correo ?: 'Sin correo registrado' }}</p>
+                                    <div class="tarjeta-usuario-etiquetas">
+                                        <span class="etiqueta-rol">{{ $usuario->nombre_rol ?? 'Sin rol' }}</span>
+                                        @if ($usuario->estado_usuario)
+                                        <span class="estado activo">Activo</span>
+                                        @else
+                                        <span class="estado inactivo">Inactivo</span>
+                                        @endif
+                                    </div>
+                                </div>
 
-                                            <div class="dato-secundario">
-                                                {{ $usuario->correo ?? 'Sin correo registrado' }}
-                                            </div>
-                                        </td>
-
-                                        <td class="col-telefono">
-                                            <div class="dato-principal">
-                                                {{ $usuario->telefono ?? 'Sin teléfono registrado' }}
-                                            </div>
-                                        </td>
-
-                                        <td class="col-rol">
-                                            <div class="dato-principal">
-                                                {{ $usuario->nombre_rol ?? 'Sin rol' }}
-                                            </div>
-                                        </td>
-
-                                        <td class="col-tipo">
-                                            <div class="dato-principal">
-                                                {{ $usuario->nombre_institucion ?? 'Sin institución' }}
-                                            </div>
-                                        </td>
-
-                                        <td class="col-estado">
-                                            @if ($usuario->estado_usuario)
-                                            <span class="estado activo">Activo</span>
-                                            @else
-                                            <span class="estado inactivo">Inactivo</span>
-                                            @endif
-                                        </td>
-
-                                        <td class="col-acciones">
-                                            <div class="dato-principal">
-                                                <button
-                                                    type="button"
-                                                    class="btn-enlace btn-editar-usuario"
-                                                    data-id="{{ $usuario->usuario_id }}"
-                                                    data-nombre="{{ $usuario->nombre }}"
-                                                    data-apellido="{{ $usuario->apellido }}"
-                                                    data-tipo_documento_id="{{ $usuario->tipo_documento_id }}"
-                                                    data-documento="{{ $usuario->documento }}"
-                                                    data-genero_id="{{ $usuario->genero_id }}"
-                                                    data-eps_id="{{ $usuario->eps_id }}"
-                                                    data-correo="{{ $usuario->correo }}"
-                                                    data-telefono="{{ $usuario->telefono }}"
-                                                    data-fecha_nacimiento="{{ $usuario->fecha_nacimiento }}"
-                                                    data-rol_usuario_id="{{ $usuario->rol_usuario_id }}"
-                                                    data-institucion_id="{{ $usuario->institucion_id }}"
-                                                    data-estado_usuario="{{ $usuario->estado_usuario ? 1 : 0 }}">
-                                                    Ver / Editar
-                                                </button>
-                                                <a href="{{ route('usuarios.historial', $usuario->usuario_id) }}">Historial</a>
-                                                {{-- HU-144: cambiar el estado del usuario --}}
-                                                <form method="POST" action="{{ route('usuarios.estado', $usuario->usuario_id) }}" style="display:inline" data-confirmar="¿{{ $usuario->estado_usuario ? 'Desactivar' : 'Activar' }} a este usuario?">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    @foreach (['buscar', 'rol', 'estado', 'institucion', 'genero', 'page'] as $filtro)
-                                                    @if (request()->filled($filtro))
-                                                    <input type="hidden" name="{{ $filtro }}" value="{{ request($filtro) }}">
-                                                    @endif
-                                                    @endforeach
-                                                    <button type="submit" class="btn-enlace">{{ $usuario->estado_usuario ? 'Desactivar' : 'Activar' }}</button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="8" class="sin-registros">
-                                            No hay usuarios registrados.
-                                        </td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                                <div class="tarjeta-usuario-acciones">
+                                    <button type="button" class="btn-icono btn-ver-usuario" data-ficha="{{ json_encode($ficha, JSON_UNESCAPED_UNICODE) }}" title="Ver información" aria-label="Ver información de {{ $usuario->nombre }} {{ $usuario->apellido }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn-icono btn-editar-usuario"
+                                        title="Editar"
+                                        aria-label="Editar a {{ $usuario->nombre }} {{ $usuario->apellido }}"
+                                        data-id="{{ $usuario->usuario_id }}"
+                                        data-nombre="{{ $usuario->nombre }}"
+                                        data-apellido="{{ $usuario->apellido }}"
+                                        data-tipo_documento_id="{{ $usuario->tipo_documento_id }}"
+                                        data-documento="{{ $usuario->documento }}"
+                                        data-genero_id="{{ $usuario->genero_id }}"
+                                        data-eps_id="{{ $usuario->eps_id }}"
+                                        data-correo="{{ $usuario->correo }}"
+                                        data-telefono="{{ $usuario->telefono }}"
+                                        data-fecha_nacimiento="{{ $usuario->fecha_nacimiento }}"
+                                        data-rol_usuario_id="{{ $usuario->rol_usuario_id }}"
+                                        data-institucion_id="{{ $usuario->institucion_id }}"
+                                        data-estado_usuario="{{ $usuario->estado_usuario ? 1 : 0 }}"
+                                        data-imagen="{{ $foto }}"
+                                        data-iniciales="{{ $iniciales }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+                                    </button>
+                                </div>
+                            </article>
+                            @empty
+                            <p class="sin-registros">No hay usuarios registrados.</p>
+                            @endforelse
                         </div>
-
-                        <!-- CIERRA TABLA -->
+                        <!-- CIERRA TARJETAS DE USUARIOS -->
 
                         <!-- ABRE PAGINACION -->
                         <div class="paginacion">
@@ -884,6 +937,7 @@
                     });
 
                     formulario.querySelectorAll('.invalid-feedback').forEach((error) => error.remove());
+                    window.sigipMostrarFotoEdicion?.(boton.dataset.imagen, boton.dataset.iniciales);
                     modal.showModal();
                 });
             });

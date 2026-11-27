@@ -6,6 +6,7 @@ use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\Auth\DobleFactorController;
 use App\Http\Controllers\ControlAccesoController;
 use App\Http\Controllers\EspacioController;
+use App\Http\Controllers\ImagenController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\InventarioController;
@@ -112,6 +113,9 @@ Route::middleware('auth')->group(function () {
     */
     Route::middleware('tipo_cuenta:Administrador,Operador')->group(function () {
 
+        // Fotos de usuarios y espacios (disco privado, solo personal autenticado).
+        Route::get('/imagenes/{carpeta}/{archivo}', [ImagenController::class, 'ver'])->whereIn('carpeta', ['usuarios', 'espacios'])->where('archivo', '[0-9a-f\-]{36}\.(jpg|jpeg|png|webp)')->name('imagenes.ver');
+
         // HU-199 / HU-204: notificaciones de solicitudes.
         Route::get('/notificaciones', [NotificacionController::class, 'index'])->name('notificaciones');
 
@@ -201,6 +205,7 @@ Route::middleware('auth')->group(function () {
         // Espacios
         Route::post('/espacios', [EspacioController::class, 'store'])->name('espacios.store');
         Route::patch('/espacios/{id}/estado', [EspacioController::class, 'cambiarEstado'])->whereNumber('id')->name('espacios.estado');
+        Route::post('/espacios/{id}/imagen', [EspacioController::class, 'cambiarImagen'])->whereNumber('id')->name('espacios.imagen');
         Route::post('/espacios/{id}/mantenimientos', [EspacioController::class, 'registrarMantenimiento'])->whereNumber('id')->name('espacios.mantenimientos.store');
         Route::patch('/espacios/{id}/mantenimientos/{mantenimiento}/finalizar', [EspacioController::class, 'finalizarMantenimiento'])->whereNumber(['id', 'mantenimiento'])->name('espacios.mantenimientos.finalizar');
 

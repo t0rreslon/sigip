@@ -18,6 +18,7 @@ class Espacio extends Model
         'descripcion',
         'capacidad',
         'estado_espacio_id',
+        'imagen',
     ];
 
     // Estados que impiden usar o reservar el espacio.

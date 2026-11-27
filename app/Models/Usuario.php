@@ -26,6 +26,7 @@ class Usuario extends Model
         'institucion_id',
         'estado_usuario',
         'autoriza_datos_en',
+        'imagen',
     ];
 
     protected function casts(): array

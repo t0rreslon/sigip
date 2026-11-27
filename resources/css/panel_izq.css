@@ -163,3 +163,23 @@
 .tabla-desplazable th {
     white-space: nowrap;
 }
+
+/* Controles de consulta (búsqueda, filtros y sus botones) con la misma altura en todos los módulos. */
+:is(.filtros, .busquedas, .filtros-pagos, .filtros-pagos-secundarios, .acciones-filtros-pagos, .consulta-identificacion)
+    :is(input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not(.barra-busqueda):not(.fecha-oculta), select, button, a.btn-borde, a.btn-primario, .buscar, .btn-calendario) {
+    height: 42px;
+    min-height: 42px;
+    max-height: 42px;
+    box-sizing: border-box;
+}
+
+:is(.filtros, .busquedas, .filtros-pagos, .filtros-pagos-secundarios, .acciones-filtros-pagos, .consulta-identificacion)
+    :is(button, a.btn-borde, a.btn-primario) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
+    white-space: nowrap;
+    text-decoration: none;
+}

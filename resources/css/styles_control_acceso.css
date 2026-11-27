@@ -516,3 +516,34 @@ html body {
 body :is(h1, h2, h3, h4, h5, h6) {
   color: inherit;
 }
+
+/* Botón "Ver historial de accesos" dentro de la sección de historial reciente. */
+.historial-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.btn-historial-accesos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 18px;
+    border-radius: 6px;
+    background-color: var(--morado-600, #692a7f);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+.btn-historial-accesos:hover,
+.btn-historial-accesos:focus-visible {
+    background-color: var(--morado-800, #441b54);
+    color: #fff;
+}

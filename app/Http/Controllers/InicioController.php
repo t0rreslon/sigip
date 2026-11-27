@@ -55,13 +55,29 @@ class InicioController extends Controller
             $ingresos['valores'][] = (float) ($porMes[$m->format('Y-m')] ?? 0);
         }
 
-        $usuariosPorRol = DB::table('usuario as u')
-            ->join('rol_usuario as r', 'r.rol_usuario_id', '=', 'u.rol_usuario_id')
-            ->where('u.estado_usuario', true)
-            ->select('r.nombre', DB::raw('COUNT(*) AS total'))
-            ->groupBy('r.nombre')
-            ->orderByDesc('total')
-            ->get();
+        // Suscripciones por estado (activa, por activar, vencida), con el mismo cálculo que el resto del sistema.
+        $porEstado = DB::table('suscripcion as s')
+            ->join('plan as pl', 'pl.plan_id', '=', 's.plan_id')
+            // Alias distinto de la columna suscripcion.estado: en GROUP BY, PostgreSQL prefiere la columna.
+            ->select(DB::raw('(' . Suscripcion::sqlEstadoCalculado() . ') AS estado_calculado'), DB::raw('COUNT(*) AS total'))
+            ->groupBy('estado_calculado')
+            ->pluck('total', 'estado_calculado');
+
+        $nombresEstado = ['activa' => 'Activas', 'por_activar' => 'Por activar', 'vencida' => 'Vencidas'];
+        $suscripcionesPorEstado = ['etiquetas' => [], 'valores' => []];
+
+        foreach ($nombresEstado as $clave => $nombre) {
+            $suscripcionesPorEstado['etiquetas'][] = $nombre;
+            $suscripcionesPorEstado['valores'][] = (int) ($porEstado[$clave] ?? 0);
+        }
+
+        // Estados que no estén en la lista (por si el cálculo agrega otro) también se muestran.
+        foreach ($porEstado as $clave => $total) {
+            if (!isset($nombresEstado[$clave])) {
+                $suscripcionesPorEstado['etiquetas'][] = ucfirst(str_replace('_', ' ', (string) $clave));
+                $suscripcionesPorEstado['valores'][] = (int) $total;
+            }
+        }
 
         $suscripcionesPorPlan = DB::table('suscripcion as s')
             ->join('plan as pl', 'pl.plan_id', '=', 's.plan_id')
@@ -77,7 +93,7 @@ class InicioController extends Controller
             'graficas' => [
                 ['id' => 'accesos-14', 'titulo' => 'Accesos por día', 'subtitulo' => 'Últimos 14 días', 'tipo' => 'line', 'serie' => 'Accesos', 'datos' => $this->accesosPorDia(14)],
                 ['id' => 'ingresos-mes', 'titulo' => 'Ingresos verificados por mes', 'subtitulo' => 'Últimos 6 meses, en pesos', 'tipo' => 'bar', 'serie' => 'Ingresos', 'moneda' => true, 'datos' => $ingresos],
-                ['id' => 'usuarios-rol', 'titulo' => 'Usuarios activos por rol', 'subtitulo' => 'Comunidad que usa el gimnasio', 'tipo' => 'barh', 'serie' => 'Usuarios', 'datos' => $this->serie($usuariosPorRol, 'nombre')],
+                ['id' => 'suscripciones-estado', 'titulo' => 'Suscripciones por estado', 'subtitulo' => 'Activas, por activar (pago pendiente) y vencidas', 'tipo' => 'barh', 'serie' => 'Suscripciones', 'datos' => $suscripcionesPorEstado],
                 ['id' => 'planes', 'titulo' => 'Suscripciones activas por plan', 'subtitulo' => 'Planes con más usuarios', 'tipo' => 'barh', 'serie' => 'Suscripciones', 'datos' => $this->serie($suscripcionesPorPlan, 'nombre_plan')],
             ],
             'listas' => [],
