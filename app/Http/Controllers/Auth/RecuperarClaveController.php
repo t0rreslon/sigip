@@ -59,13 +59,23 @@ class RecuperarClaveController extends Controller
 
             $enlace = route('password.reset', ['cuenta' => $cuenta->cuenta_id, 'token' => $token]);
 
-            Mail::raw(
-                "Hola {$cuenta->nombre}:\n\n"
-                . "Recibimos una solicitud para restablecer la contraseña de tu cuenta \"{$cuenta->login}\" en SIGIP.\n\n"
-                . "Abre este enlace para crear una nueva contraseña (vence en " . self::MINUTOS_VIGENCIA . " minutos):\n{$enlace}\n\n"
-                . "Si no fuiste tú, ignora este mensaje: tu contraseña no cambiará.\n\nBienestar Universitario · Pascual Bravo",
-                fn ($mensaje) => $mensaje->to($cuenta->correo)->subject('SIGIP · Restablecer contraseña')
-            );
+            try {
+                Mail::raw(
+                    "Hola {$cuenta->nombre}:\n\n"
+                    . "Recibimos una solicitud para restablecer la contraseña de tu cuenta \"{$cuenta->login}\" en SIGIP.\n\n"
+                    . "Abre este enlace para crear una nueva contraseña (vence en " . self::MINUTOS_VIGENCIA . " minutos):\n{$enlace}\n\n"
+                    . "Si no fuiste tú, ignora este mensaje: tu contraseña no cambiará.\n\nBienestar Universitario · Pascual Bravo",
+                    fn ($mensaje) => $mensaje->to($cuenta->correo)->subject('SIGIP · Restablecer contraseña')
+                );
+            } catch (\Throwable $e) {
+                // Si el servidor de correo falla, se registra para el administrador y la
+                // persona ve el mismo mensaje de siempre (no se revela si la cuenta existe).
+                report($e);
+            }
+
+            if (config('mail.default') === 'log') {
+                logger()->warning('Recuperación de contraseña: MAIL_MAILER=log, el correo se guardó en el log y no se envió.', ['cuenta' => $cuenta->login]);
+            }
         }
 
         return back()->with('status', 'Si el usuario existe y tiene un correo registrado, enviamos un enlace para restablecer la contraseña. Revisa tu bandeja de entrada.');

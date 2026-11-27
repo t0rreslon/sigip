@@ -72,3 +72,27 @@ Artisan::command('cuenta:quitar-doble-factor {login}', function (string $login) 
 Schedule::command('auditoria:verificar')->dailyAt('02:00');
 Schedule::command('suscripciones:vencer')->hourly();
 Schedule::command('espacios:actualizar-estados')->everyFifteenMinutes();
+
+// Prueba la configuración del correo saliente (MAIL_* del .env) enviando un mensaje corto.
+Artisan::command('correo:probar {destino}', function (string $destino) {
+    $mailer = config('mail.default');
+
+    if ($mailer === 'log') {
+        $this->warn('MAIL_MAILER=log: el correo se guardará en storage/logs/laravel.log y NO se enviará.');
+    }
+
+    try {
+        \Illuminate\Support\Facades\Mail::raw(
+            "Este es un correo de prueba de SIGIP. Si lo recibes, la recuperación de contraseña ya puede enviar correos.",
+            fn ($m) => $m->to($destino)->subject('SIGIP · Correo de prueba')
+        );
+    } catch (\Throwable $e) {
+        $this->error('No se pudo enviar: ' . $e->getMessage());
+
+        return 1;
+    }
+
+    $this->info("Correo enviado con \"{$mailer}\" a {$destino}. Revisa la bandeja de entrada y la carpeta de spam.");
+
+    return 0;
+})->purpose('Envía un correo de prueba con la configuración actual');
