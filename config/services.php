@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    // Asistente con IA local (Ollama). Gratis por uso: el modelo corre en el equipo
+    // y los datos no salen de la institución.
+    'ollama' => [
+        'url' => env('OLLAMA_URL', 'http://127.0.0.1:11434'),
+        'modelo' => env('OLLAMA_MODELO', 'qwen2.5:7b'),
+        'tiempo' => (int) env('OLLAMA_TIEMPO', 120),
+        // false = usar solo el procesador (por ejemplo, si el controlador de la tarjeta de video no es compatible).
+        'gpu' => filter_var(env('OLLAMA_GPU', true), FILTER_VALIDATE_BOOL),
+    ],
+
 ];

@@ -4,7 +4,7 @@
 @section('descripcion', $esAdmin ? 'Resumen general del gimnasio para la administración.' : 'Resumen de la operación de hoy.')
 
 @section('contenido')
-@vite(['resources/css/inicio.css', 'resources/js/inicio.js'])
+@vite(['resources/css/inicio.css', 'resources/js/inicio.js', 'resources/js/asistente.js'])
 
 <section class="inicio-bienvenida">
   <div>
@@ -31,10 +31,54 @@
   @endforeach
 </section>
 
+{{-- Asistente con IA local (Ollama): responde con los datos del gimnasio, en texto o con gráfica. --}}
+<section class="tarjeta asistente" id="asistente" data-url="{{ route('asistente.preguntar') }}" data-estado="{{ route('asistente.estado') }}">
+  <div class="asistente-cabecera">
+    <div class="asistente-titulo">
+      <span class="asistente-icono" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>
+      </span>
+      <div>
+        <h2>Asistente SIGIP</h2>
+        <p class="asistente-estado" id="asistente-estado" role="status">Comprobando el asistente…</p>
+      </div>
+    </div>
+
+    <div class="asistente-formato" role="radiogroup" aria-label="Formato de la respuesta">
+      <span>Responder con:</span>
+      <label><input type="radio" name="asistente-formato" value="auto" checked> Automático</label>
+      <label><input type="radio" name="asistente-formato" value="texto"> Texto</label>
+      <label><input type="radio" name="asistente-formato" value="grafica"> Gráfica</label>
+    </div>
+  </div>
+
+  <div class="asistente-mensajes" id="asistente-mensajes" aria-live="polite">
+    <div class="asistente-burbuja asistente-bot">Hola, {{ $nombre }}. Pregúntame por los datos del gimnasio: accesos, suscripciones, planes, préstamos, inventario{{ $esAdmin ? ' o ingresos' : '' }}. Puedo responder en texto o con una gráfica.</div>
+  </div>
+
+  <div class="asistente-sugerencias" id="asistente-sugerencias">
+    <button type="button" class="asistente-sugerencia">¿Cuántas personas hay dentro ahora?</button>
+    <button type="button" class="asistente-sugerencia">Muéstrame los accesos de los últimos 14 días</button>
+    <button type="button" class="asistente-sugerencia">¿Cuál es el plan más asignado?</button>
+    @if ($esAdmin)
+    <button type="button" class="asistente-sugerencia">¿Cómo van los ingresos este semestre?</button>
+    @else
+    <button type="button" class="asistente-sugerencia">¿Qué implementos están prestados?</button>
+    @endif
+  </div>
+
+  <form class="asistente-entrada" id="asistente-formulario">
+    <label for="asistente-pregunta" class="visualmente-oculto">Escribe tu pregunta</label>
+    <input type="text" id="asistente-pregunta" maxlength="500" autocomplete="off" placeholder="Escribe tu pregunta sobre el gimnasio…" required>
+    <button type="submit" class="btn-primario" id="asistente-enviar">Enviar</button>
+  </form>
+  <p class="asistente-aviso">Funciona con un modelo de IA local (Ollama): los datos no salen de SIGIP. Puede equivocarse; verifica las cifras importantes en su módulo.</p>
+</section>
+
 {{-- Gráficas: los datos viajan en data-grafica y se dibujan con resources/js/inicio.js --}}
 <section class="inicio-graficas">
   @foreach ($graficas as $grafica)
-  <article class="tarjeta inicio-grafica">
+  <article class="tarjeta inicio-grafica {{ !empty($grafica['ancho']) ? 'inicio-grafica-ancha' : '' }}">
     <h2>{{ $grafica['titulo'] }}</h2>
     <span class="tarjeta-sub">{{ $grafica['subtitulo'] }}</span>
     <div class="inicio-lienzo">

@@ -32,6 +32,7 @@ export default defineConfig({
                 'resources/js/tablas.js',
                 'resources/js/usuarios-tarjetas.js',
                 'resources/js/planes-registros.js',
+                'resources/js/asistente.js',
             ],
             refresh: true,
         }),

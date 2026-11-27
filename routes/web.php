@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActividadController;
+use App\Http\Controllers\AsistenteController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\Auth\DobleFactorController;
 use App\Http\Controllers\ControlAccesoController;
@@ -63,6 +64,12 @@ Route::middleware('auth')->group(function () {
     })->name('index');
 
     // Inicio del personal: bienvenida, indicadores y gráficas según el rol.
+    // Asistente con IA local (Ollama) del inicio del personal.
+    Route::middleware('tipo_cuenta:Administrador,Operador')->group(function () {
+        Route::post('/asistente', [AsistenteController::class, 'preguntar'])->middleware('throttle:15,1')->name('asistente.preguntar');
+        Route::get('/asistente/estado', [AsistenteController::class, 'estado'])->name('asistente.estado');
+    });
+
     Route::get('/inicio', [InicioController::class, 'index'])
         ->middleware('tipo_cuenta:Administrador,Operador')
         ->name('inicio');

@@ -22,7 +22,7 @@ Chart.defaults.color = TEXTO;
 const pesos = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 const numero = new Intl.NumberFormat('es-CO');
 
-function crear(lienzo) {
+export function crear(lienzo) {
     const g = JSON.parse(lienzo.dataset.grafica);
     const horizontal = g.tipo.startsWith('barh');
     const apilada = g.tipo === 'barh-apilada';
@@ -77,4 +77,7 @@ function crear(lienzo) {
     });
 }
 
-document.querySelectorAll('canvas[data-grafica]').forEach(crear);
+document.querySelectorAll('canvas[data-grafica]:not([data-creada])').forEach((lienzo) => {
+    lienzo.dataset.creada = '1';
+    crear(lienzo);
+});

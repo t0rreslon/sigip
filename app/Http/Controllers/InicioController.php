@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Suscripcion;
+use App\Support\Indicadores;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -40,61 +41,12 @@ class InicioController extends Controller
             ['Accesos hoy', DB::table('acceso')->whereDate('fecha_ingreso', today())->count(), 'ingresos registrados'],
         ];
 
-        // Ingresos verificados por mes (últimos 6 meses, incluidos los meses en cero).
-        $desde = now()->subMonths(5)->startOfMonth();
-        $porMes = DB::table('pago')
-            ->where('estado_pago', 'Verificado')
-            ->where('fecha_pago', '>=', $desde)
-            ->select(DB::raw("to_char(date_trunc('month', fecha_pago), 'YYYY-MM') AS mes"), DB::raw('SUM(monto) AS total'))
-            ->groupBy('mes')
-            ->pluck('total', 'mes');
-
-        $ingresos = ['etiquetas' => [], 'valores' => []];
-        for ($m = $desde->copy(); $m <= now(); $m->addMonth()) {
-            $ingresos['etiquetas'][] = $this->mes($m);
-            $ingresos['valores'][] = (float) ($porMes[$m->format('Y-m')] ?? 0);
-        }
-
-        // Suscripciones por estado (activa, por activar, vencida), con el mismo cálculo que el resto del sistema.
-        $porEstado = DB::table('suscripcion as s')
-            ->join('plan as pl', 'pl.plan_id', '=', 's.plan_id')
-            // Alias distinto de la columna suscripcion.estado: en GROUP BY, PostgreSQL prefiere la columna.
-            ->select(DB::raw('(' . Suscripcion::sqlEstadoCalculado() . ') AS estado_calculado'), DB::raw('COUNT(*) AS total'))
-            ->groupBy('estado_calculado')
-            ->pluck('total', 'estado_calculado');
-
-        $nombresEstado = ['activa' => 'Activas', 'por_activar' => 'Por activar', 'vencida' => 'Vencidas'];
-        $suscripcionesPorEstado = ['etiquetas' => [], 'valores' => []];
-
-        foreach ($nombresEstado as $clave => $nombre) {
-            $suscripcionesPorEstado['etiquetas'][] = $nombre;
-            $suscripcionesPorEstado['valores'][] = (int) ($porEstado[$clave] ?? 0);
-        }
-
-        // Estados que no estén en la lista (por si el cálculo agrega otro) también se muestran.
-        foreach ($porEstado as $clave => $total) {
-            if (!isset($nombresEstado[$clave])) {
-                $suscripcionesPorEstado['etiquetas'][] = ucfirst(str_replace('_', ' ', (string) $clave));
-                $suscripcionesPorEstado['valores'][] = (int) $total;
-            }
-        }
-
-        $suscripcionesPorPlan = DB::table('suscripcion as s')
-            ->join('plan as pl', 'pl.plan_id', '=', 's.plan_id')
-            ->whereRaw('(' . Suscripcion::sqlEstadoCalculado() . ") = 'activa'")
-            ->select('pl.nombre_plan', DB::raw('COUNT(*) AS total'))
-            ->groupBy('pl.nombre_plan')
-            ->orderByDesc('total')
-            ->limit(8)
-            ->get();
-
         return [
             'indicadores' => $indicadores,
             'graficas' => [
-                ['id' => 'accesos-14', 'titulo' => 'Accesos por día', 'subtitulo' => 'Últimos 14 días', 'tipo' => 'line', 'serie' => 'Accesos', 'datos' => $this->accesosPorDia(14)],
-                ['id' => 'ingresos-mes', 'titulo' => 'Ingresos verificados por mes', 'subtitulo' => 'Últimos 6 meses, en pesos', 'tipo' => 'bar', 'serie' => 'Ingresos', 'moneda' => true, 'datos' => $ingresos],
-                ['id' => 'suscripciones-estado', 'titulo' => 'Suscripciones por estado', 'subtitulo' => 'Activas, por activar (pago pendiente) y vencidas', 'tipo' => 'barh', 'serie' => 'Suscripciones', 'datos' => $suscripcionesPorEstado],
-                ['id' => 'planes', 'titulo' => 'Suscripciones activas por plan', 'subtitulo' => 'Planes con más usuarios', 'tipo' => 'barh', 'serie' => 'Suscripciones', 'datos' => $this->serie($suscripcionesPorPlan, 'nombre_plan')],
+                ['id' => 'accesos-14', 'titulo' => 'Accesos por día', 'subtitulo' => 'Últimos 14 días', 'tipo' => 'line', 'serie' => 'Accesos', 'datos' => Indicadores::accesosPorDia(14)],
+                ['id' => 'ingresos-mes', 'titulo' => 'Ingresos verificados por mes', 'subtitulo' => 'Últimos 6 meses, en pesos', 'tipo' => 'bar', 'serie' => 'Ingresos', 'moneda' => true, 'datos' => Indicadores::ingresosPorMes(6)],
+                ['id' => 'planes-asignados', 'titulo' => 'Planes y suscripciones más asignados', 'subtitulo' => 'Suscripciones asignadas por plan: activas y vencidas o por activar', 'tipo' => 'barh-apilada', 'ancho' => true, 'datos' => Indicadores::planesMasAsignados(8)],
             ],
             'listas' => [],
         ];
@@ -108,32 +60,6 @@ class InicioController extends Controller
             ['Pagos por verificar', DB::table('pago')->where('estado_pago', 'Pendiente')->count(), 'pendientes de revisión'],
             ['Préstamos activos', DB::table('prestamo')->where('activo', true)->count(), 'implementos sin devolver'],
         ];
-
-        // Accesos de hoy por hora, dentro del horario de atención.
-        $porHora = DB::table('acceso')
-            ->whereDate('fecha_ingreso', today())
-            ->select(DB::raw('EXTRACT(HOUR FROM fecha_ingreso)::int AS hora'), DB::raw('COUNT(*) AS total'))
-            ->groupBy('hora')
-            ->pluck('total', 'hora');
-
-        // Se amplía el rango si hubo ingresos fuera del horario, para que ninguno quede por fuera.
-        $horas = ['etiquetas' => [], 'valores' => []];
-        $primera = min(6, $porHora->keys()->min() ?? 6);
-        $ultima = max(20, $porHora->keys()->max() ?? 20);
-        for ($h = $primera; $h <= $ultima; $h++) {
-            $horas['etiquetas'][] = sprintf('%02d:00', $h);
-            $horas['valores'][] = (int) ($porHora[$h] ?? 0);
-        }
-
-        $inventario = DB::table('categoria_implemento as c')
-            ->leftJoin('implemento as i', 'i.categoria_implemento_id', '=', 'c.categoria_implemento_id')
-            ->leftJoin('estado_implemento as e', 'e.estado_implemento_id', '=', 'i.estado_implemento_id')
-            ->select('c.nombre_categoria',
-                DB::raw("COUNT(i.implemento_id) FILTER (WHERE e.nombre_estado = 'Disponible') AS disponibles"),
-                DB::raw("COUNT(i.implemento_id) FILTER (WHERE e.nombre_estado = 'Ocupado') AS prestados"))
-            ->groupBy('c.nombre_categoria')
-            ->orderBy('c.nombre_categoria')
-            ->get();
 
         $reservasHoy = DB::table('reserva as r')
             ->join('espacio as e', 'e.espacio_id', '=', 'r.espacio_id')
@@ -155,15 +81,9 @@ class InicioController extends Controller
         return [
             'indicadores' => $indicadores,
             'graficas' => [
-                ['id' => 'accesos-hora', 'titulo' => 'Accesos de hoy por hora', 'subtitulo' => 'Ingresos registrados hoy, hora por hora', 'tipo' => 'bar', 'serie' => 'Accesos', 'datos' => $horas],
-                ['id' => 'accesos-7', 'titulo' => 'Accesos por día', 'subtitulo' => 'Últimos 7 días', 'tipo' => 'line', 'serie' => 'Accesos', 'datos' => $this->accesosPorDia(7)],
-                ['id' => 'implementos', 'titulo' => 'Implementos por categoría', 'subtitulo' => 'Disponibles y prestados', 'tipo' => 'barh-apilada', 'datos' => [
-                    'etiquetas' => $inventario->pluck('nombre_categoria'),
-                    'series' => [
-                        ['nombre' => 'Disponibles', 'valores' => $inventario->pluck('disponibles')->map(fn ($v) => (int) $v)],
-                        ['nombre' => 'Prestados', 'valores' => $inventario->pluck('prestados')->map(fn ($v) => (int) $v)],
-                    ],
-                ]],
+                ['id' => 'accesos-hora', 'titulo' => 'Accesos de hoy por hora', 'subtitulo' => 'Ingresos registrados hoy, hora por hora', 'tipo' => 'bar', 'serie' => 'Accesos', 'datos' => Indicadores::accesosHoyPorHora()],
+                ['id' => 'accesos-7', 'titulo' => 'Accesos por día', 'subtitulo' => 'Últimos 7 días', 'tipo' => 'line', 'serie' => 'Accesos', 'datos' => Indicadores::accesosPorDia(7)],
+                ['id' => 'implementos', 'titulo' => 'Implementos por categoría', 'subtitulo' => 'Disponibles y prestados', 'tipo' => 'barh-apilada', 'datos' => Indicadores::implementosPorCategoria()],
             ],
             'listas' => [
                 ['titulo' => 'Reservas de hoy', 'vacio' => 'No hay reservas para hoy.', 'filas' => $reservasHoy->map(fn ($r) => [
@@ -174,24 +94,6 @@ class InicioController extends Controller
         ];
     }
 
-    private function accesosPorDia(int $dias): array
-    {
-        $desde = today()->subDays($dias - 1);
-        $porDia = DB::table('acceso')
-            ->where('fecha_ingreso', '>=', $desde)
-            ->select(DB::raw("to_char(fecha_ingreso, 'YYYY-MM-DD') AS dia"), DB::raw('COUNT(*) AS total'))
-            ->groupBy('dia')
-            ->pluck('total', 'dia');
-
-        $resultado = ['etiquetas' => [], 'valores' => []];
-        for ($d = $desde->copy(); $d <= today(); $d->addDay()) {
-            $resultado['etiquetas'][] = $d->format('d/m');
-            $resultado['valores'][] = (int) ($porDia[$d->format('Y-m-d')] ?? 0);
-        }
-
-        return $resultado;
-    }
-
     private function suscripcionesActivas(): int
     {
         return DB::table('suscripcion as s')
@@ -200,14 +102,9 @@ class InicioController extends Controller
             ->count();
     }
 
-    private function serie($filas, string $campo): array
-    {
-        return ['etiquetas' => $filas->pluck($campo), 'valores' => $filas->pluck('total')->map(fn ($v) => (int) $v)];
-    }
-
     private function mes(Carbon $fecha): string
     {
-        return ucfirst($fecha->locale('es')->translatedFormat('M Y'));
+        return Indicadores::mes($fecha);
     }
 
     private function rango($inicio, $fin): string

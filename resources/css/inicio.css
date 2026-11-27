@@ -118,3 +118,236 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Gráfica que ocupa todo el ancho (planes más asignados). */
+.inicio-graficas > .inicio-grafica-ancha {
+    grid-column: 1 / -1;
+}
+
+.inicio-grafica-ancha .inicio-lienzo {
+    height: 280px;
+}
+
+/* Asistente SIGIP (chat con IA local) */
+.asistente {
+    margin-bottom: 16px;
+}
+
+.asistente-cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.asistente-titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.asistente-titulo h2 {
+    margin: 0;
+}
+
+.asistente-icono {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: linear-gradient(120deg, #692a7f, #8e44ad);
+    color: #fff;
+}
+
+.asistente-estado {
+    margin: 2px 0 0;
+    font-size: 11px;
+    color: var(--texto-suave, #6b6b6b);
+}
+
+.asistente-estado::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: #b8b3bd;
+    vertical-align: middle;
+}
+
+.asistente-estado.disponible::before {
+    background: #1b9e5a;
+}
+
+.asistente-estado.no-disponible::before {
+    background: #d9822b;
+}
+
+.asistente-formato {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--texto-suave, #52514e);
+}
+
+.asistente-formato label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border: 1px solid var(--borde, #e5e5e5);
+    border-radius: 20px;
+    cursor: pointer;
+    background: #fff;
+}
+
+.asistente-formato label:has(input:checked) {
+    border-color: #692a7f;
+    background: #f3e9f7;
+    color: #692a7f;
+    font-weight: 600;
+}
+
+.asistente-formato input {
+    accent-color: #692a7f;
+    margin: 0;
+}
+
+.asistente-mensajes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 420px;
+    min-height: 120px;
+    overflow-y: auto;
+    padding: 12px;
+    border: 1px solid var(--borde, #e5e5e5);
+    border-radius: 10px;
+    background: #fbf9fc;
+}
+
+.asistente-burbuja {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.asistente-bot {
+    align-self: flex-start;
+    background: #fff;
+    border: 1px solid #ece3f0;
+    border-bottom-left-radius: 4px;
+    color: #1f1f1f;
+}
+
+.asistente-usuario {
+    align-self: flex-end;
+    background: #692a7f;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.asistente-pensando {
+    color: var(--texto-suave, #6b6b6b);
+    font-style: italic;
+}
+
+.asistente-error {
+    background: #fff4e5;
+    border-color: #f3d2a2;
+    color: #8a4b00;
+}
+
+.asistente-grafica {
+    margin: 10px 0 0;
+    padding: 10px;
+    min-width: min(520px, 70vw);
+    background: #fff;
+    border: 1px solid #ece3f0;
+    border-radius: 10px;
+    white-space: normal;
+}
+
+.asistente-grafica figcaption {
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #441b54;
+}
+
+.asistente-sugerencias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0;
+}
+
+.asistente-sugerencia {
+    padding: 6px 12px;
+    border: 1px solid #e4d6ea;
+    border-radius: 20px;
+    background: #fff;
+    color: #692a7f;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.asistente-sugerencia:hover {
+    background: #f3e9f7;
+}
+
+.asistente-entrada {
+    display: flex;
+    gap: 8px;
+}
+
+.asistente-entrada input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid var(--borde, #e5e5e5);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.asistente-entrada input:focus {
+    outline: none;
+    border-color: #692a7f;
+    box-shadow: 0 0 0 3px rgba(105, 42, 127, 0.12);
+}
+
+.asistente-entrada .btn-primario {
+    height: 42px;
+}
+
+.asistente-entrada .btn-primario:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.asistente-aviso {
+    margin: 8px 0 0;
+    font-size: 11px;
+    color: var(--texto-suave, #6b6b6b);
+}
+
+.asistente-entrada input {
+    background: #fff;
+    color: #1f1f1f;
+}
+
+.asistente-entrada input::placeholder {
+    color: #8a8590;
+}

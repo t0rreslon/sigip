@@ -20,6 +20,9 @@ class RegistrarMovimiento
         'DELETE' => 'Eliminar',
     ];
 
+    // Rutas POST que no modifican datos y registran su propia acción.
+    private const EXCLUIDAS = ['asistente.preguntar'];
+
     public function handle(Request $request, Closure $next): Response
     {
         $respuesta = $next($request);
@@ -27,7 +30,7 @@ class RegistrarMovimiento
         $accion = self::ACCIONES[$request->method()] ?? null;
         $exitosa = $respuesta->getStatusCode() < 400 && !session()->has('errors');
 
-        if ($accion && $request->user() && $exitosa) {
+        if ($accion && $request->user() && $exitosa && !in_array($request->route()?->getName(), self::EXCLUIDAS, true)) {
             try {
                 Auditoria::movimiento($accion, [
                     'ruta' => $request->route()?->getName(),
