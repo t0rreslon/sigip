@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Doble factor de autenticación (TOTP) para las cuentas de administrador.
+ * Doble factor de autenticación (TOTP), opcional para todas las cuentas
+ * (administradores, operadores e instructores). Se configura escaneando un código QR.
  * ISO 25010 – Seguridad / Autenticidad.
  *
  * Al iniciar sesión, si la cuenta tiene el doble factor activo, la contraseña
@@ -84,8 +85,6 @@ class DobleFactorController extends Controller
      */
     public function iniciarActivacion(Request $request)
     {
-        $this->soloAdministrador($request);
-
         $request->session()->put('doble_factor.nuevo_secreto', Totp::generarSecreto());
 
         return redirect()->route('perfil')->withFragment('doble-factor');
@@ -93,8 +92,6 @@ class DobleFactorController extends Controller
 
     public function activar(Request $request)
     {
-        $this->soloAdministrador($request);
-
         $secreto = $request->session()->get('doble_factor.nuevo_secreto');
 
         if (!$secreto) {
@@ -171,10 +168,5 @@ class DobleFactorController extends Controller
         }
 
         return Cuenta::where('cuenta_id', $id)->where('estado_cuenta', true)->first();
-    }
-
-    private function soloAdministrador(Request $request): void
-    {
-        abort_unless($request->user()->tieneTipo('Administrador'), 403);
     }
 }

@@ -33,6 +33,21 @@ class Totp
             . '&digits=' . self::DIGITOS . '&period=' . self::PERIODO;
     }
 
+    /**
+     * Código QR (SVG) con el enlace otpauth:// para escanearlo con la app de autenticación.
+     * Se genera en el servidor: la clave secreta no se envía a ningún servicio externo.
+     */
+    public static function qrSvg(string $uri, int $tamano = 200): string
+    {
+        $escritor = new \BaconQrCode\Writer(new \BaconQrCode\Renderer\ImageRenderer(
+            new \BaconQrCode\Renderer\RendererStyle\RendererStyle($tamano, 1),
+            new \BaconQrCode\Renderer\Image\SvgImageBackEnd(),
+        ));
+
+        // Se quita la declaración XML para poder incrustar el SVG dentro del HTML.
+        return trim(preg_replace('/^<\?xml[^>]*\?>/', '', $escritor->writeString($uri)));
+    }
+
     public static function codigo(string $secreto, ?int $intervalo = null): string
     {
         $intervalo ??= intdiv(time(), self::PERIODO);

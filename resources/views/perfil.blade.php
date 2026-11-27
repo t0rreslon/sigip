@@ -50,7 +50,6 @@
   </form>
 </section>
 
-@if ($cuenta->tieneTipo('Administrador') || $cuenta->doble_factor_activo)
 <section class="tarjeta" id="doble-factor">
   <h2>Verificación en dos pasos</h2>
   @if ($cuenta->doble_factor_activo)
@@ -60,15 +59,27 @@
       @method('DELETE')
       <label class="campo-plan"><span>Contraseña actual *</span><input type="password" name="clave_actual_2fa" autocomplete="current-password" required></label>
       <div class="modal-plan-acciones">
-        <button type="submit" class="btn-secundario">Desactivar</button>
+        <button type="submit" class="btn-borde">Desactivar</button>
       </div>
     </form>
   @elseif ($nuevoSecreto)
-    <ol class="nota-plan">
-      <li>Instala en tu celular Google Authenticator, Microsoft Authenticator o Authy.</li>
-      <li>Elige <em>Ingresar clave de configuración</em> y escribe esta clave (cuenta: <strong>SIGIP:{{ $cuenta->login }}</strong>, basada en tiempo):</li>
-    </ol>
-    <p class="clave-2fa"><code>{{ \App\Support\Totp::formatear($nuevoSecreto) }}</code></p>
+    <div class="doble-factor-qr">
+      <figure>
+        {!! \App\Support\Totp::qrSvg(\App\Support\Totp::uri($nuevoSecreto, $cuenta->login)) !!}
+        <figcaption>Escanea este código con tu celular</figcaption>
+      </figure>
+      <ol class="nota-plan">
+        <li>Instala en tu celular Google Authenticator, Microsoft Authenticator o Authy.</li>
+        <li>En la app toca <em>+</em> y elige <em>Escanear un código QR</em>.</li>
+        <li>Apunta la cámara a este código. Aparecerá <strong>SIGIP ({{ $cuenta->login }})</strong> con un código de 6 dígitos que cambia cada 30 segundos.</li>
+        <li>Escribe ese código abajo y toca <em>Activar</em>.</li>
+      </ol>
+    </div>
+    <details class="clave-manual">
+      <summary>¿No puedes escanear el código? Ingresa la clave a mano</summary>
+      <p>Elige <em>Ingresar clave de configuración</em>, cuenta <strong>SIGIP:{{ $cuenta->login }}</strong>, basada en tiempo:</p>
+      <p class="clave-2fa"><code>{{ \App\Support\Totp::formatear($nuevoSecreto) }}</code></p>
+    </details>
     <form method="POST" action="{{ route('perfil.2fa.activar') }}">
       @csrf
       <label class="campo-plan"><span>Código de 6 dígitos que muestra la app *</span>
@@ -79,10 +90,10 @@
     </form>
     <form method="POST" action="{{ route('perfil.2fa.cancelar') }}">
       @csrf
-      <button type="submit" class="btn-secundario">Cancelar</button>
+      <button type="submit" class="btn-borde">Cancelar</button>
     </form>
   @else
-    <p>Protege tu cuenta de administrador: además de la contraseña, se pedirá un código que cambia cada 30 segundos en tu celular.</p>
+    <p>Estado: <strong>inactiva</strong> (es opcional). Si la activas, además de la contraseña se pedirá un código que cambia cada 30 segundos en tu celular. Así, aunque alguien conozca tu contraseña, no podrá entrar sin tu celular.</p>
     <form method="POST" action="{{ route('perfil.2fa.iniciar') }}">
       @csrf
       <div class="modal-plan-acciones">
@@ -91,5 +102,4 @@
     </form>
   @endif
 </section>
-@endif
 @endsection

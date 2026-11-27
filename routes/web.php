@@ -73,7 +73,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
     Route::put('/perfil/clave', [PerfilController::class, 'cambiarClave'])->name('perfil.clave');
 
-    // ISO 25010 – Autenticidad: doble factor (TOTP) para administradores.
+    // ISO 25010 – Autenticidad: doble factor (TOTP) opcional para todas las cuentas.
     Route::post('/perfil/doble-factor/iniciar', [DobleFactorController::class, 'iniciarActivacion'])->name('perfil.2fa.iniciar');
     Route::post('/perfil/doble-factor/activar', [DobleFactorController::class, 'activar'])->middleware('throttle:10,1')->name('perfil.2fa.activar');
     Route::post('/perfil/doble-factor/cancelar', [DobleFactorController::class, 'cancelarActivacion'])->name('perfil.2fa.cancelar');
