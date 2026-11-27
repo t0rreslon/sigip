@@ -41,7 +41,7 @@ class InventarioController extends Controller
         $hayFiltros = $request->hasAny(['buscar', 'categoria', 'espacio', 'estado']);
         $tarjetas = $this->tarjetasPorCategoria($tipo, $maquinasFiltradas, $implementosFiltrados, $hayFiltros);
 
-        $porPagina = 12;
+        $porPagina = 8;
         $paginaActual = LengthAwarePaginator::resolveCurrentPage();
 
         $paginacion = new LengthAwarePaginator(
