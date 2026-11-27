@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActividadController;
+use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\Auth\DobleFactorController;
 use App\Http\Controllers\ControlAccesoController;
 use App\Http\Controllers\EspacioController;
@@ -114,6 +115,9 @@ Route::middleware('auth')->group(function () {
         // HU-199 / HU-204: notificaciones de solicitudes.
         Route::get('/notificaciones', [NotificacionController::class, 'index'])->name('notificaciones');
 
+        // Historial de cambios de un pago, una suscripción o una reserva.
+        Route::get('/historial/{modulo}/{id}', [AuditoriaController::class, 'registro'])->whereIn('modulo', ['pago', 'suscripcion', 'reserva'])->whereNumber('id')->name('historial.registro');
+
         // Usuarios
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios');
         Route::get('/usuarios/exportar', [UsuarioController::class, 'exportar'])->name('usuarios.exportar');
@@ -216,6 +220,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/operadores', [OperadorController::class, 'index'])->name('operadores.index');
         Route::get('/operadores/historial', [OperadorController::class, 'movimientos'])->name('operadores.movimientos');
         Route::post('/operadores', [OperadorController::class, 'store'])->name('operadores.store');
+
+        // Auditoría del sistema: cambios en registros, acciones de las cuentas e integridad.
+        Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria');
         Route::patch('/operadores/{id}/estado', [OperadorController::class, 'cambiarEstado'])->whereNumber('id')->name('operadores.estado');
 
         // Actividades: catálogo, programación y validación

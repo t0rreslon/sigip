@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Plan;
 use App\Models\Suscripcion;
+use App\Support\Auditoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -76,6 +77,10 @@ class SuscripcionController extends Controller
 
             // Un plan gratuito se activa de inmediato.
             $suscripcion->sincronizarEstado();
+
+            Auditoria::cambio('suscripcion', 'INSERT', $suscripcion->suscripcion_id, null, [
+                'usuario' => "{$usuario->nombre} {$usuario->apellido} ({$usuario->documento})",
+            ] + self::paraAuditoria($suscripcion, $plan));
         });
 
         return redirect()
@@ -120,6 +125,8 @@ class SuscripcionController extends Controller
         }
 
         DB::transaction(function () use ($suscripcion, $plan, $datos, $fechaFin) {
+            $antes = self::paraAuditoria($suscripcion, $suscripcion->plan);
+
             $suscripcion->plan_id = $plan->plan_id;
             $suscripcion->fecha_fin = $fechaFin ? Carbon::parse($fechaFin)->endOfDay() : null;
             $suscripcion->cantidad_dias_restantes = $datos['cantidad_dias_restantes'];
@@ -128,11 +135,27 @@ class SuscripcionController extends Controller
             // Con el nuevo plan puede cambiar el valor a pagar o la vigencia.
             $suscripcion->unsetRelation('plan');
             $suscripcion->sincronizarEstado();
+
+            Auditoria::cambio('suscripcion', 'UPDATE', $suscripcion->suscripcion_id, $antes, self::paraAuditoria($suscripcion, $plan));
         });
 
         return redirect()
             ->route('planes.index', $request->only(['buscar', 'estado', 'plan', 'page']))
             ->with('mensaje', 'Suscripción actualizada exitosamente.');
+    }
+
+    /**
+     * Datos legibles de la suscripción para el historial de cambios.
+     */
+    private static function paraAuditoria(Suscripcion $suscripcion, Plan $plan): array
+    {
+        return [
+            'plan' => $plan->nombre_plan,
+            'fecha_inicio' => $suscripcion->fecha_inicio?->format('d/m/Y'),
+            'fecha_vencimiento' => $suscripcion->fecha_fin?->format('d/m/Y') ?? 'Sin vencimiento',
+            'entradas_o_dias_restantes' => (int) $suscripcion->cantidad_dias_restantes,
+            'estado' => $suscripcion->estado ? 'Activa' : 'Por activar',
+        ];
     }
 
     /**

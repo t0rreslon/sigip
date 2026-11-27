@@ -251,6 +251,7 @@
                                                     </button>
 
                                                 @endif
+                                                <a href="{{ route('historial.registro', ['pago', $pago->pago_id]) }}" class="enlace-historial">Ver historial</a>
                                             </td>
 
                                         </tr>

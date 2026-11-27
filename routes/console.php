@@ -38,29 +38,14 @@ Artisan::command('espacios:actualizar-estados', function () {
 // Cada fila guarda el hash de la anterior; si alguien cambia o borra una fila
 // directamente en la base, la cadena se rompe en ese punto.
 Artisan::command('auditoria:verificar', function () {
-    $tablas = [
-        'auditoria_tablas' => ['id', "concat_ws('|', r.id, r.nombre_tabla, r.operacion, r.registro_id, r.datos_anteriores::text, r.datos_nuevos::text, r.usuario, r.creado_en::text)"],
-        'auditoria_movimientos' => ['auditoria_id', "concat_ws('|', r.auditoria_id, host(r.ip), r.cuenta_id, r.tipo_accion_id, r.datos::text, extract(epoch from r.fecha_hora)::text)"],
-    ];
-
     $todoBien = true;
 
-    foreach ($tablas as $tabla => [$id, $contenido]) {
-        $errores = DB::select(<<<SQL
-            SELECT {$id} AS id,
-                   (r.hash_anterior IS DISTINCT FROM lag(r.hash) OVER (ORDER BY {$id})) AS enlace_roto,
-                   (r.hash IS DISTINCT FROM encode(digest(coalesce(r.hash_anterior, '') || {$contenido}, 'sha256'), 'hex')) AS contenido_alterado
-              FROM {$tabla} r
-             ORDER BY {$id}
-        SQL);
-
-        $malos = array_filter($errores, fn ($fila) => $fila->enlace_roto || $fila->contenido_alterado);
-
-        if ($malos === []) {
-            $this->info("{$tabla}: " . count($errores) . ' registros, cadena íntegra.');
+    foreach (\App\Support\Auditoria::verificarIntegridad() as $tabla => $r) {
+        if ($r['alterados'] === 0) {
+            $this->info("{$tabla}: {$r['total']} registros, cadena íntegra.");
         } else {
             $todoBien = false;
-            $this->error("{$tabla}: " . count($malos) . ' registro(s) alterado(s) o faltante(s). Primer id: ' . reset($malos)->id);
+            $this->error("{$tabla}: {$r['alterados']} registro(s) alterado(s) o faltante(s). Primer id: {$r['primer_id']}");
         }
     }
 

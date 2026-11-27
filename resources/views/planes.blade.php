@@ -254,6 +254,7 @@
                     data-entradas="{{ $suscripcion->cantidad_dias_restantes }}">
                     Modificar
                   </button>
+                  <a href="{{ route('historial.registro', ['suscripcion', $suscripcion->suscripcion_id]) }}" class="enlace-historial">Ver historial</a>
                 </td>
               </tr>
               @empty

@@ -13,24 +13,9 @@
     @forelse ($registros as $registro)
     <tr>
       <td>{{ \Illuminate\Support\Carbon::parse($registro->creado_en)->format('d/m/Y h:i a') }}</td>
-      <td>{{ ['INSERT' => 'Registro', 'UPDATE' => 'Modificación', 'DELETE' => 'Eliminación', 'ESTADO' => 'Cambio de estado'][$registro->operacion] ?? $registro->operacion }}</td>
+      <td>{{ \App\Support\Auditoria::OPERACIONES[$registro->operacion] ?? $registro->operacion }}</td>
       <td>{{ $registro->usuario }}</td>
-      <td>
-        @if ($registro->operacion === 'INSERT')
-        Registro inicial
-        @else
-        <ul class="lista-cambios">
-          @foreach ($registro->nuevos as $campo => $valor)
-          <li>
-            <strong>{{ str_replace('_', ' ', $campo) }}:</strong>
-            {{ is_bool($registro->anteriores[$campo] ?? null) ? (($registro->anteriores[$campo]) ? 'Sí' : 'No') : ($registro->anteriores[$campo] ?? '—') }}
-            →
-            {{ is_bool($valor) ? ($valor ? 'Sí' : 'No') : ($valor ?? '—') }}
-          </li>
-          @endforeach
-        </ul>
-        @endif
-      </td>
+      <td><x-detalle-cambio :registro="$registro" /></td>
     </tr>
     @empty
     <tr>

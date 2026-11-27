@@ -18,6 +18,7 @@
         ['actividades.index', 'https://img.icons8.com/fluency-systems-regular/24/activity.png', 'Actividades', $esPersonal],
         ['instructores.index', 'https://img.icons8.com/external-anggara-basic-outline-anggara-putra/24/external-contact-user-interface-anggara-basic-outline-anggara-putra.png', 'Instructores y turnos', $esAdmin],
         ['operadores.index', 'https://img.icons8.com/ios/50/admin-settings-male.png', 'Operadores', $esAdmin],
+        ['auditoria', 'https://img.icons8.com/ios/50/security-checked--v1.png', 'Auditoría', $esAdmin],
         ['actividades.reporte', 'https://img.icons8.com/pastel-glyph/64/bar-chart--v2.png', 'Reportes', $esPersonal],
         ['portal.horario', 'https://img.icons8.com/material-outlined/24/tear-off-calendar.png', 'Mi horario', $esInstructor],
         ['portal.actividades', 'https://img.icons8.com/fluency-systems-regular/24/activity.png', 'Mis actividades', $esInstructor],

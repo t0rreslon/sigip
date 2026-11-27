@@ -207,9 +207,8 @@
                     @method('PATCH')
                     <button type="submit" class="btn-borde">Cancelar</button>
                   </form>
-                  @else
-                  —
                   @endif
+                  <a href="{{ route('historial.registro', ['reserva', $reserva->reserva_id]) }}" class="enlace-historial">Ver historial</a>
                 </td>
               </tr>
               @empty

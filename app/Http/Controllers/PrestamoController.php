@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Auditoria;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -173,7 +174,9 @@ class PrestamoController extends Controller
             ->select('i.implemento_id', 'i.nombre_implemento', 'ci.nombre_categoria', 'ei.nombre_estado as estado_actual', 'eid.nombre_estado as estado_devolucion')
             ->get();
 
-        return view('prestamo-detalle', compact('prestamo', 'implementos'));
+        $historial = Auditoria::historial('prestamo', $id);
+
+        return view('prestamo-detalle', compact('prestamo', 'implementos', 'historial'));
     }
 
     // HU-166: reporte PDF de los préstamos con los filtros aplicados.
@@ -519,6 +522,23 @@ class PrestamoController extends Controller
                     ->update([
                         'estado_implemento_id' => $estadoOcupado,
                     ]);
+
+                // 9. Dejar el préstamo y el cambio de cada implemento en la auditoría.
+                $nombreDestinatario = $usuarioId
+                    ? DB::table('usuario')->where('usuario_id', $usuarioId)->selectRaw("CONCAT_WS(' ', nombre, apellido) AS n")->value('n')
+                    : DB::table('personal')->where('personal_id', $personalId)->selectRaw("CONCAT_WS(' ', nombre, apellido) AS n")->value('n');
+
+                Auditoria::cambio('prestamo', 'INSERT', $prestamoId, null, [
+                    'destinatario' => "{$nombreDestinatario} ({$datos['documento']})",
+                    'tipo' => $usuarioId ? 'Usuario' : 'Instructor',
+                    'implementos' => $implementos->map(fn ($i) => "IMP-{$i->implemento_id} {$i->nombre_implemento}")->implode(', '),
+                ]);
+
+                foreach ($implementos as $implemento) {
+                    Auditoria::cambio('implemento', 'ESTADO', $implemento->implemento_id,
+                        ['estado' => 'Disponible'],
+                        ['estado' => "Ocupado (préstamo #{$prestamoId})"]);
+                }
             });
 
             return redirect()
@@ -582,9 +602,11 @@ class PrestamoController extends Controller
                     )
                     ->where('pi.prestamo_id', $prestamoId)
                     ->whereIn('pi.prestamo_implemento_id', $idsDetalles)
+                    ->join('implemento as i', 'i.implemento_id', '=', 'pi.implemento_id')
                     ->select(
                         'pi.prestamo_implemento_id',
                         'pi.implemento_id',
+                        'i.nombre_implemento',
                         'eid.nombre_estado'
                     )
                     ->lockForUpdate()
@@ -615,6 +637,9 @@ class PrestamoController extends Controller
                     ->pluck('estado_implemento_id', 'nombre_estado');
 
                 // 6. Actualizar cada devolución y el estado del implemento.
+                $antes = [];
+                $despues = [];
+
                 foreach ($detalles as $detalle) {
 
                     $estadoDevolucion = $datos['devoluciones'][$detalle->prestamo_implemento_id];
@@ -650,6 +675,14 @@ class PrestamoController extends Controller
                             'estado_implemento_id' =>
                             $estadosImplemento[$estadoImplemento],
                         ]);
+
+                    $etiqueta = "IMP-{$detalle->implemento_id} {$detalle->nombre_implemento}";
+                    $antes[$etiqueta] = 'Pendiente';
+                    $despues[$etiqueta] = $estadoDevolucion;
+
+                    Auditoria::cambio('implemento', 'ESTADO', $detalle->implemento_id,
+                        ['estado' => 'Ocupado'],
+                        ['estado' => "{$estadoImplemento} (devuelto {$estadoDevolucion}, préstamo #{$prestamoId})"]);
                 }
 
                 // 7. Comprobar si todavía quedan implementos pendientes.
@@ -670,9 +703,17 @@ class PrestamoController extends Controller
                         ->where('prestamo_id', $prestamoId)
                         ->update([
                             'activo' => false,
-                            'fecha_devuelto' => now(),
+                            // La fecha la pone la base: now() de PHP pierde los microsegundos y,
+                            // si la devolución ocurre en el mismo segundo, quedaría antes del préstamo.
+                            'fecha_devuelto' => DB::raw('now()'),
                         ]);
+
+                    $antes['estado del préstamo'] = 'Activo';
+                    $despues['estado del préstamo'] = 'Finalizado';
                 }
+
+                // 9. Una fila de auditoría por devolución, con el estado de cada implemento.
+                Auditoria::cambio('prestamo', 'DEVOLUCION', $prestamoId, $antes, $despues);
             });
 
             return redirect()

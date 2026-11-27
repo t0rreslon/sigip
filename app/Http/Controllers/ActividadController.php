@@ -258,6 +258,10 @@ class ActividadController extends Controller
                 'programacion_actividad_id' => $id,
             ]);
 
+            Auditoria::cambio('programacion_actividad', 'UPDATE', $id,
+                ['inscripcion' => null],
+                ['inscripcion' => "Inscribió a {$usuario->nombre} {$usuario->apellido} ({$usuario->documento})"]);
+
             return "{$usuario->nombre} {$usuario->apellido}";
         });
 
@@ -268,8 +272,16 @@ class ActividadController extends Controller
     public function desinscribir($id, $usuarioId)
     {
         DB::transaction(function () use ($id, $usuarioId) {
-            DB::table('registro_actividad')->where('programacion_actividad_id', $id)->where('usuario_id', $usuarioId)->delete();
+            $borrados = DB::table('registro_actividad')->where('programacion_actividad_id', $id)->where('usuario_id', $usuarioId)->delete();
             DB::table('asistencia_actividad')->where('programacion_actividad_id', $id)->where('usuario_id', $usuarioId)->delete();
+
+            if ($borrados) {
+                $usuario = DB::table('usuario')->where('usuario_id', $usuarioId)->first(['nombre', 'apellido', 'documento']);
+
+                Auditoria::cambio('programacion_actividad', 'UPDATE', $id,
+                    ['inscripcion' => "{$usuario?->nombre} {$usuario?->apellido} ({$usuario?->documento})"],
+                    ['inscripcion' => 'Inscripción retirada']);
+            }
         });
 
         return back()->with('success', 'Se retiró la inscripción del usuario.');

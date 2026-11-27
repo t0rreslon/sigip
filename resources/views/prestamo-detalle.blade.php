@@ -49,4 +49,10 @@
     </tbody>
   </table>
 </section>
+
+<section class="tarjeta">
+  <h2>Historial del préstamo</h2>
+  <p class="resumen-texto">Quién registró el préstamo, quién recibió cada devolución y en qué estado llegó cada implemento.</p>
+  <x-historial-cambios :registros="$historial" />
+</section>
 @endsection

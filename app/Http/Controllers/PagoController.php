@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Pago;
 use App\Models\MetodoPago;
 use App\Models\Suscripcion;
+use App\Support\Auditoria;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -232,10 +233,21 @@ class PagoController extends Controller
 
             // Registrar pago
             // La fecha y el estado se asignan automáticamente
-            Pago::create([
+            $pago = Pago::create([
                 'suscripcion_id' => $datosValidos['suscripcion_id'],
                 'metodo_pago_id' => $datosValidos['metodo_pago_id'],
                 'monto' => $datosValidos['monto'],
+                'estado_pago' => 'Pendiente',
+            ]);
+
+            $suscripcion->loadMissing('usuario');
+
+            Auditoria::cambio('pago', 'INSERT', $pago->pago_id, null, [
+                'usuario' => trim($suscripcion->usuario?->nombre . ' ' . $suscripcion->usuario?->apellido),
+                'plan' => $suscripcion->plan->nombre_plan,
+                'suscripcion' => '#' . $suscripcion->suscripcion_id,
+                'metodo' => DB::table('metodo_pago')->where('metodo_pago_id', $datosValidos['metodo_pago_id'])->value('nombre_metodo'),
+                'monto' => '$' . number_format((float) $datosValidos['monto'], 0, ',', '.'),
                 'estado_pago' => 'Pendiente',
             ]);
 
@@ -282,6 +294,8 @@ class PagoController extends Controller
             $pago->fecha_revision = now();
 
             $pago->save();
+
+            Auditoria::cambio('pago', 'ESTADO', $pago->pago_id, ['estado_pago' => 'Pendiente'], ['estado_pago' => $pago->estado_pago]);
 
             // Si con este pago se completa el valor del plan, la suscripción se activa.
             Suscripcion::with('plan')
